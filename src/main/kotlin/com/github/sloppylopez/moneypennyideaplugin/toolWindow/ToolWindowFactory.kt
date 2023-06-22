@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import PromptPanelFactory
+import RandomCodeToolWindowFactory
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -29,6 +30,8 @@ class ToolWindowFactory : ToolWindowFactory {
         toolWindow.contentManager.addContent(content)
         val customIconUrl = "C:\\elgato\\images\\8-bit-marvel-thanos-smirk-hducou899xnaxkre.gif"
         val customIcon = ImageIcon(customIconUrl)
+        val codeViewerAction = toolWindow.project.service<RandomCodeToolWindowFactory>()
+        codeViewerAction.createToolWindowContent(project, toolWindow)
         toolWindow.setIcon(customIcon)
     }
 

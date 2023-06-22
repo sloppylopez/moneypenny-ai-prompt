@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import com.intellij.ui.components.JBScrollPane
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -48,11 +49,11 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 postPromptTextArea
             )
 
-            val prePromptScrollPane = JScrollPane(prePromptTextArea)
+            val prePromptScrollPane = JBScrollPane(prePromptTextArea)
             panel.add(prePromptScrollPane)
-            val contentPromptScrollPane = JScrollPane(contentPromptTextArea!!)
+            val contentPromptScrollPane = JBScrollPane(contentPromptTextArea!!)
             panel.add(contentPromptScrollPane)
-            val postPromptScrollPane = JScrollPane(postPromptTextArea)
+            val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
             checkBoxFactory.checkboxPanel(panel)
 
