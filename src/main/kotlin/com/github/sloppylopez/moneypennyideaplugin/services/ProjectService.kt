@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
-import com.github.sloppylopez.moneypennyideaplugin.MyBundle
+import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -12,14 +12,14 @@ import javax.swing.Icon
 class ProjectService(project: Project) {
 
     init {
-        thisLogger().info(MyBundle.message("projectService", project.name))
+        thisLogger().info(Bundle.message("projectService", project.name))
     }
 
     fun getRandomNumber() = (1..100).random()
 
     fun showDialog(
-        message: String, title:
-        String, buttons: Array<String>, defaultOptionIndex:
+        message: String, title: String,
+        buttons: Array<String>, defaultOptionIndex:
         Int, icon: Icon
     ) {
         Messages.showDialog(
@@ -28,6 +28,14 @@ class ProjectService(project: Project) {
             defaultOptionIndex,
             icon
 
+        )
+    }
+
+    fun showMessage(
+        message: String, title: String
+    ) {
+        Messages.showInfoMessage(
+            message, title,
         )
     }
 }

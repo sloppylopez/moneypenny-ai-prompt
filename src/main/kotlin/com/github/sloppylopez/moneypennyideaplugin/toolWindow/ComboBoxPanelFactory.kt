@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.MyBundle
+import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -13,7 +13,7 @@ class ComboBoxPanelFactory(project: Project) {
     private val buttonPanelFactory = ButtonPanelFactory(project)
 
     init {
-        thisLogger().info(MyBundle.message("projectService", project.name))
+        thisLogger().info(Bundle.message("projectService", project.name))
     }
 
     fun comboBoxPanel(panel: JPanel) {

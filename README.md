@@ -42,3 +42,18 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
 
 [template]: https://github.com/JetBrains/intellij-platform-plugin-template
 [docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
+
+## Debugging the plugin
+
+    If your IntelliJ IDEA plugin doesn't have a main class or an entry point that you can directly run and debug, you can still debug it by attaching the debugger to the running IntelliJ IDEA instance. Here's how you can do it:
+    
+    Build and package your plugin into a JAR or an IntelliJ IDEA plugin format (such as a ZIP or JAR with specific plugin structure).
+    Install or enable your plugin in IntelliJ IDEA. You can do this by going to "File" -> "Settings" -> "Plugins" and selecting "Install Plugin from Disk" or "Enable" if your plugin is already installed.
+    Run the IntelliJ IDEA instance that has your plugin enabled.
+    In your IntelliJ IDEA instance, go to "Run" -> "Attach to Process" to open the "Attach to Process" dialog.
+    In the "Attach to Process" dialog, select the IntelliJ IDEA process that you want to attach the debugger to. Make sure you choose the correct process if multiple instances are running.
+    Click the "OK" button to attach the debugger to the selected process.
+    IntelliJ IDEA will connect the debugger to the running instance, and you can now set breakpoints in your plugin code.
+    Trigger the functionality of your plugin within the running IntelliJ IDEA instance to hit the breakpoints and start debugging.
+    Use the debugging features provided by IntelliJ IDEA, such as stepping through the code, inspecting variables, and evaluating expressions, to analyze and debug your plugin.
+    By attaching the debugger to the running IntelliJ IDEA process, you can debug your plugin code even if it doesn't have a specific main class or entry point.

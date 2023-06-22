@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.MyBundle
+import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -15,7 +15,7 @@ import javax.swing.JTextArea
 class RadioButtonFactory(project: Project) {
 
     init {
-        thisLogger().info(MyBundle.message("projectService", project.name))
+        thisLogger().info(Bundle.message("projectService", project.name))
     }
 
     fun radioButtonsPanel(

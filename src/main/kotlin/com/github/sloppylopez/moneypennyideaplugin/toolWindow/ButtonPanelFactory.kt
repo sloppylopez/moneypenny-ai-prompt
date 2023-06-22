@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.MyBundle
+import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -12,7 +12,7 @@ import javax.swing.JPanel
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
     init {
-        thisLogger().info(MyBundle.message("projectService", project.name))
+        thisLogger().info(Bundle.message("projectService", project.name))
     }
 
     fun buttonPanel(panel: JPanel) {
@@ -32,12 +32,12 @@ class ButtonPanelFactory(project: Project) {
         runPromptBtn.addActionListener { e ->
             println("Run Prompt" + e.actionCommand)
         }
-        panel.add(fileDialogBtn)
+        panel.add(runPromptBtn)
 
         val runAllPromptBtn = JButton("Run All")
         runAllPromptBtn.addActionListener { e ->
             println("Run All Prompt" + e.actionCommand)
         }
-        panel.add(fileDialogBtn)
+        panel.add(runAllPromptBtn)
     }
 }

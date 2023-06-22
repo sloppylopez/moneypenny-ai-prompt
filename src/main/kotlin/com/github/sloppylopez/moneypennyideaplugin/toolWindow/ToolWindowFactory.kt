@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import PromptPanelFactory
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -23,8 +24,8 @@ class ToolWindowFactory : ToolWindowFactory {
     }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val myToolWindow = MyToolWindow(toolWindow)
-        val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(), null, false)
+        val moneyPennyToolWindow = MoneyPennyToolWindow(toolWindow)
+        val content = ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny", true)
         toolWindow.contentManager.addContent(content)
         val customIconUrl = "C:\\elgato\\images\\8-bit-marvel-thanos-smirk-hducou899xnaxkre.gif"
         val customIcon = ImageIcon(customIconUrl)
@@ -33,28 +34,20 @@ class ToolWindowFactory : ToolWindowFactory {
 
     override fun shouldBeAvailable(project: Project) = true
 
-    class MyToolWindow(toolWindow: ToolWindow) {
+    class MoneyPennyToolWindow(toolWindow: ToolWindow) {
 
-        private val comboBoxPanelFactory = toolWindow.project.service<ComboBoxPanelFactory>()
-        private val tabbedPaneFactory = toolWindow.project.service<TabbedPaneFactory>()
+        private val comboBoxPaneFactory = toolWindow.project.service<ComboBoxPanelFactory>()
+        private val tabbedPanelFactory = toolWindow.project.service<TabbedPanelFactory>()
         private val promptPaneFactory = toolWindow.project.service<PromptPanelFactory>()
+        private val waitingBarFactory = toolWindow.project.service<WaitingBarFactory>()
 
         fun getContent() = JBPanel<JBPanel<*>>().apply {
-//            val label = JBLabel(MyBundle.message("randomLabel", "?"))
-//
-//            add(label)
-//            add(JButton(MyBundle.message("shuffle")).apply {
-//                addActionListener {
-//                    label.text = MyBundle.message("randomLabel", service.getRandomNumber())
-//                }
-//            })
             add(moneyPennyPromptPanel())
         }
 
         private fun moneyPennyPromptPanel(): JComponent {
             val tabbedPane = JBTabbedPane()
-            val tabCount = (1..15).random()
-
+            val tabCount = 1
             for (i in 1..tabCount) {
                 val panel = JPanel(GridBagLayout())
 
@@ -86,82 +79,14 @@ class ToolWindowFactory : ToolWindowFactory {
                 1 -> promptPaneFactory
                     .promptPanel(innerPanel)
 
-                2 -> comboBoxPanelFactory
+                2 -> comboBoxPaneFactory
                     .comboBoxPanel(innerPanel)
 
-                3 -> tabbedPaneFactory
+                3 -> tabbedPanelFactory
                     .getTabbedPanel(innerPanel)
             }
 
             return innerPanel
         }
-
-
-//        fun sliderPanel(panel: JPanel) {
-//            val volumeSlider = JSlider(0, 100, 50)
-//            val volumeLevel = volumeSlider.value
-//            panel.add(volumeSlider)
-//        }
-//
-//        class AIRefactor : AnAction(), DumbAware {
-//            override fun actionPerformed(event: AnActionEvent) {
-////        event.presentation.icon = com.intellij.icons.AllIcons.General.Balloon
-//                println(event.project?.name)
-////        event.presentation.text = "AI Refactor2"
-//                val action = ActionManager.getInstance().getAction("ToggleBookmark1")
-//                action?.actionPerformed(event)
-//            }
-//
-//            override fun update(event: AnActionEvent) {
-//                event.presentation.isEnabledAndVisible = event.project != null
-//            }
-//        }
-
-
-//class WaitingBarExample {
-//    private val progressBar: JProgressBar
-//    private var timer: Timer? = null
-//
-//    init {
-//        val frame = JFrame("Waiting Bar Example")
-//        frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-//        frame.setSize(300, 100)
-//        frame.layout = FlowLayout()
-//        progressBar = JProgressBar(0, MAX_PROGRESS)
-//        progressBar.preferredSize = Dimension(250, 25)
-//        progressBar.isStringPainted = true
-//        val startButton = JButton("Start")
-//        startButton.addActionListener { startProgressBar() }
-//        frame.add(progressBar)
-//        frame.add(startButton)
-//        frame.isVisible = true
-//    }
-//
-//    private fun startProgressBar() {
-//        progressBar.value = 0
-//        progressBar.string = "Waiting..."
-//        timer = Timer(DELAY, object : ActionListener {
-//            var progress = 0
-//            override fun actionPerformed(e: ActionEvent?) {
-//                progress++
-//                progressBar.value = progress
-//                if (progress >= MAX_PROGRESS) {
-//                    timer!!.stop()
-//                    progressBar.string = "Done!"
-//                }
-//            }
-//        })
-//        timer!!.start()
-//    }
-//
-//    companion object {
-//        private const val MAX_PROGRESS = 100
-//        private const val DELAY = 50
-//        @JvmStatic
-//        fun main(args: Array<String>) {
-//            SwingUtilities.invokeLater { WaitingBarExample() }
-//        }
-//    }
-//}
     }
 }
