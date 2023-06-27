@@ -126,4 +126,12 @@ tasks {
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
         channels = properties("pluginVersion").map { listOf(it.split('-').getOrElse(1) { "default" }.split('.').first()) }
     }
+
+//    jar {
+//        sourceSets.main.get().output.resourcesDir?.let {
+//            from(it) {
+//                include("images/**")
+//            }
+//        }
+//    }
 }

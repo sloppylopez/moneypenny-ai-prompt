@@ -57,3 +57,9 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
     Trigger the functionality of your plugin within the running IntelliJ IDEA instance to hit the breakpoints and start debugging.
     Use the debugging features provided by IntelliJ IDEA, such as stepping through the code, inspecting variables, and evaluating expressions, to analyze and debug your plugin.
     By attaching the debugger to the running IntelliJ IDEA process, you can debug your plugin code even if it doesn't have a specific main class or entry point.
+
+https://plugins.jetbrains.com/docs/intellij/syntax-highlighter-and-color-settings-page.html#define-a-color-settings-page
+
+  https://plugins.jetbrains.com/docs/intellij/lexer-and-parser-definition.html#define-a-parser
+
+https://plugins.jetbrains.com/docs/intellij/controlling-highlighting.html

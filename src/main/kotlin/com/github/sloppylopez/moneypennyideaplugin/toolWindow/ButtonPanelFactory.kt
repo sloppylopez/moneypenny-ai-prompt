@@ -28,9 +28,9 @@ class ButtonPanelFactory(project: Project) {
         }
         panel.add(fileDialogBtn)
 
-        val runPromptBtn = JButton("Run Prompt")
+        val runPromptBtn = JButton("Run")
         runPromptBtn.addActionListener { e ->
-            println("Run Prompt" + e.actionCommand)
+            println("Run" + e.actionCommand)
         }
         panel.add(runPromptBtn)
 
@@ -39,5 +39,11 @@ class ButtonPanelFactory(project: Project) {
             println("Run All Prompt" + e.actionCommand)
         }
         panel.add(runAllPromptBtn)
+
+        val showDiffBtn = JButton("Show Diff")
+        showDiffBtn.addActionListener { e ->
+            println("Show diff" + e.actionCommand)
+        }
+        panel.add(showDiffBtn)
     }
 }

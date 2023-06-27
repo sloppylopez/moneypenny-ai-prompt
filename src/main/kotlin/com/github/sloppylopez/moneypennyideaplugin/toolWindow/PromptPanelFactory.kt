@@ -1,11 +1,8 @@
-import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.CheckBoxFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.TextAreaFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
 import java.awt.datatransfer.DataFlavor
@@ -19,7 +16,6 @@ import java.io.File
 import java.io.FileReader
 import javax.swing.ImageIcon
 import javax.swing.JPanel
-import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
@@ -32,21 +28,15 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private var promptPanel = JPanel()
     private var contentPromptTextArea: JTextArea? = null
 
-    init {
-        thisLogger().info(Bundle.message("projectService", project.name))
-    }
-
     fun promptPanel(panel: JPanel) {
         try {
             promptPanel = panel
-            val prePromptTextArea = textAreaFactory.createTextArea("", 2, 80)
-            contentPromptTextArea = textAreaFactory.createTextArea("", 10, 80)
-            val postPromptTextArea = textAreaFactory.createTextArea("", 2, 80)
+            val prePromptTextArea = textAreaFactory.createTextArea("", 2, 81)
+            contentPromptTextArea = textAreaFactory.createTextArea("", 12, 81)
+            val postPromptTextArea = textAreaFactory.createTextArea("", 4, 81)
             radioButtonFactory.radioButtonsPanel(
                 panel,
                 prePromptTextArea,
-                contentPromptTextArea!!,
-                postPromptTextArea
             )
 
             val prePromptScrollPane = JBScrollPane(prePromptTextArea)
@@ -55,7 +45,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             panel.add(contentPromptScrollPane)
             val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
-            checkBoxFactory.checkboxPanel(panel)
+            checkBoxFactory.checkboxesPanel(panel, postPromptTextArea)
 
             // Attach DropTarget to contentPromptTextArea
             contentPromptTextArea!!.dropTarget = DropTarget(contentPromptTextArea, this)

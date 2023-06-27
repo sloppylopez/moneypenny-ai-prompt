@@ -25,7 +25,7 @@ class TabbedPanelFactory(project: Project) {
 
         for (i in 1..tabCount) {
             val tabPanel = JPanel()
-            val textArea = textAreaFactory.createTextArea("", 12, 80)
+            val textArea = textAreaFactory.createTextArea("", 8, 79)
             tabPanel.add(textArea)
             nestedTabbedPane.addTab("Tab $i", tabPanel)
         }

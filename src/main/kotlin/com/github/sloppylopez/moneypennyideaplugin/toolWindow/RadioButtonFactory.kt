@@ -5,6 +5,7 @@ import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.ButtonGroup
 import javax.swing.JPanel
@@ -20,9 +21,7 @@ class RadioButtonFactory(project: Project) {
 
     fun radioButtonsPanel(
         panel: JPanel,
-        prePromptTextArea: JTextArea,
-        contentPromptTextArea: JTextArea,
-        postPromptTextArea: JTextArea
+        prePromptTextArea: JTextArea
     ) {
         val radioButtonPanel = JPanel()
         val buttonLabels = arrayOf("Refactor", "Unit Test", "DRY", "Explain", "FreeStyle")
@@ -32,29 +31,34 @@ class RadioButtonFactory(project: Project) {
             selectedRadioButton?.let {
                 radioButtonPressed(
                     selectedRadioButton.text,
-                    prePromptTextArea,
-                    contentPromptTextArea,
-                    postPromptTextArea
+                    prePromptTextArea
                 )
             }
         }
         val radioGroup = ButtonGroup()
         buttonLabels.forEach { label ->
-            println()
             val radioButton = createRadioButton(label, actionListener)
-//        radioButton.isSelected = label == "Refactor"
+            radioButton.isSelected = label == "Refactor"
             radioGroup.add(radioButton)
             radioButtonPanel.add(radioButton)
+            // If the radio button is initially selected, simulate a click event
+            if (radioButton.isSelected) {
+                val event = ActionEvent(
+                    radioButton,
+                    ActionEvent.ACTION_PERFORMED,
+                    radioButton.actionCommand
+                )
+                radioButton.actionListeners.forEach { it.actionPerformed(event) }
+            }
         }
 
         panel.add(radioButtonPanel)
     }
 
+
     private fun radioButtonPressed(
         option: String,
-        prePromptTextArea: JTextArea,
-        contentPromptTextArea: JTextArea,
-        postPromptTextArea: JTextArea
+        prePromptTextArea: JTextArea
     ) {
         when (option) {
             "Refactor" -> {

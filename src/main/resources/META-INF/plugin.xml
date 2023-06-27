@@ -15,9 +15,4 @@
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
-<!--    <extensions defaultExtensionNs="com.intellij">-->
-<!--        <notificationGroup id="Custom Notification Group"-->
-<!--                           displayType="BALLOON"-->
-<!--                           key="MyNotificationGroup"/>-->
-<!--    </extensions>-->
 </idea-plugin>
