@@ -14,10 +14,21 @@ class ToolWindowFactory : ToolWindowFactory {
         toolWindow: ToolWindow
     ) {
         try {
-            val moneyPennyToolWindow = MoneyPennyToolWindow(toolWindow)
+//            Messages.showDialog(
+//                project.name,
+//                toolWindow.id,
+//                arrayOf("OK"),
+//                0,
+//                Messages.getInformationIcon()
+//            )
+            val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
             val content =
                 ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny", true)
             toolWindow.contentManager.addContent(content)
+//            val content2 = toolWindow.contentManager.getContent(0)
+//            Messages.showInfoMessage(
+//                content2.toString(), "CONTENT",
+//            )
             val customIconUrl = "C:\\elgato\\images\\8-bit-marvel-thanos-smirk-hducou899xnaxkre.gif"
             val customIcon = ImageIcon(customIconUrl)
             toolWindow.setIcon(customIcon)

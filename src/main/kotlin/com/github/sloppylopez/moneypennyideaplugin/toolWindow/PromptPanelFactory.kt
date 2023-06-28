@@ -1,10 +1,13 @@
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.TextAreaFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.content.ContentFactory
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -17,6 +20,8 @@ import java.io.FileReader
 import javax.swing.ImageIcon
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import com.intellij.openapi.wm.ToolWindow
+
 
 @Service(Service.Level.PROJECT)
 class PromptPanelFactory(project: Project) : DropTargetAdapter() {
@@ -26,13 +31,18 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private val service = project.service<ProjectService>()
     private val customIcon = ImageIcon("C:\\elgato\\images\\moneypenny3.jpg")
     private var promptPanel = JPanel()
-    private var contentPromptTextArea: JTextArea? = null
+    private var contentPromptTextArea: JTextArea? = JTextArea()
+    private var currentProject = project
+    private var currentToolWindow: ToolWindow? = null
 
-    fun promptPanel(panel: JPanel) {
+    fun promptPanel(panel: JPanel, toolWindow: ToolWindow? = null) {
         try {
             promptPanel = panel
+            currentToolWindow = toolWindow
             val prePromptTextArea = textAreaFactory.createTextArea("", 2, 81)
             contentPromptTextArea = textAreaFactory.createTextArea("", 12, 81)
+            contentPromptTextArea!!.text =
+                "Paste text, drag a file, copy folder path..."
             val postPromptTextArea = textAreaFactory.createTextArea("", 4, 81)
             radioButtonFactory.radioButtonsPanel(
                 panel,
@@ -41,7 +51,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
 
             val prePromptScrollPane = JBScrollPane(prePromptTextArea)
             panel.add(prePromptScrollPane)
-            val contentPromptScrollPane = JBScrollPane(contentPromptTextArea!!)
+            val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
             panel.add(contentPromptScrollPane)
             val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
@@ -61,12 +71,22 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             try {
                 val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-                if (fileList.isNotEmpty()) {
-                    val file = fileList[0] as File
-                    updateWithFileContents(file)
+                for (fileObj in fileList) {
+                    if (fileObj is File) {
+                        updateWithFileContents(fileObj)
+                    }
                 }
             } catch (e: Exception) {
-                println(e.printStackTrace())
+                // Messages.showInfoMessage(
+                //     e.stackTraceToString(), "Error",
+                // )
+                service.showDialog(
+                    e.stackTraceToString(),
+                    "ERROR",
+                    arrayOf("OK"),
+                    0,
+                    Messages.getErrorIcon()
+                )
             }
         }
     }
@@ -83,17 +103,29 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 }
                 contentPromptTextArea?.text = contents.toString()
             }
-            service.showDialog(
-                file.canonicalPath,
-                file.name,
-                arrayOf("OK"),
-                0,
-                customIcon
-            )
+            val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
+            val content =
+                ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny2", true)
+            currentToolWindow!!.contentManager.addContent(content)
+
+//            service.showDialog(
+//                file.canonicalPath,
+//                file.name,
+//                arrayOf("OK"),
+//                0,
+//                customIcon
+//            )
         } catch (e: Exception) {
-            service.showMessage(
+//            service.showMessage(
+//                e.stackTraceToString(),
+//                "error: ",
+//            )
+            service.showDialog(
                 e.stackTraceToString(),
                 "error: ",
+                arrayOf("OK"),
+                0,
+                Messages.getErrorIcon()
             )
         }
     }

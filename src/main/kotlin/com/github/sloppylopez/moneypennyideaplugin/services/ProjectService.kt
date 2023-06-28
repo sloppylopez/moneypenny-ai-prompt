@@ -27,7 +27,6 @@ class ProjectService(project: Project) {
             buttons,
             defaultOptionIndex,
             icon
-
         )
     }
 
