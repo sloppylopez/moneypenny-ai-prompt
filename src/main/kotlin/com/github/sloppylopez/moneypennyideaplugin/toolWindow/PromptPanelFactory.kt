@@ -35,7 +35,11 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private var currentProject = project
     private var currentToolWindow: ToolWindow? = null
 
-    fun promptPanel(panel: JPanel, toolWindow: ToolWindow? = null) {
+    fun promptPanel(
+        panel: JPanel,
+        toolWindow: ToolWindow? = null,
+        file: File?
+    ) {
         try {
             promptPanel = panel
             currentToolWindow = toolWindow
@@ -52,6 +56,18 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             val prePromptScrollPane = JBScrollPane(prePromptTextArea)
             panel.add(prePromptScrollPane)
             val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
+            if (file != null) {
+                val reader = BufferedReader(FileReader(file))
+                reader.use {
+                    val contents = StringBuilder()
+                    var line: String? = reader.readLine()
+                    while (line != null) {
+                        contents.append(line).append(System.lineSeparator())
+                        line = reader.readLine()
+                    }
+                    contentPromptTextArea?.text = contents.toString()
+                }
+            }
             panel.add(contentPromptScrollPane)
             val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
@@ -71,11 +87,19 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             try {
                 val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-                for (fileObj in fileList) {
-                    if (fileObj is File) {
-                        updateWithFileContents(fileObj)
-                    }
-                }
+                val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
+                val content =
+                    ContentFactory.getInstance()
+                        .createContent(
+                            moneyPennyToolWindow.getContent(fileList),
+                            "MoneyPenny2", true
+                        )
+                currentToolWindow!!.contentManager.addContent(content)
+//                for (fileObj in fileList) {
+//                    if (fileObj is File) {
+//                        updateWithFileContents(fileObj)
+//                    }
+//                }
             } catch (e: Exception) {
                 Messages.showInfoMessage(
                     e.stackTraceToString(), "Error",
@@ -103,10 +127,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 }
                 contentPromptTextArea?.text = contents.toString()
             }
-            val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
-            val content =
-                ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny2", true)
-            currentToolWindow!!.contentManager.addContent(content)
         } catch (e: Exception) {
             service.showMessage(
                 e.stackTraceToString(),
