@@ -53,8 +53,11 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
                 gridBagConstraints.gridy = j - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-
-            tabbedPane.addTab("Tab $i", panel)
+            if (i < fileList.size){
+                tabbedPane.addTab(file!!.name, panel)
+            } else {
+                tabbedPane.addTab("Tab $i", panel)
+            }
         }
 
         val mainPanel = JPanel(BorderLayout())

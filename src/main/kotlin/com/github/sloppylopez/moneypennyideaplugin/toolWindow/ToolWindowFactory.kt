@@ -14,13 +14,13 @@ class ToolWindowFactory : ToolWindowFactory {
         toolWindow: ToolWindow
     ) {
         try {
+            val customIconUrl = "C:\\elgato\\images\\8-bit-marvel-thanos-smirk-hducou899xnaxkre.gif"
+            val customIcon = ImageIcon(customIconUrl)
+            toolWindow.setIcon(customIcon)
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
             val content =
                 ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny", true)
             toolWindow.contentManager.addContent(content)
-            val customIconUrl = "C:\\elgato\\images\\8-bit-marvel-thanos-smirk-hducou899xnaxkre.gif"
-            val customIcon = ImageIcon(customIconUrl)
-            toolWindow.setIcon(customIcon)
 //            val codeViewerAction = toolWindow.project.service<RandomCodeToolWindowFactory>()
 //            codeViewerAction.createToolWindowContent(project, toolWindow)
         } catch (e: Exception) {

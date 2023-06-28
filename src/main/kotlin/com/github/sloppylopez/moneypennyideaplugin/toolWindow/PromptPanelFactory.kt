@@ -92,25 +92,13 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     ContentFactory.getInstance()
                         .createContent(
                             moneyPennyToolWindow.getContent(fileList),
-                            "MoneyPenny2", true
+                            fileList.size.toString() + " Archives", true
                         )
-                currentToolWindow!!.contentManager.addContent(content)
-//                for (fileObj in fileList) {
-//                    if (fileObj is File) {
-//                        updateWithFileContents(fileObj)
-//                    }
-//                }
+                currentToolWindow!!.contentManager.addContent(content, 0)
             } catch (e: Exception) {
                 Messages.showInfoMessage(
                     e.stackTraceToString(), "Error",
                 )
-//                service.showDialog(
-//                    e.stackTraceToString(),
-//                    "ERROR",
-//                    arrayOf("OK"),
-//                    0,
-//                    Messages.getErrorIcon()
-//                )
             }
         }
     }
