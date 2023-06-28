@@ -77,16 +77,16 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     }
                 }
             } catch (e: Exception) {
-                // Messages.showInfoMessage(
-                //     e.stackTraceToString(), "Error",
-                // )
-                service.showDialog(
-                    e.stackTraceToString(),
-                    "ERROR",
-                    arrayOf("OK"),
-                    0,
-                    Messages.getErrorIcon()
+                Messages.showInfoMessage(
+                    e.stackTraceToString(), "Error",
                 )
+//                service.showDialog(
+//                    e.stackTraceToString(),
+//                    "ERROR",
+//                    arrayOf("OK"),
+//                    0,
+//                    Messages.getErrorIcon()
+//                )
             }
         }
     }
@@ -107,26 +107,18 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             val content =
                 ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny2", true)
             currentToolWindow!!.contentManager.addContent(content)
-
-//            service.showDialog(
-//                file.canonicalPath,
-//                file.name,
-//                arrayOf("OK"),
-//                0,
-//                customIcon
-//            )
         } catch (e: Exception) {
-//            service.showMessage(
-//                e.stackTraceToString(),
-//                "error: ",
-//            )
-            service.showDialog(
+            service.showMessage(
                 e.stackTraceToString(),
                 "error: ",
-                arrayOf("OK"),
-                0,
-                Messages.getErrorIcon()
             )
+//            service.showDialog(
+//                e.stackTraceToString(),
+//                "error: ",
+//                arrayOf("OK"),
+//                0,
+//                Messages.getErrorIcon()
+//            )
         }
     }
 }
