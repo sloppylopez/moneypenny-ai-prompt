@@ -1,5 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.intellij.lang.Language
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow

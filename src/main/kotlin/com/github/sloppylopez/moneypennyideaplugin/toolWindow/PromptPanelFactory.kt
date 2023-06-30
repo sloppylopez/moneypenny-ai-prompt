@@ -102,31 +102,4 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             }
         }
     }
-
-    private fun updateWithFileContents(file: File) {
-        try {
-            val reader = BufferedReader(FileReader(file))
-            reader.use {
-                val contents = StringBuilder()
-                var line: String? = reader.readLine()
-                while (line != null) {
-                    contents.append(line).append(System.lineSeparator())
-                    line = reader.readLine()
-                }
-                contentPromptTextArea?.text = contents.toString()
-            }
-        } catch (e: Exception) {
-            service.showMessage(
-                e.stackTraceToString(),
-                "error: ",
-            )
-//            service.showDialog(
-//                e.stackTraceToString(),
-//                "error: ",
-//                arrayOf("OK"),
-//                0,
-//                Messages.getErrorIcon()
-//            )
-        }
-    }
 }

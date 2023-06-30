@@ -1,9 +1,13 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import PromptPanelFactory
+import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.intellij.lang.Language
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
@@ -13,7 +17,10 @@ import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.BoxLayout
+import javax.swing.JComponent
+import javax.swing.JPanel
 
 class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
@@ -21,6 +28,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     private val tabbedPanelFactory = project.service<TabbedPanelFactory>()
     private val promptPaneFactory = project.service<PromptPanelFactory>()
     private val waitingBarFactory = project.service<WaitingBarFactory>()
+    private val service = project.service<ProjectService>()
     private val currentToolWindow = toolWindow
 
     fun getContent(
@@ -35,9 +43,6 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     ): JComponent {
         val tabbedPane = JBTabbedPane()
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
-        Messages.showInfoMessage(
-            fileList.toString(), "fileList",
-        )
         for (i in 0..tabCount) {
             val file = readFile(fileList, i)
             val panel = JPanel(GridBagLayout())
@@ -53,7 +58,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
                 gridBagConstraints.gridy = j - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-            if (i < fileList.size){
+            if (i < fileList.size) {
                 tabbedPane.addTab(file!!.name, panel)
             } else {
                 tabbedPane.addTab("Tab $i", panel)
@@ -80,7 +85,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
             }
         } catch (e: Exception) {
             Messages.showInfoMessage(
-                e.stackTraceToString(), "LALALALALAL",
+                e.stackTraceToString(), "Error",
             )
         }
         return null
@@ -93,7 +98,23 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     ): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
-
+        if (toolWindow != null) {
+            val language = Language.findLanguageByID("kotlin") // Get the Kotlin language instance
+            Messages.showInfoMessage(
+                language.toString(), "Language",
+            )
+            if (language != null && file != null) {
+                val hl = SyntaxHighlighterFactory
+                    .getSyntaxHighlighter(
+                        language,
+                        toolWindow.project,
+                        service.fileToVirtualFile(file)
+                    )
+                Messages.showInfoMessage(
+                    hl.highlightingLexer.toString(), "Language",
+                )
+            }
+        }
         when (panelIndex) {
             1 -> promptPaneFactory
                 .promptPanel(innerPanel, toolWindow, file)
@@ -107,31 +128,4 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
         return innerPanel
     }
-
-//    private fun updateWithFileContents(file: File) {
-//        try {
-//            val reader = BufferedReader(FileReader(file))
-//            reader.use {
-//                val contents = StringBuilder()
-//                var line: String? = reader.readLine()
-//                while (line != null) {
-//                    contents.append(line).append(System.lineSeparator())
-//                    line = reader.readLine()
-//                }
-//                contentPromptTextArea?.text = contents.toString()
-//            }
-//        } catch (e: Exception) {
-//            service.showMessage(
-//                e.stackTraceToString(),
-//                "error: ",
-//            )
-//            service.showDialog(
-//                e.stackTraceToString(),
-//                "error: ",
-//                arrayOf("OK"),
-//                0,
-//                Messages.getErrorIcon()
-//            )
-//        }
-//    }
 }

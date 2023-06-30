@@ -25,7 +25,10 @@ repositories {
 dependencies {
 //    implementation(libs.annotations)
 //    implementation("com.google.api:gax:2.29.0")
-
+//    implementation(kotlin("stdlib-jdk8"))
+//    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
+//    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
+//    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

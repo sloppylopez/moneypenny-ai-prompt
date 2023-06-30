@@ -1,6 +1,5 @@
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import java.awt.event.ActionEvent
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JTextArea

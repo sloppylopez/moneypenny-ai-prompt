@@ -6,6 +6,9 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import java.io.File
 import javax.swing.Icon
 
 @Service(Service.Level.PROJECT)
@@ -16,6 +19,11 @@ class ProjectService(project: Project) {
     }
 
     fun getRandomNumber() = (1..100).random()
+
+    fun fileToVirtualFile(file: File?): VirtualFile? {
+        val localFileSystem = LocalFileSystem.getInstance()
+        return file?.let { localFileSystem.findFileByIoFile(it) }
+    }
 
     fun showDialog(
         message: String, title: String,
