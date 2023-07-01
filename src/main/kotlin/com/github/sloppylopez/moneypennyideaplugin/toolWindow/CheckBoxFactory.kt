@@ -12,9 +12,7 @@ class CheckBoxFactory {
             arrayOf("Add", "Create", "Modify", "Remove", "Replace", "Update", "Why", "Gives", "With")
 
         checkboxLabels.forEach { label ->
-            val isSelected = label == "Add" // Set the initial state for the "Add" checkbox
-            val checkBox = createCheckBox(label, isSelected, postPromptTextArea)
-
+            val checkBox = createCheckBox(label, false, postPromptTextArea)
             checkboxPanel.add(checkBox)
         }
 

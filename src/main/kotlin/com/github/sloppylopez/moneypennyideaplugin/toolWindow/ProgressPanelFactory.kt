@@ -14,25 +14,32 @@ class ProgressPanelFactory {
     }
 
     private fun createProgressBar(min: Int, max: Int, initial: Int): JProgressBar {
-        val MAX_PROGRESS = 100
-        val DELAY = 50
+        val maxProgress = 100
+        val delay = 50
         val progressBar = JProgressBar(min, max)
         progressBar.value = initial
         progressBar.isStringPainted = true
         progressBar.string = "Waiting..."
-        timer = Timer(DELAY, object : ActionListener {
+        setTimer(delay, progressBar, maxProgress)
+        return progressBar
+    }
+
+    private fun setTimer(delay: Int, progressBar: JProgressBar, maxProgress: Int) {
+        timer = Timer(delay, object : ActionListener {
             var progress = 0
 
             override fun actionPerformed(e: ActionEvent?) {
                 progress++
                 progressBar.value = progress
-                if (progress >= MAX_PROGRESS) {
+                if (progress >= maxProgress) {
                     timer?.stop()
-                    progressBar.isVisible = false
+                    val container = progressBar.parent
+                    container?.remove(progressBar)
+                    container?.revalidate()
+                    container?.repaint()
                 }
             }
         })
         timer?.start()
-        return progressBar
     }
 }
