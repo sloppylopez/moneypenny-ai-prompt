@@ -62,7 +62,6 @@ class RadioButtonFactory(project: Project) {
     ) {
         when (option) {
             "Refactor" -> {
-                println("Refactor")
                 prePromptTextArea.text = "Refactor Code:\n"
             }
 

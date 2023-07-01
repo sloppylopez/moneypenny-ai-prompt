@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -14,7 +15,6 @@ class ToolWindowFactory : ToolWindowFactory {
         try {
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-//            toolWindow.contentManager.removeAllContents(true) // Remove existing content
             val content =
                 ContentFactory.getInstance().createContent(
                     moneyPennyToolWindow.getContent(),
@@ -22,7 +22,7 @@ class ToolWindowFactory : ToolWindowFactory {
                 )
             toolWindow.contentManager.addContent(content)
         } catch (e: Exception) {
-            println(e.stackTraceToString())
+            Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())
         }
     }
 
@@ -34,7 +34,7 @@ class ToolWindowFactory : ToolWindowFactory {
                 "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\moneypenny-logo-main.jpg"
             return ImageIcon(customIconUrl)
         } catch (e: Exception) {
-            println(e.stackTraceToString())
+            Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())
         }
         return ImageIcon()
     }

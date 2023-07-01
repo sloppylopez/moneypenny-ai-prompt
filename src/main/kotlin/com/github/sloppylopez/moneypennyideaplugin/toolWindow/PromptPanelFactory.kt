@@ -1,7 +1,6 @@
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.TextAreaFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -17,22 +16,26 @@ import java.awt.dnd.DropTargetDropEvent
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import javax.swing.ImageIcon
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
 
 @Service(Service.Level.PROJECT)
 class PromptPanelFactory(project: Project) : DropTargetAdapter() {
+    private var promptPanel = JPanel()
+    private var currentProject = project
+    private var currentToolWindow: ToolWindow? = null
     private val checkBoxFactory = project.service<CheckBoxFactory>()
     private val radioButtonFactory = project.service<RadioButtonFactory>()
     private val textAreaFactory = project.service<TextAreaFactory>()
     private val service = project.service<ProjectService>()
-    private val customIcon = ImageIcon("C:\\elgato\\images\\moneypenny3.jpg")
-    private var promptPanel = JPanel()
-    private var contentPromptTextArea: JTextArea? = JTextArea()
-    private var currentProject = project
-    private var currentToolWindow: ToolWindow? = null
+    var prePromptTextArea: JTextArea? = JTextArea()
+        private set
+    var contentPromptTextArea: JTextArea? = JTextArea()
+        private set
+    var postPromptTextArea: JTextArea? = JTextArea()
+        private set
+
 
     fun promptPanel(
         panel: JPanel,
@@ -42,14 +45,14 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         try {
             promptPanel = panel
             currentToolWindow = toolWindow
-            val prePromptTextArea = textAreaFactory.createTextArea("", 2, 81)
+            prePromptTextArea = textAreaFactory.createTextArea("", 2, 81)
             contentPromptTextArea = textAreaFactory.createTextArea("", 12, 81)
             contentPromptTextArea!!.text =
                 "Paste text, drag a file, copy folder path..."
-            val postPromptTextArea = textAreaFactory.createTextArea("", 4, 81)
+            postPromptTextArea = textAreaFactory.createTextArea("", 4, 81)
             radioButtonFactory.radioButtonsPanel(
                 panel,
-                prePromptTextArea,
+                prePromptTextArea!!
             )
 
             val prePromptScrollPane = JBScrollPane(prePromptTextArea)
@@ -70,12 +73,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             panel.add(contentPromptScrollPane)
             val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
-            checkBoxFactory.checkboxesPanel(panel, postPromptTextArea)
+            checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
 
             // Attach DropTarget to contentPromptTextArea
             contentPromptTextArea!!.dropTarget = DropTarget(contentPromptTextArea, this)
         } catch (e: Exception) {
-            println(e.stackTrace)
+            service.logError("PromptPanelFactory", e)
         }
     }
 
@@ -95,7 +98,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                         )
                 currentToolWindow!!.contentManager.addContent(content, 0)
             } catch (e: Exception) {
-                println(e.stackTraceToString())
+                service.logError("PromptPanelFactory", e)
             }
         }
     }

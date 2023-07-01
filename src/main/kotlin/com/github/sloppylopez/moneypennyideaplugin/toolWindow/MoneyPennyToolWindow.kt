@@ -7,8 +7,6 @@ import com.intellij.lang.Language
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
@@ -25,9 +23,9 @@ import javax.swing.JPanel
 
 class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
-    private val comboBoxPaneFactory = project.service<ComboBoxPanelFactory>()
+    private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val progressPanelFactory = project.service<ProgressPanelFactory>()
-    private val promptPaneFactory = project.service<PromptPanelFactory>()
+    private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
     private val currentToolWindow = toolWindow
 
@@ -43,8 +41,11 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     ): JComponent {
         val tabbedPane = JBTabbedPane()
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
+        var file: File? = null
         for (i in 0..tabCount) {
-            val file = readFile(fileList, i)
+            if(fileList.isNotEmpty()){
+                file = readFile(fileList, i)
+            }
             val panel = JPanel(GridBagLayout())
 
             val gridBagConstraints = GridBagConstraints()
@@ -61,7 +62,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
             if (i < fileList.size && file != null) {
                 tabbedPane.addTab(file.name, panel)
             } else {
-                tabbedPane.addTab("Tab $i", panel)
+                tabbedPane.addTab("$i", panel)
             }
         }
 
@@ -74,18 +75,13 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
         try {
             if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
                 val file = fileList[i] as File
-//                Messages.showInfoMessage(
-//                    file.name, "File",
-//                )
-                println("File $file")
+                service.logInfo("MoneyPennyToolWindow", "File $file")
                 return file
             } else {
-                println("File is null")
+                service.logInfo("MoneyPennyToolWindow", "File is null")
             }
         } catch (e: Exception) {
-            Messages.showInfoMessage(
-                e.stackTraceToString(), "Error",
-            )
+            service.logError("MoneyPennyToolWindow", e)
         }
         return null
     }
@@ -97,30 +93,34 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     ): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
-        if (toolWindow != null) {
+        getSyntaxHighlighter(toolWindow, file)
+        when (panelIndex) {
+            1 -> promptPanelFactory
+                .promptPanel(innerPanel, toolWindow, file)
+
+            2 -> comboBoxPanelFactory
+                .comboBoxPanel(innerPanel, this.promptPanelFactory)
+
+//            3 -> progressPanelFactory
+//                .getProgressBarPanel(innerPanel)
+        }
+
+        return innerPanel
+    }
+
+    private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
+        if (toolWindow != null && file != null) {
             val language = Language.findLanguageByID("java")
-            println(language)
-            if (language != null && file != null) {
+            service.logInfo("MoneyPennyToolWindow", language.toString())
+            if (language != null) {
                 val hl = SyntaxHighlighterFactory
                     .getSyntaxHighlighter(
                         language,
                         toolWindow.project,
                         service.fileToVirtualFile(file)
                     )
-                println(hl)
+                service.logInfo("MoneyPennyToolWindow", hl.toString())
             }
         }
-        when (panelIndex) {
-            1 -> promptPaneFactory
-                .promptPanel(innerPanel, toolWindow, file)
-
-            2 -> comboBoxPaneFactory
-                .comboBoxPanel(innerPanel)
-
-            3 -> progressPanelFactory
-                .getProgressBarPanel(innerPanel)
-        }
-
-        return innerPanel
     }
 }

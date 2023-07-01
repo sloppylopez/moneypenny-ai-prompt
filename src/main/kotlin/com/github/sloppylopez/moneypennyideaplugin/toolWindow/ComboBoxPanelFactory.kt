@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import PromptPanelFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
@@ -10,7 +11,10 @@ import javax.swing.JPanel
 class ComboBoxPanelFactory(project: Project) {
     private val buttonPanelFactory = ButtonPanelFactory(project)
 
-    fun comboBoxPanel(panel: JPanel) {
+    fun comboBoxPanel(
+        panel: JPanel,
+        promptPanelFactory: PromptPanelFactory
+    ) {
         val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
         val modelStrings = arrayOf("Davinci", "Curie", "Babbage", "Ada")
         val models = ComboBox(modelStrings)
@@ -21,7 +25,7 @@ class ComboBoxPanelFactory(project: Project) {
         languages.selectedIndex = selectedIndex
         nestedPanel.add(models)
         nestedPanel.add(languages)
-        buttonPanelFactory.buttonPanel(nestedPanel)
+        buttonPanelFactory.buttonPanel(nestedPanel, promptPanelFactory)
         panel.add(nestedPanel)
     }
 }

@@ -3,6 +3,7 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
@@ -44,5 +45,13 @@ class ProjectService(project: Project) {
         Messages.showInfoMessage(
             message, title,
         )
+    }
+
+    fun logError(className: String, e: Exception) {
+        Logger.getInstance(className).error(e.stackTraceToString())
+    }
+
+    fun logInfo(className: String, info: String) {
+        Logger.getInstance(className).info(info)
     }
 }
