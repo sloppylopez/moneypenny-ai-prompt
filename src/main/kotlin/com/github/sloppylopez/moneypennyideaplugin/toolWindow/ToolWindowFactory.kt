@@ -13,7 +13,6 @@ class ToolWindowFactory : ToolWindowFactory {
         toolWindow: ToolWindow
     ) {
         try {
-            toolWindow.title = "MoneyPenny7"
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
             val content =
