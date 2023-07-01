@@ -1,11 +1,11 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import javax.swing.ImageIcon
-
 
 class ToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(
@@ -24,8 +24,15 @@ class ToolWindowFactory : ToolWindowFactory {
     }
 
     override fun shouldBeAvailable(project: Project) = true
+
     private fun getToolWindowIcon(): ImageIcon {
-        val customIconUrl = "C:\\elgato\\images\\moneypenny-logo-main.jpg"
-        return ImageIcon(customIconUrl)
+        try {
+            val customIconUrl =
+                "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\moneypenny-logo-main.jpg"
+            return ImageIcon(customIconUrl)
+        } catch (e: Exception) {
+            println(e.stackTraceToString())
+        }
+        return ImageIcon()
     }
 }
