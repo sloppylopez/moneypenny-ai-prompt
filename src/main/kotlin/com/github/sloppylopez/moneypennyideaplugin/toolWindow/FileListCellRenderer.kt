@@ -1,12 +1,12 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.project.Project
 import com.intellij.ui.ColoredListCellRenderer
 import com.intellij.ui.SimpleTextAttributes
 import java.io.File
-import javax.swing.DefaultListModel
-import javax.swing.JFrame
-import javax.swing.JList
+import javax.swing.*
+
 @Service(Service.Level.PROJECT)
 class FileListCellRenderer : ColoredListCellRenderer<File>() {
     override fun customizeCellRenderer(
@@ -26,14 +26,12 @@ class FileListCellRenderer : ColoredListCellRenderer<File>() {
         }
     }
 
-    fun getFileList(): JFrame {
-        // Create a JFrame to hold the JList
-        val frame = JFrame("File List")
-        frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+    fun getFileList(project: Project): JComponent {
+        // Create a JPanel to hold the JList
+        val panel = JPanel()
 
         // Create a JList to display the files
         val fileList = JList<File>()
-        frame.contentPane.add(fileList)
 
         // Create a DefaultListModel to hold the files
         val model = DefaultListModel<File>()
@@ -41,8 +39,6 @@ class FileListCellRenderer : ColoredListCellRenderer<File>() {
         // Add some example files to the model
         model.addElement(File("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\kotlin\\com\\github\\sloppylopez\\moneypennyideaplugin\\toolWindow\\AIToolWindowFactory.kt"))
         model.addElement(File("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\kotlin\\com\\github\\sloppylopez\\moneypennyideaplugin\\services"))
-//        model.addElement(File("path/to/folder1"))
-//        model.addElement(File("path/to/folder2"))
 
         // Set the model on the JList
         fileList.model = model
@@ -50,9 +46,11 @@ class FileListCellRenderer : ColoredListCellRenderer<File>() {
         // Set the FileListCellRenderer as the cell renderer for the JList
         fileList.cellRenderer = FileListCellRenderer()
 
-        // Display the JFrame
-        frame.pack()
-        frame.isVisible = true
-        return frame
+        // Add the JList to the panel
+        panel.add(fileList)
+
+        // Return the panel as JComponent
+        return panel
     }
+
 }

@@ -7,9 +7,8 @@ import com.intellij.ui.components.JBTabbedPane
 import javax.swing.*
 
 @Service(Service.Level.PROJECT)
-class TabbedPanelFactory(project: Project) {
+class TabbedPanelFactory(private val project: Project) {
     private val textAreaFactory = TextAreaFactory(project)
-
     fun getTabbedPanel(panel: JPanel) {
         val nestedTabbedPane = JBTabbedPane()
         nestedTabbedPane.tabPlacement = JTabbedPane.BOTTOM
@@ -25,7 +24,7 @@ class TabbedPanelFactory(project: Project) {
 
         val volumeSlider = JSlider(0, 100, 50)
 //            val volumeLevel = volumeSlider.value
-        panel.add(FileListCellRenderer().getFileList())
+//        panel.add(FileListCellRenderer().getFileList(project))
         panel.add(nestedTabbedPane)
         panel.add(volumeSlider)
     }

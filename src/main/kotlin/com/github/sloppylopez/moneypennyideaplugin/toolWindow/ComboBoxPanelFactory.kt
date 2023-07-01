@@ -16,11 +16,11 @@ class ComboBoxPanelFactory(project: Project) {
         val models = ComboBox(modelStrings)
         val selectedIndex = 0
         models.selectedIndex = selectedIndex
-        val personalityStrings = arrayOf("Moneypenny", "Kotlin", "Python", "Java", "Javascript")
-        val personalities = ComboBox(personalityStrings)
-        personalities.selectedIndex = selectedIndex
+        val languageStrings = arrayOf("Kotlin", "Python", "Java", "Javascript")
+        val languages = ComboBox(languageStrings)
+        languages.selectedIndex = selectedIndex
         nestedPanel.add(models)
-        nestedPanel.add(personalities)
+        nestedPanel.add(languages)
         buttonPanelFactory.buttonPanel(nestedPanel)
         panel.add(nestedPanel)
     }
