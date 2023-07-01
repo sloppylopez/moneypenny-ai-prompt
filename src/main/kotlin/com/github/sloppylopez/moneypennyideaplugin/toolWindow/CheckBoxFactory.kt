@@ -1,11 +1,10 @@
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.project.Project
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
-class CheckBoxFactory(project: Project) {
+class CheckBoxFactory {
 
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
         val checkboxPanel = JPanel()

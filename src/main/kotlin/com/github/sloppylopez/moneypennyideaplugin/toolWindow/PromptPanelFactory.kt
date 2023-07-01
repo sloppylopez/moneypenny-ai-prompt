@@ -96,9 +96,10 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                         )
                 currentToolWindow!!.contentManager.addContent(content, 0)
             } catch (e: Exception) {
-                Messages.showInfoMessage(
-                    e.stackTraceToString(), "Error",
-                )
+//                Messages.showInfoMessage(
+//                    e.stackTraceToString(), "Error",
+//                )
+                println(e.stackTraceToString())
             }
         }
     }

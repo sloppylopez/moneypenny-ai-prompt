@@ -58,8 +58,8 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
                 gridBagConstraints.gridy = j - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-            if (i < fileList.size) {
-                tabbedPane.addTab(file!!.name, panel)
+            if (i < fileList.size && file != null) {
+                tabbedPane.addTab(file.name, panel)
             } else {
                 tabbedPane.addTab("Tab $i", panel)
             }
@@ -74,14 +74,13 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
         try {
             if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
                 val file = fileList[i] as File
-                Messages.showInfoMessage(
-                    file.name, "File",
-                )
+//                Messages.showInfoMessage(
+//                    file.name, "File",
+//                )
+                println("File $file")
                 return file
             } else {
-                Messages.showInfoMessage(
-                    "File is null", "File",
-                )
+                println("File is null")
             }
         } catch (e: Exception) {
             Messages.showInfoMessage(
@@ -99,10 +98,8 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         if (toolWindow != null) {
-            val language = Language.findLanguageByID("kotlin") // Get the Kotlin language instance
-            Messages.showInfoMessage(
-                language.toString(), "Language",
-            )
+            val language = Language.findLanguageByID("java")
+            println(language)
             if (language != null && file != null) {
                 val hl = SyntaxHighlighterFactory
                     .getSyntaxHighlighter(
@@ -110,9 +107,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
                         toolWindow.project,
                         service.fileToVirtualFile(file)
                     )
-                Messages.showInfoMessage(
-                    hl.highlightingLexer.toString(), "Language",
-                )
+                println(hl)
             }
         }
         when (panelIndex) {

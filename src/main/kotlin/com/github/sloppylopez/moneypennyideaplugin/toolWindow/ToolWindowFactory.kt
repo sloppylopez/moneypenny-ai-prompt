@@ -1,9 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.intellij.lang.Language
-import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
@@ -23,14 +20,34 @@ class ToolWindowFactory : ToolWindowFactory {
             val content =
                 ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny", true)
             toolWindow.contentManager.addContent(content)
-//            val codeViewerAction = toolWindow.project.service<RandomCodeToolWindowFactory>()
-//            codeViewerAction.createToolWindowContent(project, toolWindow)
         } catch (e: Exception) {
-            Messages.showInfoMessage(
-                e.stackTraceToString(), "Error",
-            )
+//            Messages.showInfoMessage(
+//                e.stackTraceToString(), "Error",
+//            )
+            println(e.stackTraceToString())
         }
     }
 
     override fun shouldBeAvailable(project: Project) = true
+
+//    companion object {
+//        @JvmStatic
+//        fun main(args: Array<String>) {
+//            // You can add breakpoints and debug your plugin code here
+//
+//            // Obtain the current project instance
+//            val project = ApplicationManager.getApplication().runReadAction<Project> {
+//                ProjectManager.getInstance().openProjects.firstOrNull()
+//            }
+//
+//            // Create an instance of your CustomToolWindowFactory
+//            val toolWindowFactory = ToolWindowFactory()
+//
+//            // Obtain the ToolWindow instance
+//            val toolWindow = toolWindowFactory.createToolWindowContent(project)
+//
+//            // Create the tool window content
+//            toolWindowFactory.createToolWindowContent(project, toolWindow)
+//        }
+//    }
 }
