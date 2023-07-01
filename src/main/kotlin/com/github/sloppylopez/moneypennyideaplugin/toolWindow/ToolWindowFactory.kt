@@ -13,10 +13,8 @@ class ToolWindowFactory : ToolWindowFactory {
         toolWindow: ToolWindow
     ) {
         try {
-//            val customIconUrl = "C:\\elgato\\images\\cartuli-logo-master-small.ico"
-//            val customIcon = ImageIcon(customIconUrl)
-//            toolWindow.setIcon(customIcon)
-            toolWindow.title = "MoneyPenny"
+            toolWindow.title = "MoneyPenny7"
+            toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
             val content =
                 ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny", true)
@@ -27,4 +25,8 @@ class ToolWindowFactory : ToolWindowFactory {
     }
 
     override fun shouldBeAvailable(project: Project) = true
+    private fun getToolWindowIcon(): ImageIcon {
+        val customIconUrl = "C:\\elgato\\images\\moneypenny-logo-main.jpg"
+        return ImageIcon(customIconUrl)
+    }
 }
