@@ -1,11 +1,10 @@
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.TextAreaFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
 import java.awt.datatransfer.DataFlavor
@@ -20,7 +19,6 @@ import java.io.FileReader
 import javax.swing.ImageIcon
 import javax.swing.JPanel
 import javax.swing.JTextArea
-import com.intellij.openapi.wm.ToolWindow
 
 
 @Service(Service.Level.PROJECT)
@@ -96,9 +94,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                         )
                 currentToolWindow!!.contentManager.addContent(content, 0)
             } catch (e: Exception) {
-//                Messages.showInfoMessage(
-//                    e.stackTraceToString(), "Error",
-//                )
                 println(e.stackTraceToString())
             }
         }

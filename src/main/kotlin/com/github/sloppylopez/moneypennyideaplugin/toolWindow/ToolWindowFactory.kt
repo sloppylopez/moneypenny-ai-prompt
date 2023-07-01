@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import MoneyPennyToolWindow
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.ToolWindow
@@ -15,8 +16,10 @@ class ToolWindowFactory : ToolWindowFactory {
         try {
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
+            toolWindow.contentManager.removeAllContents(true) // Remove existing content
             val content =
-                ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(), "MoneyPenny", true)
+                ContentFactory.getInstance().createContent(moneyPennyToolWindow.getContent(),
+                    "Prompt", true)
             toolWindow.contentManager.addContent(content)
         } catch (e: Exception) {
             println(e.stackTraceToString())
