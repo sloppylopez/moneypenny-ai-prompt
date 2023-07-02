@@ -1,4 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.IntentionManager
 import com.intellij.openapi.application.ApplicationManager
@@ -11,6 +12,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.thisLogger
 import java.io.File
 import javax.swing.SwingUtilities
 import javax.swing.SwingUtilities.invokeLater
@@ -26,14 +28,12 @@ class FileEditorManager(private val project: Project) {
         if (virtualFile != null) {
             val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
             fileEditorManager.openEditor(openFileDescriptor, true)
-
+            highlightTextInEditor(
+                "override fun applicationActivated(ideFrame: IdeFrame) {\n" +
+                        "        thisLogger().warn(\"Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.\")\n" +
+                        "    }"
+            )
             invokeLater {
-                highlightTextInEditor(
-                    "override fun applicationActivated(ideFrame: IdeFrame) {\n" +
-                            "        thisLogger().warn(\"Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.\")\n" +
-                            "    }"
-                )
-//                val editor = FileEditorManager.getInstance(project).selectedTextEditor
                 val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
                 if (psiFile != null) {
                     ApplicationManager.getApplication().invokeLater({

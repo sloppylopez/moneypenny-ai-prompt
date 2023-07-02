@@ -16,12 +16,7 @@ import javax.swing.JPanel
 //TODO   dont write context if file is not null
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
-        private val service = project.service<ProjectService>()
-
-    init {
-        thisLogger().info(Bundle.message("projectService", project.name))
-    }
-
+    private val service = project.service<ProjectService>()
     fun buttonPanel(
         panel: JPanel,
         promptPanelFactory: PromptPanelFactory
