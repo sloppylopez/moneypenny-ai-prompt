@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import java.io.File
 
 @Service(Service.Level.PROJECT)
-class FileEditorFactory2(private val project: Project) {
+class FileEditorManager(private val project: Project) {
 
     fun openFileInEditor(filePath: String?) {
         if (filePath == null) return

@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import MoneyPennyToolWindow
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow

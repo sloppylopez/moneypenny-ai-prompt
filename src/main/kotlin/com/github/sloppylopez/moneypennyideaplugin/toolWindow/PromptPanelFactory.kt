@@ -1,5 +1,4 @@
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
