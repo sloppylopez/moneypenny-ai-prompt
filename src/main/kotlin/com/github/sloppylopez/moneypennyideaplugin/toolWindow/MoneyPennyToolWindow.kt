@@ -8,6 +8,7 @@ import com.intellij.lang.Language
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
@@ -19,11 +20,8 @@ import java.awt.GridBagLayout
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.io.File
-import javax.swing.BorderFactory
-import javax.swing.BoxLayout
-import javax.swing.JButton
-import javax.swing.JComponent
-import javax.swing.JPanel
+import javax.swing.*
+import javax.swing.event.ChangeListener
 
 class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
@@ -43,11 +41,18 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
     private fun moneyPennyPromptPanel(
         toolWindow: ToolWindow? = null,
-        fileList: List<*>,
+        fileList: List<*>
     ): JComponent {
         val tabbedPane = JBTabbedPane()
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
         var file: File? = null
+
+        val changeListener = ChangeListener { _ ->
+            val selectedTab = tabbedPane.selectedIndex
+            val tabName = tabbedPane.getTitleAt(selectedTab)
+            JOptionPane.showMessageDialog(tabbedPane, "Selected Tab: $tabName")
+        }
+
         for (i in 0..tabCount) {
             if(fileList.isNotEmpty()){
                 file = readFile(fileList, i)
@@ -55,7 +60,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
             val panel = JPanel(GridBagLayout())
 
             val gridBagConstraints = GridBagConstraints()
-            gridBagConstraints.anchor = GridBagConstraints.NORTH // Westsiiide!!!
+            gridBagConstraints.anchor = GridBagConstraints.NORTH
             gridBagConstraints.insets = JBUI.insets(2)
 
             for (j in 1..3) {
@@ -71,6 +76,8 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
                 tabbedPane.addTab("$i", panel)
             }
         }
+
+        tabbedPane.addChangeListener(changeListener)
 
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.NORTH)

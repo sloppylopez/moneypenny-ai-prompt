@@ -17,7 +17,7 @@ import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
-    private val service = project.service<ProjectService>()
+        private val service = project.service<ProjectService>()
 
     init {
         thisLogger().info(Bundle.message("projectService", project.name))
