@@ -25,11 +25,11 @@ class AncestorListener(project: Project) {
             }
 
             override fun ancestorMoved(e: AncestorEvent?) {
-                service.logInfo("com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListenerFactory", "Ancestor Moved")
+                service.logInfo("AncestorListenerFactory", "Ancestor Moved")
             }
 
             override fun ancestorRemoved(e: AncestorEvent?) {
-                service.logInfo("com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListenerFactory", "Ancestor Removed")
+                service.logInfo("AncestorListenerFactory", "Ancestor Removed")
             }
         }
 }

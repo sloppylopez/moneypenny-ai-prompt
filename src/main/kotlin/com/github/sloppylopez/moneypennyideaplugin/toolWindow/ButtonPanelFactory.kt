@@ -1,19 +1,18 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+//import javax.swing.JFileChooser
+//import javax.swing.JFrame
 import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import javax.swing.JButton
-//import javax.swing.JFileChooser
-//import javax.swing.JFrame
 import javax.swing.JPanel
-import javax.swing.JTextArea
+
 //TODO   dont write context if file is not null
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {

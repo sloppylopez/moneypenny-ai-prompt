@@ -89,12 +89,11 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             try {
                 val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
                 val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
-                val content =
-                    ContentFactory.getInstance()
-                        .createContent(
-                            moneyPennyToolWindow.getContent(fileList),
-                            fileList.size.toString() + " Archives", true
-                        )
+                val content = ContentFactory.getInstance()
+                    .createContent(
+                        moneyPennyToolWindow.getContent(fileList),
+                        fileList.size.toString() + " Archives", true
+                    )
                 currentToolWindow!!.contentManager.addContent(content, 0)
                 currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
             } catch (e: Exception) {
