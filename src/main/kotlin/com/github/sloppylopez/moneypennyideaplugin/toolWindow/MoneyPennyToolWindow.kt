@@ -1,28 +1,26 @@
+package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+
 import FileEditorFactory
 import ProgressPanelFactory
 import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorFactory2
 import com.intellij.lang.Language
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.ui.content.Content
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.io.File
 import javax.swing.*
 import javax.swing.event.ChangeListener
+
+private lateinit var tabbedPane: JBTabbedPane // Declare com.github.sloppylopez.moneypennyideaplugin.toolWindow.tabbedPane at the class level
 
 class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
@@ -33,28 +31,18 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
     private val currentToolWindow = toolWindow
-    private lateinit var tabbedPane: JBTabbedPane // Declare tabbedPane at the class level
 
-    fun getContent(fileList: List<*>? = emptyList<Any>()): JBPanel<JBPanel<*>> {
-        val fatherContainer = JBPanel<JBPanel<*>>().apply {
-            val changeListener = ChangeListener {
-                val selectedTab = tabbedPane.selectedIndex
-                val tabName = tabbedPane.getTitleAt(selectedTab)
-                JOptionPane.showMessageDialog(this, "Selected Tab: $tabName")
-            }
-            tabbedPane = JBTabbedPane() // Initialize tabbedPane
-            tabbedPane.addChangeListener(changeListener)
-            add(moneyPennyPromptPanel(currentToolWindow, fileList!!))
-        }
-
-        return fatherContainer
+    fun getContent(
+        fileList: List<*>? = emptyList<Any>()
+    ) = JBPanel<JBPanel<*>>().apply {
+        add(moneyPennyPromptPanel(currentToolWindow, fileList!!))
     }
 
     private fun moneyPennyPromptPanel(
         toolWindow: ToolWindow? = null,
         fileList: List<*>
     ): JComponent {
-        tabbedPane.removeAll() // Clear existing tabs
+        val tabbedPane = JBTabbedPane()
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
         var file: File? = null
 
@@ -89,7 +77,22 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
         }
 
         tabbedPane.addChangeListener(changeListener)
+        tabbedPane.addAncestorListener(object : javax.swing.event.AncestorListener {
+            override fun ancestorAdded(e: javax.swing.event.AncestorEvent?) {
+                service.logInfo("MoneyPennyToolWindow", "Ancestor Added")
+                val selectedTab = tabbedPane.selectedIndex
+                val tabName = tabbedPane.getTitleAt(selectedTab)
+                JOptionPane.showMessageDialog(tabbedPane, "Selected Tab: $tabName")
+            }
 
+            override fun ancestorMoved(e: javax.swing.event.AncestorEvent?) {
+                service.logInfo("MoneyPennyToolWindow", "Ancestor Moved")
+            }
+
+            override fun ancestorRemoved(e: javax.swing.event.AncestorEvent?) {
+                service.logInfo("MoneyPennyToolWindow", "Ancestor Removed")
+            }
+        })
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.NORTH)
         return mainPanel
