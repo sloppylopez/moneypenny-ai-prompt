@@ -33,7 +33,7 @@ class ToolWindowFactory : ToolWindowFactory {
             toolWindow.contentManager.addContentManagerListener(object : ContentManagerListener {
                 override fun selectionChanged(event: ContentManagerEvent) {
                     val selectedContent = event.content
-
+                    Messages.showInfoMessage(event.index.toString(), "Index: ")
                     val focusedTabIndex = event.index
                     val focusedContent = toolWindow.contentManager.getContent(focusedTabIndex)
                     val contentTitle = focusedContent?.displayName

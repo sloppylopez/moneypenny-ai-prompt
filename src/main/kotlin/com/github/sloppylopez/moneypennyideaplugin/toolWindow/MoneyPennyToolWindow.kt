@@ -13,6 +13,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.content.Content
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
@@ -54,7 +55,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
         }
 
         for (i in 0..tabCount) {
-            if(fileList.isNotEmpty()){
+            if (fileList.isNotEmpty()) {
                 file = readFile(fileList, i)
             }
             val panel = JPanel(GridBagLayout())
@@ -120,6 +121,12 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
         return innerPanel
     }
+
+//    fun getFocusedTabName(content: Content): String? {
+//        val tabbedPane = content.component.getComponent(0) as JBTabbedPane
+//        val selectedTab = tabbedPane.selectedIndex
+//        return tabbedPane.getTitleAt(selectedTab)
+//    }
 
     private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
         if (toolWindow != null && file != null) {
