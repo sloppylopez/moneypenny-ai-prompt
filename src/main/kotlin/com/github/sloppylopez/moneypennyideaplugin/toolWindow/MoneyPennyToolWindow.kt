@@ -24,6 +24,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
     private val fileEditorManager = project.service<FileEditorManager>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
+    private val tabNameToFileMap = mutableMapOf<String, String>()
 
     fun getContent(fileList: List<*>? = emptyList<Any>()): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
@@ -39,12 +40,8 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         val changeListener = ChangeListener { _ ->
             val selectedTab = tabbedPane.selectedIndex
             val tabName = tabbedPane.getTitleAt(selectedTab)
-            val tabComponent = tabbedPane.getComponentAt(selectedTab)
-            JOptionPane.showMessageDialog(
-                tabbedPane,
-                "Selected Tab1: ${tabComponent.getComponentAt(Point(0, 0)).name} $tabName ${file?.canonicalPath}"
-            )
-            fileEditorManager.openFileInEditor(tabName) // HACK!!!!!!!!!!!!! we should not pass the whole path as tab name. but it works...
+            val filePath = tabNameToFileMap[tabName]
+            fileEditorManager.openFileInEditor(filePath)
         }
 
         for (i in 0..tabCount) {
@@ -65,7 +62,9 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
                 panel.add(innerPanel, gridBagConstraints)
             }
             if (i < fileList.size && file != null) {
-                tabbedPane.addTab(file.name, panel)
+                val tabName = file.name
+                tabbedPane.addTab(tabName, panel)
+                tabNameToFileMap[tabName] = file.canonicalPath
             } else {
                 tabbedPane.addTab("$i", panel)
             }
@@ -74,7 +73,10 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         tabbedPane.addChangeListener(changeListener)
         tabbedPane.addAncestorListener(object : javax.swing.event.AncestorListener {
             override fun ancestorAdded(e: javax.swing.event.AncestorEvent?) {
-                fileEditorManager.openFileInEditor(file?.canonicalPath)
+                val selectedTab = tabbedPane.selectedIndex
+                val tabName = tabbedPane.getTitleAt(selectedTab)
+                val filePath = tabNameToFileMap[tabName]
+                fileEditorManager.openFileInEditor(filePath)
             }
 
             override fun ancestorMoved(e: javax.swing.event.AncestorEvent?) {
