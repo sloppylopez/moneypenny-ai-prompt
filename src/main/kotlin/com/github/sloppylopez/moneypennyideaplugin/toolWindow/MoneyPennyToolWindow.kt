@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import FileEditorFactory
 import ProgressPanelFactory
 import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
@@ -25,6 +26,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val progressPanelFactory = project.service<ProgressPanelFactory>()
+    private val fileEditorFactory = project.service<FileEditorFactory>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
     private val currentToolWindow = toolWindow
@@ -101,8 +103,8 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
             2 -> comboBoxPanelFactory
                 .comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-//            3 -> progressPanelFactory
-//                .getProgressBarPanel(innerPanel)
+            3 -> fileEditorFactory
+                .getCurrentEditorPane(innerPanel)
         }
 
         return innerPanel
