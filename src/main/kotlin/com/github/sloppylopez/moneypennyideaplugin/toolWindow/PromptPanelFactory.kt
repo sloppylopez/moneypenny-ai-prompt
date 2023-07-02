@@ -1,12 +1,13 @@
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
+import com.intellij.ui.content.ContentManagerListener
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -29,6 +30,10 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private val radioButtonFactory = project.service<RadioButtonFactory>()
     private val textAreaFactory = project.service<TextAreaFactory>()
     private val service = project.service<ProjectService>()
+    private var previousContent: Content? = null
+    private var contentManagerListener: ContentManagerListener? = null
+
+    private var previousTabIndex: Int = -1
     var prePromptTextArea: JTextArea? = JTextArea()
         private set
     var contentPromptTextArea: JTextArea? = JTextArea()
@@ -97,6 +102,27 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                             fileList.size.toString() + " Archives", true
                         )
                 currentToolWindow!!.contentManager.addContent(content, 0)
+                currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
+
+//                // Add a new ContentManagerListener
+//                contentManagerListener = object : ContentManagerListener {
+//                    override fun selectionChanged(event: ContentManagerEvent) {
+//                        val selectedContent = event.content
+//                        val selectedTabIndex = currentToolWindow!!.contentManager.getIndexOfContent(selectedContent)
+//
+//                        if (selectedTabIndex != previousTabIndex && previousTabIndex != -1) {
+//                            val message = "Selected Tab Index: $selectedTabIndex"
+//                            Messages.showInfoMessage(message, "Message")
+//                        }
+//
+//                        previousTabIndex = selectedTabIndex
+//                    }
+//
+//                    override fun contentAdded(event: ContentManagerEvent) {}
+//                    override fun contentRemoved(event: ContentManagerEvent) {}
+//                    override fun contentRemoveQuery(event: ContentManagerEvent) {}
+//                }
+//                currentToolWindow!!.contentManager.addContentManagerListener(contentManagerListener!!)
             } catch (e: Exception) {
                 service.logError("PromptPanelFactory", e)
             }

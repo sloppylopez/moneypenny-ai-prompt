@@ -1,9 +1,9 @@
-package com.github.sloppylopez.moneypennyideaplugin.toolWindow
-
 import FileEditorFactory
 import ProgressPanelFactory
 import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorFactory2
 import com.intellij.lang.Language
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
@@ -33,18 +33,28 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
     private val currentToolWindow = toolWindow
+    private lateinit var tabbedPane: JBTabbedPane // Declare tabbedPane at the class level
 
-    fun getContent(
-        fileList: List<*>? = emptyList<Any>()
-    ) = JBPanel<JBPanel<*>>().apply {
-        add(moneyPennyPromptPanel(currentToolWindow, fileList!!))
+    fun getContent(fileList: List<*>? = emptyList<Any>()): JBPanel<JBPanel<*>> {
+        val fatherContainer = JBPanel<JBPanel<*>>().apply {
+            val changeListener = ChangeListener {
+                val selectedTab = tabbedPane.selectedIndex
+                val tabName = tabbedPane.getTitleAt(selectedTab)
+                JOptionPane.showMessageDialog(this, "Selected Tab: $tabName")
+            }
+            tabbedPane = JBTabbedPane() // Initialize tabbedPane
+            tabbedPane.addChangeListener(changeListener)
+            add(moneyPennyPromptPanel(currentToolWindow, fileList!!))
+        }
+
+        return fatherContainer
     }
 
     private fun moneyPennyPromptPanel(
         toolWindow: ToolWindow? = null,
         fileList: List<*>
     ): JComponent {
-        val tabbedPane = JBTabbedPane()
+        tabbedPane.removeAll() // Clear existing tabs
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
         var file: File? = null
 
@@ -121,12 +131,6 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
         return innerPanel
     }
-
-//    fun getFocusedTabName(content: Content): String? {
-    //        val tabbedPane = content.component.getComponent(0) as JBTabbedPane
-    //        val selectedTab = tabbedPane.selectedIndex
-    //        return tabbedPane.getTitleAt(selectedTab)
-//    }
 
     private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
         if (toolWindow != null && file != null) {
