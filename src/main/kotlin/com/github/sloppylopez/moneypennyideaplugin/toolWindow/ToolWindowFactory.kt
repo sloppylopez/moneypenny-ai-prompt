@@ -31,23 +31,18 @@ class ToolWindowFactory : ToolWindowFactory {
             toolWindow.contentManager.addContent(content)
 
             toolWindow.contentManager.addContentManagerListener(object : ContentManagerListener {
+                private var previousTabIndex: Int = -1
+
                 override fun selectionChanged(event: ContentManagerEvent) {
                     val selectedContent = event.content
-                    Messages.showInfoMessage(event.index.toString(), "Index: ")
-                    val focusedTabIndex = event.index
-                    val focusedContent = toolWindow.contentManager.getContent(focusedTabIndex)
-                    val contentTitle = focusedContent?.displayName
-                    val focusedContentDisplayName = focusedContent?.displayName
-                    val tabName = focusedContent?.tabName
+                    val selectedTabIndex = toolWindow.contentManager.getIndexOfContent(selectedContent)
 
-                    if (focusedContent?.tabName != previousContent?.tabName &&
-                        previousContent?.tabName != null) {
-                        val message =
-                            "Selected Content: Title=$contentTitle, TabName=$tabName, Display=$focusedContentDisplayName, PreviousTitle=$previousContent"
+                    if (selectedTabIndex != previousTabIndex) {
+                        val message = "Selected Tab Index: $selectedTabIndex"
                         Messages.showInfoMessage(message, "Message")
                     }
 
-                    previousContent = selectedContent
+                    previousTabIndex = selectedTabIndex
                 }
 
                 override fun contentAdded(event: ContentManagerEvent) {}

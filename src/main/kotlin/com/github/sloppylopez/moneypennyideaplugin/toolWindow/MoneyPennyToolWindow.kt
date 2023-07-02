@@ -123,9 +123,9 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     }
 
 //    fun getFocusedTabName(content: Content): String? {
-//        val tabbedPane = content.component.getComponent(0) as JBTabbedPane
-//        val selectedTab = tabbedPane.selectedIndex
-//        return tabbedPane.getTitleAt(selectedTab)
+    //        val tabbedPane = content.component.getComponent(0) as JBTabbedPane
+    //        val selectedTab = tabbedPane.selectedIndex
+    //        return tabbedPane.getTitleAt(selectedTab)
 //    }
 
     private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
