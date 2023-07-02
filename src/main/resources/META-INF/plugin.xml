@@ -9,7 +9,7 @@
     <resource-bundle>messages.Bundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory" id="MoneyPenny" anchor="right"/>
+        <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory" id="MoneyPenny AI" anchor="right"/>
     </extensions>
 
     <applicationListeners>

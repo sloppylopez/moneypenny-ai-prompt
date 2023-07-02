@@ -6,6 +6,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.ContentFactory
 import javax.swing.ImageIcon
+import javax.swing.JButton
 
 class ToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(
@@ -15,11 +16,13 @@ class ToolWindowFactory : ToolWindowFactory {
         try {
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-            val content =
-                ContentFactory.getInstance().createContent(
-                    moneyPennyToolWindow.getContent(),
-                    "Prompt", true
-                )
+
+            val content = ContentFactory.getInstance().createContent(
+                moneyPennyToolWindow.getContent(),
+                "Prompt",
+                true
+            )
+
             toolWindow.contentManager.addContent(content)
         } catch (e: Exception) {
             Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())

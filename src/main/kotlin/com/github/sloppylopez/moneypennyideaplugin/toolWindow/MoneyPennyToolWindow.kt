@@ -16,9 +16,12 @@ import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import java.io.File
 import javax.swing.BorderFactory
 import javax.swing.BoxLayout
+import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
 
@@ -27,6 +30,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val progressPanelFactory = project.service<ProgressPanelFactory>()
     private val fileEditorFactory = project.service<FileEditorFactory>()
+    private val fileEditorFactory2 = project.service<FileEditorFactory2>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
     private val currentToolWindow = toolWindow
@@ -103,8 +107,8 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
             2 -> comboBoxPanelFactory
                 .comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-            3 -> fileEditorFactory
-                .getCurrentEditorPane(innerPanel)
+            3 -> fileEditorFactory2
+                .openFileInEditor(file?.canonicalPath)
         }
 
         return innerPanel

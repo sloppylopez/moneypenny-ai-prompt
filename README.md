@@ -77,3 +77,7 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
     https://plugins.jetbrains.com/docs/intellij/controlling-highlighting.html
     
     https://web.mit.edu/6.005/www/sp14/psets/ps4/java-6-tutorial/components.html
+
+    https://docs.oracle.com/javase/tutorial/uiswing/components/tabbedpane.html
+
+    https://docs.oracle.com/javase/tutorial/uiswing/examples/components/index.html#TabbedPaneDemo
