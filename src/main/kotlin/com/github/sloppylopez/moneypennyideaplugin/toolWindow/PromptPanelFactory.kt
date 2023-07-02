@@ -2,7 +2,9 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
@@ -39,16 +41,17 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     fun promptPanel(
         panel: JPanel,
         toolWindow: ToolWindow? = null,
-        file: File?
+        file: File?,
+        message: String?
     ) {
         try {
             promptPanel = panel
             currentToolWindow = toolWindow
-            prePromptTextArea = textAreaFactory.createTextArea("", 2, 81)
-            contentPromptTextArea = textAreaFactory.createTextArea("", 12, 81)
+            prePromptTextArea = textAreaFactory.createTextArea("", 2, 79)
+            contentPromptTextArea = textAreaFactory.createTextArea("", 12, 79)
             contentPromptTextArea!!.text =
                 "Paste text, drag a file, copy folder path..."
-            postPromptTextArea = textAreaFactory.createTextArea("", 4, 81)
+            postPromptTextArea = textAreaFactory.createTextArea("", 4, 79)
             radioButtonFactory.radioButtonsPanel(
                 panel,
                 prePromptTextArea!!
@@ -68,13 +71,13 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     }
                     contentPromptTextArea?.text = contents.toString()
                 }
+            } else {
+                contentPromptTextArea?.text = message
             }
             panel.add(contentPromptScrollPane)
             val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
             checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
-
-            // Attach DropTarget to contentPromptTextArea
             contentPromptTextArea!!.dropTarget = DropTarget(contentPromptTextArea, this)
         } catch (e: Exception) {
             service.logError("PromptPanelFactory", e)
@@ -98,6 +101,30 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
             } catch (e: Exception) {
                 service.logError("PromptPanelFactory", e)
+            }
+        }
+    }
+
+    fun sendToContentPrompt(editor: Editor?) {
+        editor?.let { selectedEditor ->
+            val selectedText = selectedEditor.selectionModel.selectedText
+            if (selectedText != null) {
+                try {
+                    val message = "Selected text: $selectedText"
+                    Messages.showInfoMessage(
+                        message, "MoneyPenny Refactor",
+                    )
+                    val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
+                    val content = ContentFactory.getInstance()
+                        .createContent(
+                            moneyPennyToolWindow.getContent(emptyList<Any>(), message),
+                            "Method", true
+                        )
+                    currentToolWindow!!.contentManager.addContent(content, 0)
+                    currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
+                } catch (e: Exception) {
+                    service.logError("PromptPanelFactory", e)
+                }
             }
         }
     }

@@ -26,13 +26,17 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
     private val fileEditorManager = project.service<FileEditorManager>()
     private val service = project.service<ProjectService>()
 
-    fun getContent(fileList: List<*>? = emptyList<Any>()): JBPanel<JBPanel<*>> {
+    fun getContent(fileList: List<*>? = emptyList<Any>(), message: String? = null): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(toolWindow, fileList!!))
+            add(moneyPennyPromptPanel(toolWindow, fileList!!, message))
         }
     }
 
-    private fun moneyPennyPromptPanel(toolWindow: ToolWindow? = null, fileList: List<*>): JComponent {
+    private fun moneyPennyPromptPanel(
+        toolWindow: ToolWindow? = null,
+        fileList: List<*>,
+        message: String? = null
+    ): JComponent {
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
         var file: File? = null
@@ -55,7 +59,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
             gridBagConstraints.insets = JBUI.insets(2)
 
             for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, toolWindow, file)
+                val innerPanel = createInnerPanel(j, toolWindow, file, message)
                 innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
                 gridBagConstraints.gridy = j - 1
@@ -78,12 +82,12 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         return mainPanel
     }
 
-    private fun createInnerPanel(panelIndex: Int, toolWindow: ToolWindow? = null, file: File?): JPanel {
+    private fun createInnerPanel(panelIndex: Int, toolWindow: ToolWindow? = null, file: File?, message: String?): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         getSyntaxHighlighter(toolWindow, file)
         when (panelIndex) {
-            1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file)
+            1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, message)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
