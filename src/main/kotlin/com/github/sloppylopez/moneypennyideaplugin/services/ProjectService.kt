@@ -39,6 +39,21 @@ class ProjectService(project: Project) {
         )
     }
 
+    fun readFile(fileList: List<*>, i: Int, className: String): File? {
+        try {
+            if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
+                val file = fileList[i] as File
+                this.logInfo(className, "File $file")
+                return file
+            } else {
+                this.logInfo(className, "File is null")
+            }
+        } catch (e: Exception) {
+            this.logError(className, e)
+        }
+        return null
+    }
+
     fun showMessage(
         message: String, title: String
     ) {

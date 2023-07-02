@@ -46,7 +46,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
 
         for (i in 0..tabCount) {
             if (fileList.isNotEmpty()) {
-                file = readFile(fileList, i)
+                file = service.readFile(fileList, i, this.javaClass.name)
             }
             val panel = JPanel(GridBagLayout())
 
@@ -90,21 +90,6 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.NORTH)
         return mainPanel
-    }
-
-    private fun readFile(fileList: List<*>, i: Int): File? {
-        try {
-            if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
-                val file = fileList[i] as File
-                service.logInfo("MoneyPennyToolWindow", "File $file")
-                return file
-            } else {
-                service.logInfo("MoneyPennyToolWindow", "File is null")
-            }
-        } catch (e: Exception) {
-            service.logError("MoneyPennyToolWindow", e)
-        }
-        return null
     }
 
     private fun createInnerPanel(panelIndex: Int, toolWindow: ToolWindow? = null, file: File?): JPanel {
