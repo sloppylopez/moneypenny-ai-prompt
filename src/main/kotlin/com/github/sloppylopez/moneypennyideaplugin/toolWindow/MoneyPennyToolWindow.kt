@@ -21,6 +21,7 @@ import javax.swing.*
 import javax.swing.event.ChangeListener
 
 private lateinit var tabbedPane: JBTabbedPane // Declare com.github.sloppylopez.moneypennyideaplugin.toolWindow.tabbedPane at the class level
+private var showDialog: Boolean = false
 
 class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
 
@@ -49,7 +50,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
         val changeListener = ChangeListener { _ ->
             val selectedTab = tabbedPane.selectedIndex
             val tabName = tabbedPane.getTitleAt(selectedTab)
-            JOptionPane.showMessageDialog(tabbedPane, "Selected Tab: $tabName")
+            JOptionPane.showMessageDialog(tabbedPane, "Selected Tab1: $tabName")
         }
 
         for (i in 0..tabCount) {
@@ -82,7 +83,10 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
                 service.logInfo("MoneyPennyToolWindow", "Ancestor Added")
                 val selectedTab = tabbedPane.selectedIndex
                 val tabName = tabbedPane.getTitleAt(selectedTab)
-                JOptionPane.showMessageDialog(tabbedPane, "Selected Tab: $tabName")
+//                if (showDialog) {
+                    JOptionPane.showMessageDialog(tabbedPane, "Selected Tab2: $tabName")
+//                    showDialog = true // Set the flag to true after showing the dialog
+//                }
             }
 
             override fun ancestorMoved(e: javax.swing.event.AncestorEvent?) {
@@ -95,6 +99,7 @@ class MoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
         })
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.NORTH)
+//        showDialog = true // Set the flag to true after showing the dialog
         return mainPanel
     }
 
