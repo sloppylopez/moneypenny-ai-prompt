@@ -1,3 +1,4 @@
+import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
@@ -13,7 +14,6 @@ import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.Point
 import java.io.File
 import javax.swing.*
 import javax.swing.event.ChangeListener
@@ -21,10 +21,10 @@ import javax.swing.event.ChangeListener
 class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
-    private val fileEditorManager = project.service<FileEditorManager>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
+    private val ancestorListener = project.service<AncestorListener>()
+    private val fileEditorManager = project.service<FileEditorManager>()
     private val service = project.service<ProjectService>()
-    private val tabNameToFileMap = mutableMapOf<String, String>()
 
     fun getContent(fileList: List<*>? = emptyList<Any>()): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
@@ -40,8 +40,8 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         val changeListener = ChangeListener { _ ->
             val selectedTab = tabbedPane.selectedIndex
             val tabName = tabbedPane.getTitleAt(selectedTab)
-            val filePath = tabNameToFileMap[tabName]
-            fileEditorManager.openFileInEditor(filePath)
+            val filePath = ancestorListener.tabNameToFileMap[tabName]
+            ancestorListener.fileEditorManager.openFileInEditor(filePath)
         }
 
         for (i in 0..tabCount) {
@@ -64,29 +64,15 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
             if (i < fileList.size && file != null) {
                 val tabName = file.name
                 tabbedPane.addTab(tabName, panel)
-                tabNameToFileMap[tabName] = file.canonicalPath
+                ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
             } else {
                 tabbedPane.addTab("$i", panel)
             }
         }
 
         tabbedPane.addChangeListener(changeListener)
-        tabbedPane.addAncestorListener(object : javax.swing.event.AncestorListener {
-            override fun ancestorAdded(e: javax.swing.event.AncestorEvent?) {
-                val selectedTab = tabbedPane.selectedIndex
-                val tabName = tabbedPane.getTitleAt(selectedTab)
-                val filePath = tabNameToFileMap[tabName]
-                fileEditorManager.openFileInEditor(filePath)
-            }
-
-            override fun ancestorMoved(e: javax.swing.event.AncestorEvent?) {
-                service.logInfo("MoneyPennyToolWindow", "Ancestor Moved")
-            }
-
-            override fun ancestorRemoved(e: javax.swing.event.AncestorEvent?) {
-                service.logInfo("MoneyPennyToolWindow", "Ancestor Removed")
-            }
-        })
+        val ancestorListener = ancestorListener.getAncestorListener(tabbedPane)
+        tabbedPane.addAncestorListener(ancestorListener)
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.NORTH)
         return mainPanel
