@@ -81,3 +81,5 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
     https://docs.oracle.com/javase/tutorial/uiswing/components/tabbedpane.html
 
     https://docs.oracle.com/javase/tutorial/uiswing/examples/components/index.html#TabbedPaneDemo
+
+    https://medium.com/agorapulse-stories/how-to-debug-your-own-intellij-idea-instance-7d7df185a48d

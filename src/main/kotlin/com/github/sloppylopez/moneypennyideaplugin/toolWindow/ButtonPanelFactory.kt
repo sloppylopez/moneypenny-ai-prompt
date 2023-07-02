@@ -14,7 +14,7 @@ import javax.swing.JButton
 //import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JTextArea
-
+//TODO   dont write context if file is not null
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
         private val service = project.service<ProjectService>()

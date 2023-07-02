@@ -33,7 +33,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
     }
 
     private fun moneyPennyPromptPanel(toolWindow: ToolWindow? = null, fileList: List<*>): JComponent {
-        val tabbedPane = JBTabbedPane()
+        val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
         var file: File? = null
 
@@ -74,7 +74,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         val ancestorListener = ancestorListener.getAncestorListener(tabbedPane)
         tabbedPane.addAncestorListener(ancestorListener)
         val mainPanel = JPanel(BorderLayout())
-        mainPanel.add(tabbedPane, BorderLayout.NORTH)
+        mainPanel.add(tabbedPane, BorderLayout.CENTER)
         return mainPanel
     }
 
