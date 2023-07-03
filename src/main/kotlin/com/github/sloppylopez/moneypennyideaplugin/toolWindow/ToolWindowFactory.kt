@@ -1,8 +1,11 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import MoneyPennyToolWindow
+import com.github.sloppylopez.moneypennyideaplugin.actions.HelloWorldAction
+import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
@@ -12,22 +15,28 @@ import com.intellij.ui.content.ContentFactory
 import javax.swing.ImageIcon
 import javax.swing.SwingUtilities.invokeLater
 
-
 class ToolWindowFactory : ToolWindowFactory {
+    init {
+        val helloWorldAction = HelloWorldAction()
+        helloWorldAction.registerHelloWorldAction()
+    }
+
     override fun createToolWindowContent(
         project: Project,
         toolWindow: ToolWindow
     ) {
         try {
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
+
             invokeLater {
                 ApplicationManager.getApplication().invokeLater(
                     {
                         refactorIntentionFactory.addCustomIntentionToAllEditors()
                     },
                     ModalityState.NON_MODAL
-                )//TODO: if we drag a file before indexing we get an error here reported on intellij idea console
+                )
             }
+
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
 

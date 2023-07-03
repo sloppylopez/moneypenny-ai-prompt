@@ -6,7 +6,6 @@ import com.intellij.lang.Language
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
@@ -27,16 +26,16 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
     private val fileEditorManager = project.service<FileEditorManager>()
     private val service = project.service<ProjectService>()
 
-    fun getContent(fileList: List<*>? = emptyList<Any>(), message: String? = null): JBPanel<JBPanel<*>> {
+    fun getContent(fileList: List<*>? = emptyList<Any>(), contentPromptText: String? = null): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(toolWindow, fileList!!, message))
+            add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText))
         }
     }
 
     private fun moneyPennyPromptPanel(
         toolWindow: ToolWindow? = null,
         fileList: List<*>,
-        message: String? = null
+        contentPromptText: String? = null
     ): JComponent {
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
@@ -49,7 +48,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
 //            Messages.showInfoMessage(
 //                message, "1",
 //            )
-            ancestorListener.fileEditorManager.openFileInEditor(filePath, message)
+            ancestorListener.fileEditorManager.openFileInEditor(filePath, contentPromptText)
         }
 
         for (i in 0..tabCount) {
@@ -63,7 +62,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
             gridBagConstraints.insets = JBUI.insets(2)
 
             for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, toolWindow, file, message)
+                val innerPanel = createInnerPanel(j, toolWindow, file, contentPromptText)
                 innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
                 gridBagConstraints.gridy = j - 1
@@ -90,13 +89,13 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         panelIndex: Int,
         toolWindow: ToolWindow? = null,
         file: File?,
-        message: String?
+        contentPromptText: String?
     ): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         getSyntaxHighlighter(toolWindow, file)
         when (panelIndex) {
-            1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, message)
+            1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
@@ -104,7 +103,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
 //                Messages.showInfoMessage(
 //                    message, "2",
 //                )
-                fileEditorManager.openFileInEditor(file?.canonicalPath, message)
+                fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
             }
         }
         return innerPanel

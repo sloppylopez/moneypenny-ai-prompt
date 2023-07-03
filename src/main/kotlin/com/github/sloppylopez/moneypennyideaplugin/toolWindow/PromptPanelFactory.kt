@@ -2,9 +2,9 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
@@ -19,6 +19,7 @@ import java.io.File
 import java.io.FileReader
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import javax.swing.ScrollPaneConstants
 
 
 @Service(Service.Level.PROJECT)
@@ -42,32 +43,28 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         panel: JPanel,
         toolWindow: ToolWindow? = null,
         file: File?,
-        message: String?
+        contentPromptText: String?
     ) {
         try {
             promptPanel = panel
             currentToolWindow = toolWindow
-            prePromptTextArea = textAreaFactory.createTextArea("", 2, 79)
-            contentPromptTextArea = textAreaFactory.createTextArea("", 12, 79)
-            contentPromptTextArea!!.text =
-                "Paste text, drag a file, copy folder path..."
-            postPromptTextArea = textAreaFactory.createTextArea("", 4, 79)
-            radioButtonFactory.radioButtonsPanel(
-                panel,
-                prePromptTextArea!!
-            )
+            prePromptTextArea = textAreaFactory.createTextArea("", 4, 79)
+            contentPromptTextArea = textAreaFactory.createTextArea("", 2, 79)
+            contentPromptTextArea!!.text = "Paste text, drag a file, copy folder path..."
+            postPromptTextArea = textAreaFactory.createTextArea("", 6, 79)
+            radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
 
             val prePromptScrollPane = JBScrollPane(prePromptTextArea)
             panel.add(prePromptScrollPane)
             val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
-            addTextToContentPrompt(file, message)
+            addTextToContentPrompt(file, contentPromptText)
             panel.add(contentPromptScrollPane)
             val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
             checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
             contentPromptTextArea!!.dropTarget = DropTarget(contentPromptTextArea, this)
         } catch (e: Exception) {
-            service.logError("PromptPanelFactory", e)
+            thisLogger().error(e)
         }
     }
 
@@ -84,7 +81,8 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 contentPromptTextArea?.text = contents.toString()
             }
         } else {
-            contentPromptTextArea?.text = message
+            if (message != null)
+                contentPromptTextArea?.text = message
         }
     }
 
@@ -99,12 +97,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 val content = ContentFactory.getInstance()
                     .createContent(
                         moneyPennyToolWindow.getContent(fileList),
-                        fileList.size.toString() + " Archives", true
+                        fileList.size.toString() + " Arch", true
                     )
                 currentToolWindow!!.contentManager.addContent(content, 0)
                 currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
             } catch (e: Exception) {
-                service.logError("PromptPanelFactory", e)
+                thisLogger().error(e)
             }
         }
     }
@@ -113,9 +111,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         editor: Editor?,
         file: File?
     ) {
-//        Messages.showInfoMessage(
-//            file?.canonicalPath, file?.name.toString()
-//        )
         editor?.let { selectedEditor ->
             val selectedText = selectedEditor.selectionModel.selectedText
             if (selectedText != null) {

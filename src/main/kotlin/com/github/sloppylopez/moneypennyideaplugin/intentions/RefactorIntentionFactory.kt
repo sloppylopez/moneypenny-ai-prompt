@@ -1,4 +1,4 @@
-package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+package com.github.sloppylopez.moneypennyideaplugin.intentions
 
 import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService

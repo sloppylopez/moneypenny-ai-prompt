@@ -5,9 +5,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import java.io.File
 
 @Service(Service.Level.PROJECT)
@@ -15,10 +13,10 @@ class FileEditorManager(private val project: Project) {
 
     fun openFileInEditor(
         filePath: String?,
-        message: String? = null
+        contentPromptText: String? = null
     ) {
-        if (message != null) {
-            highlightTextInEditor(message)
+        if (contentPromptText != null) {
+            highlightTextInEditor(contentPromptText)
         }
         if (filePath == null) return
         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
@@ -30,14 +28,14 @@ class FileEditorManager(private val project: Project) {
         }
     }
 
-    private fun highlightTextInEditor(text: String) {
+    private fun highlightTextInEditor(contentPromptText: String) {
         val editor = getCurrentEditor(project)
         editor?.let {
             val document = editor.document
-            val textOffset = document.text.indexOf(text)
+            val textOffset = document.text.indexOf(contentPromptText)
             if (textOffset != -1) {
                 editor.caretModel.moveToOffset(textOffset)
-                editor.selectionModel.setSelection(textOffset, textOffset + text.length)
+                editor.selectionModel.setSelection(textOffset, textOffset + contentPromptText.length)
             }
         }
     }
