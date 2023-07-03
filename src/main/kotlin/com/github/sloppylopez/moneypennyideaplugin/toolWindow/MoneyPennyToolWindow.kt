@@ -46,9 +46,9 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
             val selectedTab = tabbedPane.selectedIndex
             val tabName = tabbedPane.getTitleAt(selectedTab)
             val filePath = ancestorListener.tabNameToFileMap[tabName]
-            Messages.showInfoMessage(
-                message, "1",
-            )
+//            Messages.showInfoMessage(
+//                message, "1",
+//            )
             ancestorListener.fileEditorManager.openFileInEditor(filePath, message)
         }
 
@@ -101,9 +101,9 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
             3 -> {
-                Messages.showInfoMessage(
-                    message, "2",
-                )
+//                Messages.showInfoMessage(
+//                    message, "2",
+//                )
                 fileEditorManager.openFileInEditor(file?.canonicalPath, message)
             }
         }

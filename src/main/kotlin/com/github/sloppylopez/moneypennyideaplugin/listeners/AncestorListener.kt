@@ -28,9 +28,9 @@ class AncestorListener(project: Project) {
                     val tabName = tabbedPane.getTitleAt(selectedTab)
                     val filePath = tabNameToFileMap[tabName]
                     val message = promptPanelFactory.contentPromptTextArea?.text
-                    Messages.showInfoMessage(
-                        message, "3",
-                    )
+//                    Messages.showInfoMessage(
+//                        message, "3",
+//                    )
                     fileEditorManager.openFileInEditor(filePath, message)
                 } catch (e: Exception) {
                     thisLogger().error(e)
