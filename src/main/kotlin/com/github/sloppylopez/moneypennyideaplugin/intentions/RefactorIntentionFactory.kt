@@ -2,8 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.intentions
 
 import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.intellij.codeInsight.intention.IntentionAction
-import com.intellij.codeInsight.intention.IntentionManager
+import com.intellij.codeInsight.intention.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
@@ -16,12 +15,12 @@ import com.intellij.psi.PsiManager
 class RefactorIntentionFactory(private val project: Project) {
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
-    fun addCustomIntentionToAllEditors() {
+    fun addIntentionToAllEditors() {
         val intentionManager = IntentionManager.getInstance()
 
         // Create a new IntentionAction for "MoneyPenny Refactor"
         val customIntention = object : IntentionAction {
-            override fun getText(): String = "MoneyPenny Refactor"
+            override fun getText(): String = "Send to MoneyPenny"
 
             override fun getFamilyName(): String = "Custom Intentions"
 

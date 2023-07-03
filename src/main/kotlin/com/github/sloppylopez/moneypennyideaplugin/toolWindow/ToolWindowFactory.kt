@@ -1,11 +1,11 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import MoneyPennyToolWindow
-import com.github.sloppylopez.moneypennyideaplugin.actions.HelloWorldAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileEditorAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
@@ -17,8 +17,10 @@ import javax.swing.SwingUtilities.invokeLater
 
 class ToolWindowFactory : ToolWindowFactory {
     init {
-        val helloWorldAction = HelloWorldAction()
-        helloWorldAction.registerHelloWorldAction()
+        val sendToPromptFileEditorAction = SendToPromptFileEditorAction()
+        sendToPromptFileEditorAction.registerFileEditorAction()
+        val sendToPromptFolderTreeAction = SendToPromptFolderTreeAction()
+        sendToPromptFolderTreeAction.registerFolderTreeAction()
     }
 
     override fun createToolWindowContent(
@@ -27,11 +29,10 @@ class ToolWindowFactory : ToolWindowFactory {
     ) {
         try {
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
-
             invokeLater {
                 ApplicationManager.getApplication().invokeLater(
                     {
-                        refactorIntentionFactory.addCustomIntentionToAllEditors()
+                        refactorIntentionFactory.addIntentionToAllEditors()
                     },
                     ModalityState.NON_MODAL
                 )
