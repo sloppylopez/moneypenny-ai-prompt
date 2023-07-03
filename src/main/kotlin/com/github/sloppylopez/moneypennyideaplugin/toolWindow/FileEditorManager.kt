@@ -1,23 +1,21 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.psi.PsiManager
 import java.io.File
-import javax.swing.SwingUtilities.invokeLater
 
 @Service(Service.Level.PROJECT)
 class FileEditorManager(private val project: Project) {
-    private val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
 
     fun openFileInEditor(filePath: String?) {
+//        Messages.showInfoMessage(
+//            filePath, filePath.toString(),
+//        )
         if (filePath == null) return
         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
         val fileEditorManager = FileEditorManager.getInstance(project)

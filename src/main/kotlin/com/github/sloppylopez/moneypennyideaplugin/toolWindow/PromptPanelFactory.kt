@@ -105,20 +105,23 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         }
     }
 
-    fun sendToContentPrompt(editor: Editor?) {
+    fun sendToContentPrompt(
+        editor: Editor?,
+        file: File?
+    ) {
+//        Messages.showInfoMessage(
+//            file?.canonicalPath, file?.name.toString()
+//        )
         editor?.let { selectedEditor ->
             val selectedText = selectedEditor.selectionModel.selectedText
             if (selectedText != null) {
                 try {
-                    val message = "Selected text: $selectedText"
-                    Messages.showInfoMessage(
-                        message, "MoneyPenny Refactor",
-                    )
                     val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
                     val content = ContentFactory.getInstance()
                         .createContent(
-                            moneyPennyToolWindow.getContent(emptyList<Any>(), message),
-                            "Method", true
+                            moneyPennyToolWindow.getContent(listOf(file), selectedText),
+                            "Snippet",
+                            true
                         )
                     currentToolWindow!!.contentManager.addContent(content, 0)
                     currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected

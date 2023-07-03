@@ -5,6 +5,7 @@ import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.ui.components.JBTabbedPane
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
@@ -21,6 +22,9 @@ class AncestorListener(project: Project) {
                 val selectedTab = tabbedPane.selectedIndex
                 val tabName = tabbedPane.getTitleAt(selectedTab)
                 val filePath = tabNameToFileMap[tabName]
+//                Messages.showInfoMessage(
+//                    tabNameToFileMap.toString(), tabName,
+//                )
                 fileEditorManager.openFileInEditor(filePath)
             }
 

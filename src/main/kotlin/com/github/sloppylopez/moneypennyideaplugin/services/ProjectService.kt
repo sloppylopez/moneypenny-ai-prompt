@@ -36,6 +36,13 @@ class ProjectService(project: Project) {
         return file?.let { localFileSystem.findFileByIoFile(it) }
     }
 
+    fun psiFileToFile(file: PsiFile?): File? {
+        return file?.virtualFile?.let { virtualFile ->
+            File(virtualFile.path)
+        }
+    }
+
+
     fun showDialog(
         message: String, title: String,
         buttons: Array<String>, defaultOptionIndex:

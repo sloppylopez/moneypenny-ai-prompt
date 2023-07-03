@@ -82,7 +82,12 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         return mainPanel
     }
 
-    private fun createInnerPanel(panelIndex: Int, toolWindow: ToolWindow? = null, file: File?, message: String?): JPanel {
+    private fun createInnerPanel(
+        panelIndex: Int,
+        toolWindow: ToolWindow? = null,
+        file: File?,
+        message: String?
+    ): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         getSyntaxHighlighter(toolWindow, file)
