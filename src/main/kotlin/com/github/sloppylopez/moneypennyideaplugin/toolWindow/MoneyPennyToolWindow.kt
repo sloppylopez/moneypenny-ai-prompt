@@ -6,6 +6,7 @@ import com.intellij.lang.Language
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
@@ -45,7 +46,10 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
             val selectedTab = tabbedPane.selectedIndex
             val tabName = tabbedPane.getTitleAt(selectedTab)
             val filePath = ancestorListener.tabNameToFileMap[tabName]
-            ancestorListener.fileEditorManager.openFileInEditor(filePath)
+            Messages.showInfoMessage(
+                message, "1",
+            )
+            ancestorListener.fileEditorManager.openFileInEditor(filePath, message)
         }
 
         for (i in 0..tabCount) {
@@ -75,7 +79,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
         }
 
         tabbedPane.addChangeListener(changeListener)
-        val ancestorListener = ancestorListener.getAncestorListener(tabbedPane)
+        val ancestorListener = ancestorListener.getAncestorListener(tabbedPane, promptPanelFactory)
         tabbedPane.addAncestorListener(ancestorListener)
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.CENTER)
@@ -96,7 +100,12 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath)
+            3 -> {
+                Messages.showInfoMessage(
+                    message, "2",
+                )
+                fileEditorManager.openFileInEditor(file?.canonicalPath, message)
+            }
         }
         return innerPanel
     }

@@ -1,12 +1,14 @@
 package com.github.sloppylopez.moneypennyideaplugin.listeners
 
-import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.ui.components.JBTabbedPane
+import java.awt.Point
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
@@ -14,26 +16,33 @@ import javax.swing.event.AncestorListener
 class AncestorListener(project: Project) {
     val tabNameToFileMap = mutableMapOf<String, String>()
     val fileEditorManager = project.service<FileEditorManager>()
-    private val service = project.service<ProjectService>()
 
-    fun getAncestorListener(tabbedPane: JBTabbedPane) =
+    fun getAncestorListener(
+        tabbedPane: JBTabbedPane,
+        promptPanelFactory: PromptPanelFactory
+    ) =
         object : AncestorListener {
             override fun ancestorAdded(e: AncestorEvent?) {
-                val selectedTab = tabbedPane.selectedIndex
-                val tabName = tabbedPane.getTitleAt(selectedTab)
-                val filePath = tabNameToFileMap[tabName]
-//                Messages.showInfoMessage(
-//                    tabNameToFileMap.toString(), tabName,
-//                )
-                fileEditorManager.openFileInEditor(filePath)
+                try {
+                    val selectedTab = tabbedPane.selectedIndex
+                    val tabName = tabbedPane.getTitleAt(selectedTab)
+                    val filePath = tabNameToFileMap[tabName]
+                    val message = promptPanelFactory.contentPromptTextArea?.text
+                    Messages.showInfoMessage(
+                        message, "3",
+                    )
+                    fileEditorManager.openFileInEditor(filePath, message)
+                } catch (e: Exception) {
+                    thisLogger().error(e)
+                }
             }
 
             override fun ancestorMoved(e: AncestorEvent?) {
-                service.logInfo("AncestorListenerFactory", "Ancestor Moved")
+                thisLogger().info("Ancestor Moved")
             }
 
             override fun ancestorRemoved(e: AncestorEvent?) {
-                service.logInfo("AncestorListenerFactory", "Ancestor Removed")
+                thisLogger().info("Ancestor Removed")
             }
         }
 }

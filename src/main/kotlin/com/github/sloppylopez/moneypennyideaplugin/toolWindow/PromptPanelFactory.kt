@@ -60,20 +60,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             val prePromptScrollPane = JBScrollPane(prePromptTextArea)
             panel.add(prePromptScrollPane)
             val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
-            if (file != null) {
-                val reader = BufferedReader(FileReader(file))
-                reader.use {
-                    val contents = StringBuilder()
-                    var line: String? = reader.readLine()
-                    while (line != null) {
-                        contents.append(line).append(System.lineSeparator())
-                        line = reader.readLine()
-                    }
-                    contentPromptTextArea?.text = contents.toString()
-                }
-            } else {
-                contentPromptTextArea?.text = message
-            }
+            addTextToContentPrompt(file, message)
             panel.add(contentPromptScrollPane)
             val postPromptScrollPane = JBScrollPane(postPromptTextArea)
             panel.add(postPromptScrollPane)
@@ -81,6 +68,23 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             contentPromptTextArea!!.dropTarget = DropTarget(contentPromptTextArea, this)
         } catch (e: Exception) {
             service.logError("PromptPanelFactory", e)
+        }
+    }
+
+    private fun addTextToContentPrompt(file: File?, message: String?) {
+        if (file != null && message == null) {
+            val reader = BufferedReader(FileReader(file))
+            reader.use {
+                val contents = StringBuilder()
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    contents.append(line).append(System.lineSeparator())
+                    line = reader.readLine()
+                }
+                contentPromptTextArea?.text = contents.toString()
+            }
+        } else {
+            contentPromptTextArea?.text = message
         }
     }
 

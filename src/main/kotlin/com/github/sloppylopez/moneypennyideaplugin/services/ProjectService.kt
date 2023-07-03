@@ -86,27 +86,4 @@ class ProjectService(project: Project) {
     fun logInfo(className: String, info: String) {
         Logger.getInstance(className).info(info)
     }
-
-    fun showPsiFile(project: Project, file: PsiFile, lineNumber: Int, column: Int, length: Int) {
-        val virtualFile: VirtualFile = file.virtualFile ?: return
-
-        val desc = OpenFileDescriptor(project, virtualFile, lineNumber - 1, column)
-        desc.navigate(true)
-
-        val editor = FileEditorManager.getInstance(project).selectedTextEditor ?: return
-        val markupModel = editor.markupModel
-
-        val caretLocation = editor.caretModel.offset
-        val startOffset = caretLocation
-        val endOffset = startOffset + length
-
-        markupModel.removeAllHighlighters()
-        val attributes: TextAttributes? = EditorColorsManager.getInstance().globalScheme.getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES)
-        val highlighter: RangeHighlighter = markupModel.addRangeHighlighter(startOffset, endOffset, HighlighterLayer.ERROR + 1, attributes, HighlighterTargetArea.EXACT_RANGE)
-
-        // To dispose of the highlighter after a certain duration, you can use:
-        // Disposer.register(project, highlighter);
-
-        editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
-    }
 }
