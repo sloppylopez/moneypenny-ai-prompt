@@ -11,6 +11,9 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory"
                     id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
+<!--        <intentionAction factoryClass="com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory" >-->
+<!--            <className/>-->
+<!--        </intentionAction>-->
     </extensions>
 
     <applicationListeners>
