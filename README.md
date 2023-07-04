@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="html">
-<head>
-</head>
 <body>
 <div>
   <div>
