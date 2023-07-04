@@ -30,7 +30,7 @@
 </head>
 <body>
   <div class="panel">
-    <img src="src/main/resources/images/moneypenny4.jpg" alt="Prompt">
+    <img src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px">
     <div class="content">
       <h1>MoneyPenny AI Prompt</h1>
       <p>
