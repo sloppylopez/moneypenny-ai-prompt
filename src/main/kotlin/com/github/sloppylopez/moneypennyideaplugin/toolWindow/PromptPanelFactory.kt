@@ -5,6 +5,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
@@ -93,18 +94,32 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             try {
                 val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                Messages.showInfoMessage(
+                    currentProject,
+                    "Dropped " + fileList.size + " files " + fileList.toString(),
+                    "MoneyPenny"
+                )
                 val expandedFileList = expandFolders(fileList)
                 val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
                 val content = ContentFactory.getInstance()
                     .createContent(
                         moneyPennyToolWindow.getContent(expandedFileList),
-                        expandedFileList.size.toString() + " Arch", true
+                        getDisplayName(expandedFileList),
+                        true
                     )
                 currentToolWindow!!.contentManager.addContent(content, 0)
                 currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
             } catch (e: Exception) {
-                thisLogger().error(e)
+                thisLogger().error("PromptPanelFactory: ", e)
             }
+        }
+    }
+
+    private fun getDisplayName(expandedFileList: List<File>): String {
+        return if (expandedFileList.isEmpty()) {
+            "Prompt"
+        } else {
+            expandedFileList.size.toString() + " Arch"
         }
     }
 
