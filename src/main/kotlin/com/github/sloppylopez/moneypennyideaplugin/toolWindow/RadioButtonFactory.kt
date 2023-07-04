@@ -14,11 +14,6 @@ import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class RadioButtonFactory(project: Project) {
-
-    init {
-        thisLogger().info(Bundle.message("projectService", project.name))
-    }
-
     fun radioButtonsPanel(
         panel: JPanel,
         prePromptTextArea: JTextArea

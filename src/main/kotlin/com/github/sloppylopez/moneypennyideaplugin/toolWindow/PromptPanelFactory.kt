@@ -48,10 +48,10 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         try {
             promptPanel = panel
             currentToolWindow = toolWindow
-            prePromptTextArea = textAreaFactory.createTextArea("", 4, 79)
-            contentPromptTextArea = textAreaFactory.createTextArea("", 2, 79)
-            contentPromptTextArea!!.text = "Paste text, drag a file, copy folder path..."
-            postPromptTextArea = textAreaFactory.createTextArea("", 6, 79)
+            prePromptTextArea = textAreaFactory.createTextArea("", 2, 79)
+            contentPromptTextArea =
+                textAreaFactory.createTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+            postPromptTextArea = textAreaFactory.createTextArea("", 5, 79)
             radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
 
             val prePromptScrollPane = JBScrollPane(prePromptTextArea)
