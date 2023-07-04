@@ -24,6 +24,7 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0-M1")
+    testImplementation("org.mockito:mockito-core:5.4.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
     implementation("com.google.api:gax:2.30.0")
