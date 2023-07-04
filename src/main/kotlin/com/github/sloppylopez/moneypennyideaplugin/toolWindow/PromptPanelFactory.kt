@@ -93,11 +93,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             try {
                 val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                val expandedFileList = expandFolders(fileList)
                 val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
                 val content = ContentFactory.getInstance()
                     .createContent(
-                        moneyPennyToolWindow.getContent(fileList),
-                        fileList.size.toString() + " Arch", true
+                        moneyPennyToolWindow.getContent(expandedFileList),
+                        expandedFileList.size.toString() + " Arch", true
                     )
                 currentToolWindow!!.contentManager.addContent(content, 0)
                 currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
@@ -106,6 +107,27 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             }
         }
     }
+
+    private fun expandFolders(fileList: List<*>): List<File> {
+        val expandedFileList = mutableListOf<File>()
+
+        for (file in fileList) {
+            try {
+                if (file is File) {
+                    if (file.isDirectory) {
+                        expandedFileList.addAll(expandFolders(file.listFiles()?.toList() ?: emptyList<String>()))
+                    } else {
+                        expandedFileList.add(file)
+                    }
+                }
+            } catch (e: Exception) {
+                thisLogger().error("PromptPanelFactory: ", e)
+            }
+        }
+
+        return expandedFileList
+    }
+
 
     fun sendToContentPrompt(
         editor: Editor?,
@@ -125,7 +147,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     currentToolWindow!!.contentManager.addContent(content, 0)
                     currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
                 } catch (e: Exception) {
-                    service.logError("PromptPanelFactory", e)
+                    thisLogger().error("PromptPanelFactory: ", e)
                 }
             }
         }

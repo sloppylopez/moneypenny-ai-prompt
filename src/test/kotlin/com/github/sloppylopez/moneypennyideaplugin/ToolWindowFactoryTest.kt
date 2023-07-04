@@ -24,13 +24,12 @@ class ToolWindowFactoryTest : BasePlatformTestCase() {
         val toolWindowManager = ToolWindowManagerEx.getInstanceEx(project)
         val id = "TestMyToolWindowId"
         val toolWindow = toolWindowManager.registerToolWindow(id, true, ToolWindowAnchor.RIGHT, true)
-        toolWindow.setToHideOnEmptyContent(true)
+        toolWindow.setToHideOnEmptyContent(false)
         // Call the method to test
         toolWindowFactory.createToolWindowContent(project, toolWindow)
         toolWindow.show()
         // Assert that the tool window's content panel is not empty
         assertNotNull(toolWindow.component)
-//        assertFalse(toolWindow.component.components.isEmpty())
     }
 
     private fun createMockProject(): Project {
