@@ -7,10 +7,9 @@
     <h1>&nbsp;&nbsp;MoneyPenny AI Prompt</h1>
   </div>
     <p>
-      Welcome to MoneyPenny AI Prompt, the powerful Kotlin IntelliJ IDEA plugin that revolutionizes
+      Welcome to MoneyPenny AI Prompt, the powerful IntelliJ IDEA plugin that revolutionizes
       code refactoring! With MoneyPenny AI Prompt, you can easily improve, refactor, and test your
-      codebase with just a few clicks. Seamlessly integrated with IntelliJ IDEA, this plugin provides
-      a user-friendly interface to simplify your development workflow.
+      codebase with just a few clicks. Seamlessly integrated with IntelliJ IDEA.
     </p>
 </div>
 
