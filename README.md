@@ -1,41 +1,49 @@
-<style>
-.panel {
-  display: flex;
-  align-items: center;
-}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MoneyPenny AI Prompt</title>
+  <style>
+    .panel {
+      display: flex;
+      align-items: center;
+    }
 
-.panel img {
-  width: 300px;
-  height: 200px;
-  margin-right: 20px;
-}
+    .panel img {
+      width: 300px;
+      height: 200px;
+      margin-right: 20px;
+    }
 
-.panel .content {
-  flex-grow: 1;
-}
+    .panel .content {
+      flex-grow: 1;
+    }
 
-.panel h1 {
-  font-size: 24px;
-  margin-top: 0;
-}
+    .panel h1 {
+      font-size: 24px;
+      margin-top: 0;
+    }
 
-.panel p {
-  font-size: 16px;
-}
-</style>
-
-<div class="panel">
-  <img src="src/main/resources/images/moneypenny4.jpg" alt="Prompt">
-  <div class="content">
-    <h1>MoneyPenny AI Prompt</h1>
-    <p>
-      Welcome to MoneyPenny AI Prompt, the powerful Kotlin IntelliJ IDEA plugin that revolutionizes
-      code refactoring! With MoneyPenny AI Prompt, you can easily improve, refactor, and test your
-      codebase with just a few clicks. Seamlessly integrated with IntelliJ IDEA, this plugin provides
-      a user-friendly interface to simplify your development workflow.
-    </p>
+    .panel p {
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <img src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px">
+    <div class="content">
+      <h1>MoneyPenny AI Prompt</h1>
+      <p>
+        Welcome to MoneyPenny AI Prompt, the powerful Kotlin IntelliJ IDEA plugin that revolutionizes
+        code refactoring! With MoneyPenny AI Prompt, you can easily improve, refactor, and test your
+        codebase with just a few clicks. Seamlessly integrated with IntelliJ IDEA, this plugin provides
+        a user-friendly interface to simplify your development workflow.
+      </p>
+    </div>
   </div>
-</div>
+</body>
+</html>
+
 
 
 ### Refactor Your Codebase with Ease at Full Speed!
