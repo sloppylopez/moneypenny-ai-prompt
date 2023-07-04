@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="html">
 <head>
-  <title>MoneyPenny AI Prompt</title>
 </head>
 <body>
 <div>
