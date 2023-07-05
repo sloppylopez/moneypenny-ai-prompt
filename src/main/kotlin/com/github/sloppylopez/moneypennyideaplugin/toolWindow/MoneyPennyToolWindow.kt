@@ -19,7 +19,7 @@ import java.io.File
 import javax.swing.*
 import javax.swing.event.ChangeListener
 
-class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow) {
+class MoneyPennyToolWindow(private val project: Project, private val toolWindow: ToolWindow) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
@@ -57,7 +57,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
                     thisLogger().error(e)
                 }
             } as String
-
+            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
             ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
         }
 
@@ -82,6 +82,9 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
                 val tabName = file.name
                 tabbedPane.addTab(tabName, panel)
                 ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
+                if (contentPromptText != null) {
+                    ancestorListener.tabNameToContentPromptTextMap[tabName] = contentPromptText
+                }
             } else {
                 tabbedPane.addTab("No File", panel)
             }
@@ -109,7 +112,10 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
+            3 -> {
+                service.showNotification(project, "CreateInnerPanel $contentPromptText", file?.canonicalPath.toString())
+                fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
+            }
 
         }
         return innerPanel

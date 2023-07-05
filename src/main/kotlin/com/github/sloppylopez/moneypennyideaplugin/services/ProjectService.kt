@@ -116,6 +116,26 @@ class ProjectService(project: Project) {
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
 
+    fun expandFolders(fileList: List<*>): List<File> {
+        val expandedFileList = mutableListOf<File>()
+
+        for (file in fileList) {
+            try {
+                if (file is File) {
+                    if (file.isDirectory) {
+                        expandedFileList.addAll(expandFolders(file.listFiles()?.toList() ?: emptyList<String>()))
+                    } else {
+                        expandedFileList.add(file)
+                    }
+                }
+            } catch (e: Exception) {
+                thisLogger().error("PromptPanelFactory: ", e)
+            }
+        }
+
+        return expandedFileList
+    }
+
 //    fun highlightTextOnCurrentEditor(contentPromptText: String?, filePath: String?) {
 //        if (contentPromptText != null) {
 //            this.showNotification(

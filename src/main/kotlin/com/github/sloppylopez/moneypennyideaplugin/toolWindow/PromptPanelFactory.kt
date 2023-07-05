@@ -1,6 +1,5 @@
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -9,7 +8,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
@@ -30,7 +28,7 @@ import javax.swing.JTextArea
 
 
 @Service(Service.Level.PROJECT)
-class PromptPanelFactory(project: Project) : DropTargetAdapter() {
+class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
     private var promptPanel = JPanel()
     private var currentProject = project
     private var currentToolWindow: ToolWindow? = null
@@ -38,6 +36,8 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private val radioButtonFactory = project.service<RadioButtonFactory>()
     private val textAreaFactory = project.service<TextAreaFactory>()
     private val service = project.service<ProjectService>()
+    private var tabCounter = 0
+
     var prePromptTextArea: JTextArea? = JTextArea()
         private set
     var contentPromptTextArea: JTextArea? = JTextArea()
@@ -100,7 +100,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             try {
                 val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-                val expandedFileList = expandFolders(fileList)
+                val expandedFileList = service.expandFolders(fileList)
                 val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
                 val content = ContentFactory.getInstance()
                     .createContent(
@@ -121,31 +121,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     }
 
     private fun getDisplayName(expandedFileList: List<File>): String {
-        return if (expandedFileList.isEmpty()) {
-            "Prompt"
-        } else {
-            expandedFileList.size.toString() + " Arch"
-        }
+        val prefix = if (expandedFileList.isEmpty()) "Prompt" else "${expandedFileList.size} Arch"
+        return "${prefix}_${getNextTabName()}"
     }
 
-    private fun expandFolders(fileList: List<*>): List<File> {
-        val expandedFileList = mutableListOf<File>()
-
-        for (file in fileList) {
-            try {
-                if (file is File) {
-                    if (file.isDirectory) {
-                        expandedFileList.addAll(expandFolders(file.listFiles()?.toList() ?: emptyList<String>()))
-                    } else {
-                        expandedFileList.add(file)
-                    }
-                }
-            } catch (e: Exception) {
-                thisLogger().error("PromptPanelFactory: ", e)
-            }
-        }
-
-        return expandedFileList
+    private fun getNextTabName(): String {
+        return tabCounter++.toString()
     }
 
     fun sendToContentPrompt(
@@ -164,7 +145,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
                     val content = ContentFactory.getInstance().createContent(
                         moneyPennyToolWindow.getContent(listOf(file), selectedText),
-                        if (isSnippet == true) "Snippet" else "1 Arch",
+                        if (isSnippet == true) "Snippet_${getNextTabName()}" else "1 Arch_${getNextTabName()}",
                         true
                     )
 

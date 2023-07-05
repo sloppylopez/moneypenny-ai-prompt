@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -13,6 +14,7 @@ import java.nio.file.Files
 @Service(Service.Level.PROJECT)
 class FileEditorManager(private val project: Project) {
     private val service = project.service<ProjectService>()
+    private val promptPanelFactory = project.service<PromptPanelFactory>()
     fun openFileInEditor(
         filePath: String?,
         contentPromptText: String? = null
@@ -32,15 +34,15 @@ class FileEditorManager(private val project: Project) {
                         contentPromptText
                     )
                     service.highlightTextInEditor(project, contentPromptText)
-                } else {
-                    val fileContents = String(Files.readAllBytes(File(filePath).toPath()))
-                    service.showNotification(
-                        project,
-                        "highlight fileContents",
-                        fileContents
-                    )
-                    service.highlightTextInEditor(project, fileContents)
                 }
+//                val fileContents = String(Files.readAllBytes(File(filePath).toPath()))
+//                service.showNotification(
+//                    project,
+//                    "highlight fileContents",
+//                    fileContents
+//                )
+//                service.highlightTextInEditor(project, fileContents)
+
             }
         } else {
             service.showNotification(
