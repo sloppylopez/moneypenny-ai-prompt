@@ -1,8 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import MoneyPennyToolWindow
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileEditorAction
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFolderTreeAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -17,10 +17,8 @@ import javax.swing.SwingUtilities.invokeLater
 
 class ToolWindowFactory : ToolWindowFactory {
     init {
-        val sendToPromptFileEditorAction = SendToPromptFileEditorAction()
-        sendToPromptFileEditorAction.registerFileEditorAction()
-        val sendToPromptFolderTreeAction = SendToPromptFolderTreeAction()
-        sendToPromptFolderTreeAction.registerFolderTreeAction()
+        val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction()
+        sendToPromptFileFolderTreeAction.registerFolderTreeAction()
     }
 
     override fun createToolWindowContent(
@@ -28,6 +26,8 @@ class ToolWindowFactory : ToolWindowFactory {
         toolWindow: ToolWindow
     ) {
         try {
+            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
+            sendToPromptTextEditorAction.registerFileEditorAction()
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
             invokeLater {
                 ApplicationManager.getApplication().invokeLater(

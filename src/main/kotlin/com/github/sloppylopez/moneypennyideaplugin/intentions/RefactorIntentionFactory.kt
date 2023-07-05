@@ -29,7 +29,7 @@ class RefactorIntentionFactory(private val project: Project) {
                 override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = true
 
                 override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
-                    promptPanelFactory.sendToContentPrompt(editor, service.psiFileToFile(file!!))
+                    promptPanelFactory.sendToContentPrompt(editor, service.psiFileToFile(file!!), true)
                 }
 
                 override fun startInWriteAction(): Boolean = false

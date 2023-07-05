@@ -4,6 +4,7 @@ import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFacto
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
 import com.intellij.lang.Language
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -26,7 +27,10 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
     private val fileEditorManager = project.service<FileEditorManager>()
     private val service = project.service<ProjectService>()
 
-    fun getContent(fileList: List<*>? = emptyList<Any>(), contentPromptText: String? = null): JBPanel<JBPanel<*>> {
+    fun getContent(
+        fileList: List<*>? = emptyList<Any>(),
+        contentPromptText: String? = null
+    ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
             add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText))
         }
@@ -45,10 +49,16 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
             val selectedTab = tabbedPane.selectedIndex
             val tabName = tabbedPane.getTitleAt(selectedTab)
             val filePath = ancestorListener.tabNameToFileMap[tabName]
-//            Messages.showInfoMessage(
-//                message, "1",
-//            )
-            ancestorListener.fileEditorManager.openFileInEditor(filePath, contentPromptText)
+
+            val fileContents: String = filePath?.let {
+                try {
+                    File(it).readText()
+                } catch (e: Exception) {
+                    thisLogger().error(e)
+                }
+            } as String
+
+            ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
         }
 
         for (i in 0..tabCount) {
@@ -73,7 +83,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
                 tabbedPane.addTab(tabName, panel)
                 ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
             } else {
-                tabbedPane.addTab("$i", panel)
+                tabbedPane.addTab("No File", panel)
             }
         }
 
@@ -93,34 +103,30 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
     ): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
-        getSyntaxHighlighter(toolWindow, file)
+//        getSyntaxHighlighter(toolWindow, file)
         when (panelIndex) {
             1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-            3 -> {
-//                Messages.showInfoMessage(
-//                    message, "2",
-//                )
-                fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
-            }
+            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
+
         }
         return innerPanel
     }
 
-    private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
-        if (toolWindow != null && file != null) {
-            val language = Language.findLanguageByID("java")
-            service.logInfo("MoneyPennyToolWindow", language.toString())
-            if (language != null) {
-                val hl = SyntaxHighlighterFactory.getSyntaxHighlighter(
-                    language,
-                    toolWindow.project,
-                    service.fileToVirtualFile(file)
-                )
-                service.logInfo("MoneyPennyToolWindow", hl.toString())
-            }
-        }
-    }
+//    private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
+//        if (toolWindow != null && file != null) {
+//            val language = Language.findLanguageByID("java")
+//            service.logInfo("MoneyPennyToolWindow", language.toString())
+//            if (language != null) {
+//                val hl = SyntaxHighlighterFactory.getSyntaxHighlighter(
+//                    language,
+//                    toolWindow.project,
+//                    service.fileToVirtualFile(file)
+//                )
+//                service.logInfo("MoneyPennyToolWindow", hl.toString())
+//            }
+//        }
+//    }
 }

@@ -3,11 +3,14 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.IconLoader
+
 import javax.swing.ImageIcon
 
 @Service(Service.Level.PROJECT)
-class SendToPromptFileEditorAction : AnAction("Send To MoneyPenny") {
+class SendToPromptFileFolderTreeAction : AnAction() {
+    companion object {
+        private const val ACTION_ID = "com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFolderTreeAction"
+    }
 
     init {
         templatePresentation.icon =
@@ -15,16 +18,17 @@ class SendToPromptFileEditorAction : AnAction("Send To MoneyPenny") {
         templatePresentation.text = "Send To MoneyPenny"
     }
 
-    companion object {
-        private const val ACTION_ID = "com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileEditorAction"
-    }
-
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.getData(CommonDataKeys.PROJECT)
-        Messages.showMessageDialog(project, "Hello, World!", "Hello World", Messages.getInformationIcon())
+        Messages.showMessageDialog(
+            project,
+            "Sent Files To MoneyPenny",
+            "Send To MoneyPenny",
+            Messages.getInformationIcon()
+        )
     }
 
-    fun registerFileEditorAction() {
+    fun registerFolderTreeAction() {
         val actionManager = ActionManager.getInstance()
 
         // Check if the action with the given ID already exists
@@ -33,15 +37,17 @@ class SendToPromptFileEditorAction : AnAction("Send To MoneyPenny") {
             actionManager.unregisterAction(ACTION_ID)
         }
 
-        val sendToPromptFileEditorAction = SendToPromptFileEditorAction()
+        val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction()
 
-        // Register the HelloWorldAction
-        actionManager.registerAction(ACTION_ID, sendToPromptFileEditorAction)
+        // Register the FolderTreeAction
+        actionManager.registerAction(ACTION_ID, sendToPromptFileFolderTreeAction)
 
-        // Add the HelloWorldAction to the right-click menu
-        val popupMenu = actionManager.getAction("EditorPopupMenu")
+        // Add the FolderTreeAction to the right-click menu in the folder tree
+        val popupMenu = actionManager.getAction("ProjectViewPopupMenu")
         val defaultActionGroup = popupMenu as? DefaultActionGroup
         defaultActionGroup?.addSeparator()
-        defaultActionGroup?.add(sendToPromptFileEditorAction, Constraints.FIRST)
+        defaultActionGroup?.add(sendToPromptFileFolderTreeAction, Constraints.FIRST)
     }
 }
+
+
