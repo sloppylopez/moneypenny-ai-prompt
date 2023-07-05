@@ -5,19 +5,13 @@ import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.editor.ScrollType
-import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.markup.HighlighterLayer
-import com.intellij.openapi.editor.markup.HighlighterTargetArea
-import com.intellij.openapi.editor.markup.RangeHighlighter
-import com.intellij.openapi.editor.markup.TextAttributes
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiFile
 import java.io.File
 import javax.swing.Icon
@@ -34,6 +28,10 @@ class ProjectService(project: Project) {
     fun fileToVirtualFile(file: File?): VirtualFile? {
         val localFileSystem = LocalFileSystem.getInstance()
         return file?.let { localFileSystem.findFileByIoFile(it) }
+    }
+
+    fun virtualFileToFile(virtualFile: VirtualFile?): File? {
+        return virtualFile?.let { File(it.path) }
     }
 
     fun psiFileToFile(file: PsiFile?): File? {
@@ -86,4 +84,75 @@ class ProjectService(project: Project) {
     fun logInfo(className: String, info: String) {
         Logger.getInstance(className).info(info)
     }
+
+    fun showNotification(project: Project?, title: String, content: String) {
+        val notification = Notification(
+            "MoneyPenny",
+            title,
+            content,
+            NotificationType.INFORMATION
+        )
+
+        val statusBar = WindowManager.getInstance()
+            .getStatusBar(project!!)
+
+        Notifications.Bus.notify(notification, project)
+    }
+
+    fun highlightTextInEditor(project: Project, contentPromptText: String) {
+        val editor = getCurrentEditor(project)
+        editor?.let {
+            val document = editor.document
+            val textOffset = document.text.indexOf(contentPromptText)
+            if (textOffset != -1) {
+                editor.caretModel.moveToOffset(textOffset)
+                editor.selectionModel.setSelection(textOffset, textOffset + contentPromptText.length)
+            }
+        }
+    }
+
+    private fun getCurrentEditor(project: Project): Editor? {
+        val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
+        return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
+    }
+
+    fun expandFolders(fileList: List<*>): List<File> {
+        val expandedFileList = mutableListOf<File>()
+
+        for (file in fileList) {
+            try {
+                if (file is File) {
+                    if (file.isDirectory) {
+                        expandedFileList.addAll(expandFolders(file.listFiles()?.toList() ?: emptyList<String>()))
+                    } else {
+                        expandedFileList.add(file)
+                    }
+                }
+            } catch (e: Exception) {
+                thisLogger().error("PromptPanelFactory: ", e)
+            }
+        }
+
+        return expandedFileList
+    }
+
+//    fun highlightTextOnCurrentEditor(contentPromptText: String?, filePath: String?) {
+//        if (contentPromptText != null) {
+//            this.showNotification(
+//                project,
+//                "highlight contentPromptText",
+//                contentPromptText
+//            )
+//            this.highlightTextInEditor(project, contentPromptText)
+//        } else {
+//            val fileContents = String(Files.readAllBytes(File(filePath).toPath()))
+//            this.showNotification(
+//                project,
+//                "highlight fileContents",
+//                fileContents
+//            )
+//            this.highlightTextInEditor(project, fileContents)
+//        }
+//    }
+
 }
