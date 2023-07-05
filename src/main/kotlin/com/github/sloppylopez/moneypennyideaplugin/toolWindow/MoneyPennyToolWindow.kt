@@ -88,6 +88,10 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
             } else {
                 tabbedPane.addTab("No File", panel)
             }
+            if (contentPromptText != null && file != null) {
+                val tabName = file.name
+                ancestorListener.tabNameToContentPromptTextMap[tabName] = contentPromptText
+            }
         }
 
         tabbedPane.addChangeListener(changeListener)

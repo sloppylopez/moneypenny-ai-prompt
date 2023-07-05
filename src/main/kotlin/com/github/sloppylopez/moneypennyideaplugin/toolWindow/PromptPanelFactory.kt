@@ -1,5 +1,6 @@
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -155,7 +156,7 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
                     thisLogger().error("PromptPanelFactory: ", e)
                 }
             } else {
-                thisLogger().warn("No text selected")
+                service.showNotification(project, "No text selected", "Please select text to send to MoneyPenny")
             }
         }
     }
@@ -164,6 +165,7 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
         selectedEditor: Editor,
         selectedText: @NlsSafe String?
     ): @NlsSafe String? {
+        service.showNotification(project, "getSelectedText1", selectedText.orEmpty() )
         var selectedText1 = selectedText
         val project: Project? = selectedEditor.project
         val fileEditorManager = FileEditorManager.getInstance(project!!)
@@ -174,6 +176,7 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
             val document = openFileDescriptor.file.let { FileDocumentManager.getInstance().getDocument(it) }
             selectedText1 = document?.text
         }
+        service.showNotification(project, "getSelectedText2", selectedText1.orEmpty() )
         return selectedText1
     }
 }

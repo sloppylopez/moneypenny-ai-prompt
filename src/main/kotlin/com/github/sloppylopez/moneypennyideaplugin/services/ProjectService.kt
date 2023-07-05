@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiFile
 import java.io.File
 import javax.swing.Icon
@@ -93,8 +92,8 @@ class ProjectService(project: Project) {
             NotificationType.INFORMATION
         )
 
-        val statusBar = WindowManager.getInstance()
-            .getStatusBar(project!!)
+//        val statusBar = WindowManager.getInstance()
+//            .getStatusBar(project!!)
 
         Notifications.Bus.notify(notification, project)
     }
