@@ -32,6 +32,7 @@ class ToolWindowFactory : ToolWindowFactory {
             invokeLater {
                 ApplicationManager.getApplication().invokeLater(
                     {
+                        refactorIntentionFactory.removeIntentions()
                         refactorIntentionFactory.addIntentionToAllEditors()
                     },
                     ModalityState.NON_MODAL

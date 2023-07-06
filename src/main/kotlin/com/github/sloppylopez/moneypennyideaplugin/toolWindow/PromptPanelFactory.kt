@@ -8,13 +8,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
@@ -32,7 +27,7 @@ import javax.swing.JTextArea
 
 
 @Service(Service.Level.PROJECT)
-class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
+class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private var promptPanel = JPanel()
     private var currentProject = project
     private var currentToolWindow: ToolWindow? = null
@@ -113,24 +108,11 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
                         true
                     )
                 currentToolWindow!!.contentManager.addContent(content, 0)
-                currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
-//                expandedFileList.forEach {
-//                    val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
-//                    service.highlightTextInEditor(currentProject, fileContents)
-//                }
+                currentToolWindow!!.contentManager.setSelectedContent(content)
             } catch (e: Exception) {
                 thisLogger().error("PromptPanelFactory: ", e)
             }
         }
-    }
-
-    private fun getDisplayName(expandedFileList: List<File>): String {
-        val prefix = if (expandedFileList.isEmpty()) "Prompt" else "${expandedFileList.size} Arch"
-        return "${prefix}_${getNextTabName()}"
-    }
-
-    private fun getNextTabName(): String {
-        return tabCounter++.toString()
     }
 
     fun sendToContentPrompt(
@@ -140,7 +122,7 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
         editor?.let { selectedEditor ->
             var selectedText = selectedEditor.selectionModel.selectedText
             if (selectedText.isNullOrEmpty()) {
-                selectedText = getSelectedText(selectedEditor, selectedText)
+                selectedText = service.getSelectedText(selectedEditor, selectedText)
             }
             if (!selectedText.isNullOrEmpty()) {
                 try {
@@ -148,10 +130,9 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
                     if (file != null) {
                         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(file)
                         val fileContent = virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)
-                        // Normalize line separators for comparison
                         val normalizedSelectedText = selectedText.replace("\r\n", "\n")
                         val normalizedFileContent = fileContent?.replace("\r\n", "\n")
-                        isSnippet = normalizedFileContent != null && normalizedSelectedText.trim() != normalizedFileContent.trim()
+                        isSnippet = service.getIsSnippet(normalizedFileContent, normalizedSelectedText)
                     }
                     val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
                     val content = ContentFactory.getInstance().createContent(
@@ -164,28 +145,16 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
                 } catch (e: Exception) {
                     thisLogger().error("PromptPanelFactory: ", e)
                 }
-            } else {
-//                service.showNotification(project, "No text selected", "Please select text to send to MoneyPenny")
             }
         }
     }
 
-    private fun getSelectedText(
-        selectedEditor: Editor,
-        selectedText: @NlsSafe String?
-    ): @NlsSafe String? {
-//        service.showNotification(project, "getSelectedText1", selectedText.orEmpty())
-        var selectedText1 = selectedText
-        val project: Project? = selectedEditor.project
-        val fileEditorManager = FileEditorManager.getInstance(project!!)
-        val selectedFile = fileEditorManager.selectedFiles.firstOrNull()
-        if (selectedFile != null) {
-            val virtualFile = VirtualFileManager.getInstance().findFileByUrl(selectedFile.url)
-            val openFileDescriptor = OpenFileDescriptor(project, virtualFile!!)
-            val document = openFileDescriptor.file.let { FileDocumentManager.getInstance().getDocument(it) }
-            selectedText1 = document?.text
-        }
-//        service.showNotification(project, "getSelectedText2", selectedText1.orEmpty())
-        return selectedText1
+    private fun getDisplayName(expandedFileList: List<File>): String {
+        val prefix = if (expandedFileList.isEmpty()) "Prompt" else "${expandedFileList.size} Arch"
+        return "${prefix}_${getNextTabName()}"
+    }
+
+    private fun getNextTabName(): String {
+        return tabCounter++.toString()
     }
 }
