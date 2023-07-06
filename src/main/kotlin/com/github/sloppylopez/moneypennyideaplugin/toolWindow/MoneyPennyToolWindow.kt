@@ -1,9 +1,8 @@
+package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -19,7 +18,7 @@ import java.io.File
 import javax.swing.*
 import javax.swing.event.ChangeListener
 
-class MoneyPennyToolWindow(private val project: Project, private val toolWindow: ToolWindow) {
+class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
@@ -59,7 +58,6 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
                     thisLogger().error(e)
                 }
             } as String
-//            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
             ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents, isSnippet)
         }
 
