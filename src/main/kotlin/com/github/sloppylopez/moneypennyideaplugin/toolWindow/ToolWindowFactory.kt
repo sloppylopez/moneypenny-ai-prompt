@@ -1,8 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import MoneyPennyToolWindow
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState

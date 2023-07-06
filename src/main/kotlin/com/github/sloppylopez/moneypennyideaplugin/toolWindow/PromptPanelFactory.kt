@@ -1,7 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import CheckBoxFactory
-import MoneyPennyToolWindow
 import TextAreaFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
