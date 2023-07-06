@@ -16,16 +16,13 @@ import javax.swing.ImageIcon
 import javax.swing.SwingUtilities.invokeLater
 
 class ToolWindowFactory : ToolWindowFactory {
-    init {
-        val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction()
-        sendToPromptFileFolderTreeAction.registerFolderTreeAction()
-    }
-
     override fun createToolWindowContent(
         project: Project,
         toolWindow: ToolWindow
     ) {
         try {
+            val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
+            sendToPromptFileFolderTreeAction.registerFolderTreeAction()
             val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
             sendToPromptTextEditorAction.registerFileEditorAction()
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()

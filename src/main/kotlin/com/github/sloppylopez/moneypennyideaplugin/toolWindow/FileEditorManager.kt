@@ -18,7 +18,6 @@ class FileEditorManager(private val project: Project) {
         isSnippet: Boolean? = false
     ) {
         service.highlightTextInEditor(project, "") //Reset previous highlight
-//        service.showNotification(project, "GOING TO HIGHLIGHT", filePath.toString())
         if (filePath != null) {
             val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
             val fileEditorManager = FileEditorManager.getInstance(project)
@@ -27,30 +26,11 @@ class FileEditorManager(private val project: Project) {
                 val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
                 fileEditorManager.openEditor(openFileDescriptor, true)
                 if (!contentPromptText.isNullOrBlank()) {
-//                    service.showNotification(
-//                        project,
-//                        "highlight contentPromptText",
-//                        contentPromptText
-//                    )
                     if (isSnippet!!) {
                         service.highlightTextInEditor(project, contentPromptText)
                     }
                 }
-//                val fileContents = String(Files.readAllBytes(File(filePath).toPath()))
-//                service.showNotification(
-//                    project,
-//                    "highlight fileContents",
-//                    fileContents
-//                )
-//                service.highlightTextInEditor(project, fileContents)
-
             }
-        } else {
-//            service.showNotification(
-//                project,
-//                "filepath is null",
-//                "NUUULL:"
-//            )
         }
     }
 }

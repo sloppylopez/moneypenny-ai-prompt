@@ -64,6 +64,10 @@ class RadioButtonFactory(project: Project) {
                 prePromptTextArea.text = "Write Unit Test for Code:\n"
             }
 
+            "E2E" -> {
+                prePromptTextArea.text = "Write E2E for Code:\n"
+            }
+
             "DRY" -> {
                 prePromptTextArea.text = "DRY Code:\n"
             }
