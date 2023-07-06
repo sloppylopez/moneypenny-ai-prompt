@@ -17,7 +17,6 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
     private val promptPanelFactory = project?.service<PromptPanelFactory>()
     private val service = project?.service<ProjectService>()
     private var editor: Editor? = null
-    private var file: VirtualFile? = null
 
     companion object {
         private const val ACTION_ID =
@@ -39,7 +38,8 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
                 val firstSelectedFile = selectedFiles.first()
                 promptPanelFactory?.sendToContentPrompt(
                     editor,
-                    service?.virtualFileToFile(firstSelectedFile)
+                    service?.virtualFileToFile(firstSelectedFile),
+                    false
                 )
             }
         } catch (e: Exception) {
@@ -58,18 +58,14 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
 
     fun registerFolderTreeAction() {
         val actionManager = ActionManager.getInstance()
-
         // Check if the action with the given ID already exists
         val existingAction = actionManager.getAction(ACTION_ID)
         if (existingAction != null) {
             actionManager.unregisterAction(ACTION_ID)
         }
-
         val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
-
         // Register the FolderTreeAction
         actionManager.registerAction(ACTION_ID, sendToPromptFileFolderTreeAction)
-
         // Add the FolderTreeAction to the right-click menu in the folder tree
         val popupMenu = actionManager.getAction("ProjectViewPopupMenu")
         val defaultActionGroup = popupMenu as? DefaultActionGroup

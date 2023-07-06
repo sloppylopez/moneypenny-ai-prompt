@@ -52,18 +52,14 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
 
     fun registerFileEditorAction() {
         val actionManager = ActionManager.getInstance()
-
         // Check if the action with the given ID already exists
         val existingAction = actionManager.getAction(ACTION_ID)
         if (existingAction != null) {
             actionManager.unregisterAction(ACTION_ID)
         }
-
         val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-
         // Register the SendToPromptFileEditorAction
         actionManager.registerAction(ACTION_ID, sendToPromptTextEditorAction)
-
         // Add the SendToPromptFileEditorAction to the right-click menu
         val popupMenu = actionManager.getAction("EditorPopupMenu")
         val defaultActionGroup = popupMenu as? DefaultActionGroup
