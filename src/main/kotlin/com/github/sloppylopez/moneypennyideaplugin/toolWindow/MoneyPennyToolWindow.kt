@@ -1,7 +1,9 @@
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.lang.Language
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -26,6 +28,8 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
     private val ancestorListener = project.service<AncestorListener>()
     private val fileEditorManager = project.service<FileEditorManager>()
     private val service = project.service<ProjectService>()
+    private var tabCounter = 0
+    private var downerTabCounter = 0
 
     fun getContent(
         fileList: List<*>? = emptyList<Any>(),
@@ -79,7 +83,7 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
                 panel.add(innerPanel, gridBagConstraints)
             }
             if (i < fileList.size && file != null) {
-                val tabName = file.name
+                val tabName = "${file.name}_${getNextTabName()}"
                 tabbedPane.addTab(tabName, panel)
                 ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
                 if (contentPromptText != null) {
@@ -89,7 +93,7 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
                 tabbedPane.addTab("No File", panel)
             }
             if (contentPromptText != null && file != null) {
-                val tabName = file.name
+                val tabName = "${file.name}_${GlobalData.tabCounter}"
                 ancestorListener.tabNameToContentPromptTextMap[tabName] = contentPromptText
             }
         }
@@ -110,33 +114,18 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
     ): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
-//        getSyntaxHighlighter(toolWindow, file)
         when (panelIndex) {
             1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-            3 -> {
-                service.showNotification(project, "CreateInnerPanel $contentPromptText", file?.canonicalPath.toString())
-                fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
-            }
+            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
 
         }
         return innerPanel
     }
 
-//    private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
-//        if (toolWindow != null && file != null) {
-//            val language = Language.findLanguageByID("java")
-//            service.logInfo("MoneyPennyToolWindow", language.toString())
-//            if (language != null) {
-//                val hl = SyntaxHighlighterFactory.getSyntaxHighlighter(
-//                    language,
-//                    toolWindow.project,
-//                    service.fileToVirtualFile(file)
-//                )
-//                service.logInfo("MoneyPennyToolWindow", hl.toString())
-//            }
-//        }
-//    }
+    private fun getNextTabName(): String {
+        return GlobalData.tabCounter++.toString()
+    }
 }

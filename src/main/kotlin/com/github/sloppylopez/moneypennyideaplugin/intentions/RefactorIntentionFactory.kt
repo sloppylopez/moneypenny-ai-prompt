@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.intentions
 
-import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.codeInsight.intention.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service

@@ -1,6 +1,8 @@
+package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+import CheckBoxFactory
+import MoneyPennyToolWindow
+import TextAreaFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.RadioButtonFactory
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -51,7 +53,7 @@ class PromptPanelFactory(private val project: Project) : DropTargetAdapter() {
         panel: JPanel,
         toolWindow: ToolWindow? = null,
         file: File?,
-        contentPromptText: String?
+        contentPromptText: String?,
     ) {
         try {
             promptPanel = panel

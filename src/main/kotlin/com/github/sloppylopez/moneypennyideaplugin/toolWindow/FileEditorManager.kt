@@ -1,6 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -9,7 +8,6 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import java.io.File
-import java.nio.file.Files
 
 @Service(Service.Level.PROJECT)
 class FileEditorManager(private val project: Project) {
