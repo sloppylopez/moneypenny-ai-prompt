@@ -1,3 +1,4 @@
+package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 import com.intellij.openapi.components.Service
 import javax.swing.JCheckBox
 import javax.swing.JPanel
