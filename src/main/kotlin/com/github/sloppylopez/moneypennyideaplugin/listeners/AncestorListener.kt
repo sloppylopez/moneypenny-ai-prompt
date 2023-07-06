@@ -1,13 +1,15 @@
 package com.github.sloppylopez.moneypennyideaplugin.listeners
 
-import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBTabbedPane
+import java.io.File
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
@@ -18,8 +20,7 @@ class AncestorListener(private val project: Project) {
     val fileEditorManager = project.service<FileEditorManager>()
     private val service = project.service<ProjectService>()
     fun getAncestorListener(
-        tabbedPane: JBTabbedPane,
-        promptPanelFactory: PromptPanelFactory
+        tabbedPane: JBTabbedPane
     ) =
         object : AncestorListener {
 
@@ -28,18 +29,26 @@ class AncestorListener(private val project: Project) {
                     val selectedTab = tabbedPane.selectedIndex
                     val tabName = tabbedPane.getTitleAt(selectedTab)
                     val filePath = tabNameToFileMap[tabName]
+                    var virtualFile: VirtualFile? = null
+                    if (filePath != null) {
+                        virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
+                    }
                     val contentPromptText = tabNameToContentPromptTextMap[tabName]
-//                    val contentPromptText = promptPanelFactory.contentPromptTextArea?.text
-                    service.showNotification(
-                        project,
-                        selectedTab.toString() + " EEEEOEOEOOEO " + contentPromptText.toString(),
-                        filePath.toString()
-                    )
-                    fileEditorManager.openFileInEditor(filePath, contentPromptText)
+                    val normalizedSelectedText = contentPromptText?.replace("\r\n", "\n")
+                    val normalizedFileContent =
+                        virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)?.replace("\r\n", "\n")
+                    val isSnippet = normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
+//                    service.showNotification(
+//                        project,
+//                        "$selectedTab Ancestor $contentPromptText",
+//                        filePath.toString()
+//                    )
+                    fileEditorManager.openFileInEditor(filePath, contentPromptText, isSnippet)
                 } catch (e: Exception) {
                     thisLogger().error(e)
                 }
             }
+
 
             override fun ancestorMoved(e: AncestorEvent?) {
                 thisLogger().info("Ancestor Moved")

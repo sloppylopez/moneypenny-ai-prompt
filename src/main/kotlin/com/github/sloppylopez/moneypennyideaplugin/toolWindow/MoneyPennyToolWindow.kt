@@ -1,11 +1,11 @@
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
-import com.intellij.lang.Language
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
@@ -29,17 +29,19 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
 
     fun getContent(
         fileList: List<*>? = emptyList<Any>(),
-        contentPromptText: String? = null
+        contentPromptText: String? = null,
+        isSnippet: Boolean? = false
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText))
+            add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText, isSnippet))
         }
     }
 
     private fun moneyPennyPromptPanel(
         toolWindow: ToolWindow? = null,
         fileList: List<*>,
-        contentPromptText: String? = null
+        contentPromptText: String? = null,
+        isSnippet: Boolean? = false
     ): JComponent {
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
@@ -57,8 +59,8 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
                     thisLogger().error(e)
                 }
             } as String
-            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
-            ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
+//            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
+            ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents, isSnippet)
         }
 
         for (i in 0..tabCount) {
@@ -78,24 +80,40 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
                 gridBagConstraints.gridy = j - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-            if (i < fileList.size && file != null) {
-                val tabName = file.name
-                tabbedPane.addTab(tabName, panel)
-                ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
-                if (contentPromptText != null) {
-                    ancestorListener.tabNameToContentPromptTextMap[tabName] = contentPromptText
-                }
-            } else {
-                tabbedPane.addTab("No File", panel)
-            }
+            setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
         }
 
         tabbedPane.addChangeListener(changeListener)
-        val ancestorListener = ancestorListener.getAncestorListener(tabbedPane, promptPanelFactory)
+        val ancestorListener = ancestorListener.getAncestorListener(tabbedPane)
         tabbedPane.addAncestorListener(ancestorListener)
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.CENTER)
         return mainPanel
+    }
+
+    private fun setTabName(
+        i: Int,
+        fileList: List<*>,
+        file: File?,
+        tabbedPane: JBTabbedPane,
+        panel: JPanel,
+        contentPromptText: String?
+    ) {
+        if (i < fileList.size && file != null) {
+            val tabName = "${getNextTabName()} ${file.name}"
+            tabbedPane.addTab(tabName, panel)
+            ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
+            contentPromptText?.let {
+                ancestorListener.tabNameToContentPromptTextMap[tabName] = it
+            }
+        } else {
+            tabbedPane.addTab("No File", panel)
+        }
+
+        if (contentPromptText != null && file != null) {
+            val tabName = "${GlobalData.downerTabName} ${file.name}"
+            ancestorListener.tabNameToContentPromptTextMap[tabName] = contentPromptText
+        }
     }
 
     private fun createInnerPanel(
@@ -106,33 +124,18 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
     ): JPanel {
         val innerPanel = JPanel()
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
-//        getSyntaxHighlighter(toolWindow, file)
         when (panelIndex) {
             1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-            3 -> {
-                service.showNotification(project, "CreateInnerPanel $contentPromptText", file?.canonicalPath.toString())
-                fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
-            }
+            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText, false)
 
         }
         return innerPanel
     }
 
-//    private fun getSyntaxHighlighter(toolWindow: ToolWindow?, file: File?) {
-//        if (toolWindow != null && file != null) {
-//            val language = Language.findLanguageByID("java")
-//            service.logInfo("MoneyPennyToolWindow", language.toString())
-//            if (language != null) {
-//                val hl = SyntaxHighlighterFactory.getSyntaxHighlighter(
-//                    language,
-//                    toolWindow.project,
-//                    service.fileToVirtualFile(file)
-//                )
-//                service.logInfo("MoneyPennyToolWindow", hl.toString())
-//            }
-//        }
-//    }
+    private fun getNextTabName(): String {
+        return GlobalData.downerTabName++.toString()
+    }
 }

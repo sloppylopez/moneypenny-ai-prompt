@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiFile
 import java.io.File
 import javax.swing.Icon
@@ -93,9 +92,6 @@ class ProjectService(project: Project) {
             NotificationType.INFORMATION
         )
 
-        val statusBar = WindowManager.getInstance()
-            .getStatusBar(project!!)
-
         Notifications.Bus.notify(notification, project)
     }
 
@@ -112,7 +108,7 @@ class ProjectService(project: Project) {
     }
 
     private fun getCurrentEditor(project: Project): Editor? {
-        val file = FileEditorManager.getInstance(project).selectedFiles.firstOrNull()
+        val file = FileEditorManager.getInstance(project)?.selectedFiles?.firstOrNull()
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
 
@@ -135,24 +131,5 @@ class ProjectService(project: Project) {
 
         return expandedFileList
     }
-
-//    fun highlightTextOnCurrentEditor(contentPromptText: String?, filePath: String?) {
-//        if (contentPromptText != null) {
-//            this.showNotification(
-//                project,
-//                "highlight contentPromptText",
-//                contentPromptText
-//            )
-//            this.highlightTextInEditor(project, contentPromptText)
-//        } else {
-//            val fileContents = String(Files.readAllBytes(File(filePath).toPath()))
-//            this.showNotification(
-//                project,
-//                "highlight fileContents",
-//                fileContents
-//            )
-//            this.highlightTextInEditor(project, fileContents)
-//        }
-//    }
 
 }

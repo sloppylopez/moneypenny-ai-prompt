@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.intentions
 
-import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.codeInsight.intention.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -29,7 +29,7 @@ class RefactorIntentionFactory(private val project: Project) {
                 override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = true
 
                 override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
-                    promptPanelFactory.sendToContentPrompt(editor, service.psiFileToFile(file!!), true)
+                    promptPanelFactory.sendToContentPrompt(editor, service.psiFileToFile(file!!))
                 }
 
                 override fun startInWriteAction(): Boolean = false

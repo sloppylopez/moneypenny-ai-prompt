@@ -2,12 +2,9 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 //import javax.swing.JFileChooser
 //import javax.swing.JFrame
-import PromptPanelFactory
-import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import javax.swing.JButton
@@ -46,7 +43,7 @@ class ButtonPanelFactory(project: Project) {
 
                 val textArray = arrayOf(prePromptText, contentPromptText, postPromptText)
                 Messages.showInfoMessage(
-                    textArray.joinToString(), "TextArray",
+                    textArray.joinToString(), "W.I.P TBI    ",
                 )
             }
             panel.add(runAllPromptBtn)

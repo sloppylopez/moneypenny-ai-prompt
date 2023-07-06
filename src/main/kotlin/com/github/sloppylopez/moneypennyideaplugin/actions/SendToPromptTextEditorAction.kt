@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -33,8 +33,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
             file?.let { file: VirtualFile ->
                 promptPanelFactory?.sendToContentPrompt(
                     editor,
-                    service?.virtualFileToFile(file),
-                    false
+                    service?.virtualFileToFile(file)
                 )
             }
         }
