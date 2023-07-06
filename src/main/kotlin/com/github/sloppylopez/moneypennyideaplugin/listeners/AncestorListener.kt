@@ -1,8 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.listeners
 
-import PromptPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
