@@ -118,6 +118,7 @@
     <li><a href="https://medium.com/agorapulse-stories/how-to-debug-your-own-intellij-idea-instance-7d7df185a48d">Debugging Your IntelliJ IDEA Instance</a></li>
     <li><a href="https://docs.oracle.com/javase/8/javafx/layout-tutorial/index.html">JavaFX Layout Tutorial</a></li>
     <li><a href="https://openjfx.io/javadoc/14/javafx.controls/javafx/scene/control/TabPane.html">JavaFX Tab Pane</a></li>
+    <li><a href="https://www.youtube.com/watch?v=WRE5VwsS1X4">Debug Intellij Idea Plugin</a></li>
   </ul>
 
 <h2>Contributing</h2>
