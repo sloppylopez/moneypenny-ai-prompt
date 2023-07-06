@@ -6,11 +6,15 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiFile
 import java.io.File
 import javax.swing.Icon
@@ -125,11 +129,30 @@ class ProjectService(project: Project) {
                     }
                 }
             } catch (e: Exception) {
-                thisLogger().error("PromptPanelFactory: ", e)
+                thisLogger().error(e)
             }
         }
 
         return expandedFileList
     }
 
+    fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
+        normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
+
+    fun getSelectedText(
+        selectedEditor: Editor,
+        selectedText: @NlsSafe String?
+    ): @NlsSafe String? {
+        var selectedText1 = selectedText
+        val project: Project? = selectedEditor.project
+        val fileEditorManager = FileEditorManager.getInstance(project!!)
+        val selectedFile = fileEditorManager.selectedFiles.firstOrNull()
+        if (selectedFile != null) {
+            val virtualFile = VirtualFileManager.getInstance().findFileByUrl(selectedFile.url)
+            val openFileDescriptor = OpenFileDescriptor(project, virtualFile!!)
+            val document = openFileDescriptor.file.let { FileDocumentManager.getInstance().getDocument(it) }
+            selectedText1 = document?.text
+        }
+        return selectedText1
+    }
 }

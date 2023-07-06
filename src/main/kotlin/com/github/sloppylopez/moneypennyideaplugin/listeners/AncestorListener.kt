@@ -14,11 +14,11 @@ import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
 @Service(Service.Level.PROJECT)
-class AncestorListener(private val project: Project) {
+class AncestorListener(project: Project) {
     val tabNameToFileMap = mutableMapOf<String, String>()
     val tabNameToContentPromptTextMap = mutableMapOf<String, String>()
     val fileEditorManager = project.service<FileEditorManager>()
-    private val service = project.service<ProjectService>()
+    val service = project.service<ProjectService>()
     fun getAncestorListener(
         tabbedPane: JBTabbedPane
     ) =
@@ -37,18 +37,12 @@ class AncestorListener(private val project: Project) {
                     val normalizedSelectedText = contentPromptText?.replace("\r\n", "\n")
                     val normalizedFileContent =
                         virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)?.replace("\r\n", "\n")
-                    val isSnippet = normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
-//                    service.showNotification(
-//                        project,
-//                        "$selectedTab Ancestor $contentPromptText",
-//                        filePath.toString()
-//                    )
+                    val isSnippet = service.getIsSnippet(normalizedFileContent, normalizedSelectedText)
                     fileEditorManager.openFileInEditor(filePath, contentPromptText, isSnippet)
                 } catch (e: Exception) {
                     thisLogger().error(e)
                 }
             }
-
 
             override fun ancestorMoved(e: AncestorEvent?) {
                 thisLogger().info("Ancestor Moved")

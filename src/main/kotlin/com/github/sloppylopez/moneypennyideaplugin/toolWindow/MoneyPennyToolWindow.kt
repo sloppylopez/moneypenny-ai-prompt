@@ -100,7 +100,7 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
         contentPromptText: String?
     ) {
         if (i < fileList.size && file != null) {
-            val tabName = "${getNextTabName()} ${file.name}"
+            val tabName = "${getNextTabName()}) ${file.name}"
             tabbedPane.addTab(tabName, panel)
             ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
             contentPromptText?.let {
@@ -111,7 +111,7 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
         }
 
         if (contentPromptText != null && file != null) {
-            val tabName = "${GlobalData.downerTabName} ${file.name}"
+            val tabName = "${GlobalData.downerTabName}) ${file.name}"
             ancestorListener.tabNameToContentPromptTextMap[tabName] = contentPromptText
         }
     }

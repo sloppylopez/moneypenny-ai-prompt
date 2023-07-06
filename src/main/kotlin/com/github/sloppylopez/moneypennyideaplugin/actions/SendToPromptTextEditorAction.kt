@@ -18,14 +18,16 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
     private var editor: Editor? = null
     private var file: VirtualFile? = null
 
-    init {
-        templatePresentation.icon =
-            ImageIcon("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\moneypenny-logo-main.jpg")
-        templatePresentation.text = "Send To MoneyPenny"
-    }
-
     companion object {
         private const val ACTION_ID = "com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileEditorAction"
+    }
+
+    init {
+        val imageUrl = "/images/MoneyPenny-Icon_13x13.jpg"
+        val url = SendToPromptFileFolderTreeAction::class.java.getResource(imageUrl)
+        val icon = ImageIcon(url)
+        templatePresentation.icon = icon
+        templatePresentation.text = "Send To MoneyPenny"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -50,18 +52,14 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
 
     fun registerFileEditorAction() {
         val actionManager = ActionManager.getInstance()
-
         // Check if the action with the given ID already exists
         val existingAction = actionManager.getAction(ACTION_ID)
         if (existingAction != null) {
             actionManager.unregisterAction(ACTION_ID)
         }
-
         val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-
         // Register the SendToPromptFileEditorAction
         actionManager.registerAction(ACTION_ID, sendToPromptTextEditorAction)
-
         // Add the SendToPromptFileEditorAction to the right-click menu
         val popupMenu = actionManager.getAction("EditorPopupMenu")
         val defaultActionGroup = popupMenu as? DefaultActionGroup

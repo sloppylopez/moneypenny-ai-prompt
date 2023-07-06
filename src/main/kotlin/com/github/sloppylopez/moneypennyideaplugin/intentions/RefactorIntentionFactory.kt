@@ -12,6 +12,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 
+private const val CUSTOM_INTENTIONS = "Custom Intentions"
+
+private const val SEND_TO_MONEY_PENNY = "Send to MoneyPenny"
+
 @Service(Service.Level.PROJECT)
 class RefactorIntentionFactory(private val project: Project) {
     private val promptPanelFactory = project.service<PromptPanelFactory>()
@@ -22,9 +26,9 @@ class RefactorIntentionFactory(private val project: Project) {
 
             // Create a new IntentionAction for "MoneyPenny Refactor"
             val customIntention = object : IntentionAction {
-                override fun getText(): String = "Send to MoneyPenny"
+                override fun getText(): String = SEND_TO_MONEY_PENNY
 
-                override fun getFamilyName(): String = "Custom Intentions"
+                override fun getFamilyName(): String = CUSTOM_INTENTIONS
 
                 override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = true
 
@@ -35,16 +39,27 @@ class RefactorIntentionFactory(private val project: Project) {
                 override fun startInWriteAction(): Boolean = false
             }
 
-            // Get all open files and add the custom intention to each editor
+            // Add Custom Intention to all editors
             val instance = FileEditorManager.getInstance(project) ?: return
-            for (editor in instance.openFiles) {
-                val psiFile = PsiManager.getInstance(project).findFile(editor)
-                if (psiFile != null) {
-                    intentionManager.addAction(customIntention)
-                }
+            val editor = instance.openFiles[0]
+            val psiFile = PsiManager.getInstance(project).findFile(editor)
+            if (psiFile != null) {
+                intentionManager.addAction(customIntention)
             }
         } catch (e: Exception) {
             thisLogger().error("RefactorIntentionFactory", e)
+        }
+    }
+
+    // Remove existing intentions
+    fun removeIntentions() {
+        val intentionManager = IntentionManager.getInstance()
+        val intentions = intentionManager.intentionActions
+
+        for (intention in intentions) {
+            if (intention.familyName == CUSTOM_INTENTIONS) {
+                intentionManager.unregisterIntention(intention)
+            }
         }
     }
 }
