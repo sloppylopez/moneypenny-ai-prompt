@@ -12,12 +12,13 @@ import java.io.File
 @Service(Service.Level.PROJECT)
 class FileEditorManager(private val project: Project) {
     private val service = project.service<ProjectService>()
-    private val promptPanelFactory = project.service<PromptPanelFactory>()
     fun openFileInEditor(
         filePath: String?,
-        contentPromptText: String? = null
+        contentPromptText: String? = null,
+        isSnippet: Boolean? = false
     ) {
-        service.showNotification(project, "GOING TO HIGHLIGHT", filePath.toString())
+        service.highlightTextInEditor(project, "") //Reset previous highlight
+//        service.showNotification(project, "GOING TO HIGHLIGHT", filePath.toString())
         if (filePath != null) {
             val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
             val fileEditorManager = FileEditorManager.getInstance(project)
@@ -26,12 +27,14 @@ class FileEditorManager(private val project: Project) {
                 val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
                 fileEditorManager.openEditor(openFileDescriptor, true)
                 if (!contentPromptText.isNullOrBlank()) {
-                    service.showNotification(
-                        project,
-                        "highlight contentPromptText",
-                        contentPromptText
-                    )
-                    service.highlightTextInEditor(project, contentPromptText)
+//                    service.showNotification(
+//                        project,
+//                        "highlight contentPromptText",
+//                        contentPromptText
+//                    )
+                    if (isSnippet!!) {
+                        service.highlightTextInEditor(project, contentPromptText)
+                    }
                 }
 //                val fileContents = String(Files.readAllBytes(File(filePath).toPath()))
 //                service.showNotification(
@@ -43,11 +46,11 @@ class FileEditorManager(private val project: Project) {
 
             }
         } else {
-            service.showNotification(
-                project,
-                "filepath is null",
-                "NUUULL:"
-            )
+//            service.showNotification(
+//                project,
+//                "filepath is null",
+//                "NUUULL:"
+//            )
         }
     }
 }

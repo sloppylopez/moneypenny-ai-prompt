@@ -43,7 +43,7 @@ class ButtonPanelFactory(project: Project) {
 
                 val textArray = arrayOf(prePromptText, contentPromptText, postPromptText)
                 Messages.showInfoMessage(
-                    textArray.joinToString(), "TextArray",
+                    textArray.joinToString(), "W.I.P TBI    ",
                 )
             }
             panel.add(runAllPromptBtn)

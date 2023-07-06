@@ -33,8 +33,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
             file?.let { file: VirtualFile ->
                 promptPanelFactory?.sendToContentPrompt(
                     editor,
-                    service?.virtualFileToFile(file),
-                    false
+                    service?.virtualFileToFile(file)
                 )
             }
         }
