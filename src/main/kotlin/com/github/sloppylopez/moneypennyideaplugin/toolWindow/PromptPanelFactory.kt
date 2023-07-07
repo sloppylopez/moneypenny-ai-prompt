@@ -127,22 +127,20 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 try {
                     var normalizedSelectedText: String? = null
                     var normalizedFileContent: String? = null
-                    var isSnippetTextEditor: Boolean? = false
                     val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
                     if (file != null) {
                         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(file)
                         val fileContent = virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)
                         normalizedSelectedText = selectedText.replace("\r\n", "\n")
                         normalizedFileContent = fileContent?.replace("\r\n", "\n")
-                        isSnippetTextEditor = service.getIsSnippet(normalizedFileContent, normalizedSelectedText)
                     }
-                    val content = createContent(
-                        moneyPennyToolWindow,
-                        file,
-                        selectedText,
-                        isSnippet != null && !isSnippet || isSnippetTextEditor!!, // If isSnippet is null, then it's a file drop
-                        normalizedFileContent,
-                        normalizedSelectedText
+                    val tabName = if (isSnippet!! &&
+                        service.getIsSnippet(normalizedFileContent, normalizedSelectedText)
+                    ) "Snippet_${getNextTabName()}" else "1 Arch_${getNextTabName()}"
+                    val content = ContentFactory.getInstance().createContent(
+                        moneyPennyToolWindow.getContent(listOf(file), selectedText, isSnippet),
+                        tabName,
+                        true
                     )
                     currentToolWindow!!.contentManager.addContent(content, 0)
                     currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected

@@ -5,13 +5,16 @@
     <vendor>sloppylopez</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+<!--    <depends>com.intellij.modules.java</depends>-->
 
     <resource-bundle>messages.Bundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory"
                     id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
-<!--        <intentionAction factoryClass="com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory" >-->
+
+<!--        <intentionAction factoryClass="com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory">-->
+<!--            <language name="JAVA"/>-->
 <!--            <className/>-->
 <!--        </intentionAction>-->
     </extensions>
@@ -20,4 +23,8 @@
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
+
+<!--    <extensions defaultExtensionNs="com.intellij.intentionAction">-->
+<!--        <intentionAction implementation="com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory$CustomIntention"/>-->
+<!--    </extensions>-->
 </idea-plugin>
