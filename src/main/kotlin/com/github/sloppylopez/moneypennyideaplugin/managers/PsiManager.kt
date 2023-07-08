@@ -1,4 +1,4 @@
-package com.github.sloppylopez.moneypennyideaplugin.highlighters
+    package com.github.sloppylopez.moneypennyideaplugin.managers
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project

@@ -13,6 +13,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
+import com.intellij.ui.content.ContentManager
 import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
 
@@ -55,20 +56,27 @@ class ToolWindowFactory : ToolWindowFactory {
             toolWindowContent.setContent(tabbedPane)
             contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
             // Add a change listener to handle tab close events
-            tabbedPane.addChangeListener { e ->
-                val source = e.source
-                if (source is JBTabbedPane && source.selectedComponent == null) {
-                    // Tab was closed, remove the content
-                    val selectedIndex = source.selectedIndex
-                    if (selectedIndex != -1) {
-                        val removedContent = contentManager.getContent(selectedIndex)
-                        if (removedContent != null)
-                            contentManager.removeContent(removedContent, true)
-                    }
-                }
-            }
+            addChangeListenerToTabbedPane(tabbedPane, contentManager)
         } catch (e: Exception) {
             Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())
+        }
+    }
+
+    private fun addChangeListenerToTabbedPane(
+        tabbedPane: JBTabbedPane,
+        contentManager: ContentManager
+    ) {
+        tabbedPane.addChangeListener { e ->
+            val source = e.source
+            if (source is JBTabbedPane && source.selectedComponent == null) {
+                // Tab was closed, remove the content
+                val selectedIndex = source.selectedIndex
+                if (selectedIndex != -1) {
+                    val removedContent = contentManager.getContent(selectedIndex)
+                    if (removedContent != null)
+                        contentManager.removeContent(removedContent, true)
+                }
+            }
         }
     }
 

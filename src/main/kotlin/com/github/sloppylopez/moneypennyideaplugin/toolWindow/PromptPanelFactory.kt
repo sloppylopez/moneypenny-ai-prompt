@@ -123,7 +123,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     getDisplayName(expandedFileList),
                     true
                 )
-//            Content.setCloseable(false)
             val contentManager = currentToolWindow!!.contentManager
             contentTab.setDisposer {
                 thisLogger().info("contentTab is disposed, contentCount: ${contentManager.contentCount}")
@@ -138,7 +137,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             thisLogger().error("PromptPanelFactory: ", e)
         }
     }
-
 
     private fun getDisplayName(expandedFileList: List<File>): String {
         val prefix = if (expandedFileList.isEmpty()) "Prompt" else
@@ -170,8 +168,9 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                         true
                     )
 
-                    currentToolWindow!!.contentManager.addContent(content, 0)
-                    currentToolWindow!!.contentManager.setSelectedContent(content) // Set the newly added content as selected
+                    val contentManager = currentToolWindow!!.contentManager
+                    contentManager.addContent(content, 0)
+                    contentManager.setSelectedContent(content) // Set the newly added content as selected
                 } catch (e: Exception) {
                     thisLogger().error(e)
                 }
