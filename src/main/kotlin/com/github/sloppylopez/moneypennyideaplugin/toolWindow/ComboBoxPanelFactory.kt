@@ -1,14 +1,13 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import java.awt.FlowLayout
 import javax.swing.JPanel
 
 @Service(Service.Level.PROJECT)
-class ComboBoxPanelFactory(project: Project) {
-    private val buttonPanelFactory = ButtonPanelFactory(project)
+class ComboBoxPanelFactory {
+    private val buttonPanelFactory = ButtonPanelFactory()
 
     fun comboBoxPanel(
         panel: JPanel,

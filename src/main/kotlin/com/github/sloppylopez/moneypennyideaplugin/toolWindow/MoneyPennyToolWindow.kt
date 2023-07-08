@@ -1,8 +1,9 @@
-package com.github.sloppylopez.moneypennyideaplugin.toolWindow
-
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
+import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -18,7 +19,7 @@ import java.io.File
 import javax.swing.*
 import javax.swing.event.ChangeListener
 
-class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow) {
+class MoneyPennyToolWindow(private val project: Project, private val toolWindow: ToolWindow) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
@@ -28,19 +29,17 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
 
     fun getContent(
         fileList: List<*>? = emptyList<Any>(),
-        contentPromptText: String? = null,
-        isSnippet: Boolean? = false
+        contentPromptText: String? = null
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText, isSnippet))
+            add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText))
         }
     }
 
     private fun moneyPennyPromptPanel(
         toolWindow: ToolWindow? = null,
         fileList: List<*>,
-        contentPromptText: String? = null,
-        isSnippet: Boolean? = false
+        contentPromptText: String? = null
     ): JComponent {
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
@@ -58,7 +57,8 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
                     thisLogger().error(e)
                 }
             } as String
-            ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents, isSnippet)
+            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
+            ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
         }
 
         for (i in 0..tabCount) {
@@ -127,7 +127,7 @@ class MoneyPennyToolWindow(project: Project, private val toolWindow: ToolWindow)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
 
-            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText, false)
+            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
 
         }
         return innerPanel

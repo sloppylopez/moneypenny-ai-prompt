@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import MoneyPennyToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory

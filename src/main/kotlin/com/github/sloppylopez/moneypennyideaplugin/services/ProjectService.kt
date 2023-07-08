@@ -15,6 +15,7 @@ import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiFile
 import java.io.File
 import javax.swing.Icon
@@ -61,13 +62,13 @@ class ProjectService(project: Project) {
         try {
             if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
                 val file = fileList[i] as File
-                this.logInfo(className, "File $file")
+                thisLogger().info(Bundle.message("projectService", "File $file"))
                 return file
             } else {
-                this.logInfo(className, "File is null")
+                thisLogger().info(Bundle.message("projectService", "File is null"))
             }
         } catch (e: Exception) {
-            this.logError(className, e)
+            thisLogger().error(Bundle.message("projectService", e))
         }
         return null
     }
@@ -80,13 +81,13 @@ class ProjectService(project: Project) {
         )
     }
 
-    fun logError(className: String, e: Exception) {
-        Logger.getInstance(className).error(e.stackTraceToString())
-    }
-
-    fun logInfo(className: String, info: String) {
-        Logger.getInstance(className).info(info)
-    }
+//    fun logError(className: String, e: Exception) {
+//        Logger.getInstance(className).error(e.stackTraceToString())
+//    }
+//
+//    fun logInfo(className: String, info: String) {
+//        Logger.getInstance(className).info(info)
+//    }
 
     fun showNotification(project: Project?, title: String, content: String) {
         val notification = Notification(
@@ -139,6 +140,7 @@ class ProjectService(project: Project) {
     fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
         normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
 
+
     fun getSelectedText(
         selectedEditor: Editor,
         selectedText: @NlsSafe String?
@@ -155,4 +157,5 @@ class ProjectService(project: Project) {
         }
         return selectedText1
     }
+
 }

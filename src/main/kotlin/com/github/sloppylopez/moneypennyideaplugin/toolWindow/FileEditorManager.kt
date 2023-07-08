@@ -34,4 +34,3 @@ class FileEditorManager(private val project: Project) {
         }
     }
 }
-
