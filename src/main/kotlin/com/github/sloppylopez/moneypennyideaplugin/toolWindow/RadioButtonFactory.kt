@@ -57,7 +57,7 @@ class RadioButtonFactory {
                 prePromptTextArea.text = "Refactor Code:\n"
             }
 
-            "Unit Test" -> {
+            "Unit" -> {
                 prePromptTextArea.text = "Write Unit Test for Code:\n"
             }
 
