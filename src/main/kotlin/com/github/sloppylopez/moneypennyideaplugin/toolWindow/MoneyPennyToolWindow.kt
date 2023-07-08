@@ -1,10 +1,9 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -52,7 +51,7 @@ class MoneyPennyToolWindow(
         val changeListener = ChangeListener { _ ->
             val selectedTab = tabbedPane.selectedIndex
             val tabName = tabbedPane.getTitleAt(selectedTab)
-            val filePath = ancestorListener.tabNameToFileMap[tabName]
+            val filePath = GlobalData.tabNameToFileMap[tabName]
 
             val fileContents: String = filePath?.let {
                 try {
@@ -75,7 +74,7 @@ class MoneyPennyToolWindow(
             gridBagConstraints.insets = JBUI.insets(2)
 
             for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, toolWindow, file, contentPromptText)
+                val innerPanel = createInnerPanel(j, toolWindow, file, contentPromptText, tabbedPane)
                 innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
                 gridBagConstraints.gridy = j - 1
@@ -92,6 +91,26 @@ class MoneyPennyToolWindow(
         return mainPanel
     }
 
+    private fun createInnerPanel(
+        panelIndex: Int,
+        toolWindow: ToolWindow? = null,
+        file: File?,
+        contentPromptText: String?,
+        tabbedPane: JBTabbedPane
+    ): JPanel {
+        val innerPanel = JPanel()
+        innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
+        when (panelIndex) {
+            1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
+
+            2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, this.promptPanelFactory, tabbedPane)
+
+            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
+
+        }
+        return innerPanel
+    }
+
     private fun setTabName(
         i: Int,
         fileList: List<*>,
@@ -103,9 +122,11 @@ class MoneyPennyToolWindow(
         if (i < fileList.size && file != null) {
             val tabName = "${getNextTabName()}) ${file.name}"
             tabbedPane.addTab(tabName, panel)
-            ancestorListener.tabNameToFileMap[tabName] = file.canonicalPath
-            contentPromptText?.let {
-                ancestorListener.tabNameToContentPromptTextMap[tabName] = it
+            GlobalData.tabNameToFileMap[tabName] = file.canonicalPath
+            if (contentPromptText != null) {
+                GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+            } else {
+                GlobalData.tabNameToContentPromptTextMap[tabName] = file.readText()
             }
         } else {
             tabbedPane.addTab("No File", panel)
@@ -113,27 +134,8 @@ class MoneyPennyToolWindow(
 
         if (contentPromptText != null && file != null) {
             val tabName = "${GlobalData.downerTabName}) ${file.name}"
-            ancestorListener.tabNameToContentPromptTextMap[tabName] = contentPromptText
+            GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
         }
-    }
-
-    private fun createInnerPanel(
-        panelIndex: Int,
-        toolWindow: ToolWindow? = null,
-        file: File?,
-        contentPromptText: String?
-    ): JPanel {
-        val innerPanel = JPanel()
-        innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
-        when (panelIndex) {
-            1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
-
-            2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, this.promptPanelFactory)
-
-            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
-
-        }
-        return innerPanel
     }
 
     private fun getNextTabName(): String {

@@ -4,6 +4,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.ui.components.JBTabbedPane
 import java.awt.FlowLayout
 import javax.swing.JPanel
 
@@ -14,7 +15,8 @@ class ComboBoxPanelFactory(project: Project) {
     fun comboBoxPanel(
         panel: JPanel,
         toolWindow: ToolWindow?,
-        promptPanelFactory: PromptPanelFactory
+        promptPanelFactory: PromptPanelFactory,
+        tabbedPane: JBTabbedPane
     ) {
         val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
         val modelStrings = arrayOf("Davinci", "Curie", "Babbage", "Ada")
@@ -26,7 +28,7 @@ class ComboBoxPanelFactory(project: Project) {
         languages.selectedIndex = selectedIndex
         nestedPanel.add(models)
         nestedPanel.add(languages)
-        buttonPanelFactory.buttonPanel(nestedPanel, promptPanelFactory, toolWindow)
+        buttonPanelFactory.buttonPanel(nestedPanel, promptPanelFactory, toolWindow!!, tabbedPane)
         panel.add(nestedPanel)
     }
 }

@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -9,17 +10,23 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import javax.swing.JButton
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
+import javax.swing.text.JTextComponent
 
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
     private val service = project.service<ProjectService>()
+
     fun buttonPanel(
-        panel: JPanel, promptPanelFactory: PromptPanelFactory, toolWindow: ToolWindow?
+        panel: JPanel,
+        promptPanelFactory: PromptPanelFactory,
+        toolWindow: ToolWindow?,
+        tabbedPane: JTabbedPane
     ) {
         val runPromptBtn = JButton("Run")
         runPromptBtn.addActionListener {
-            val combinedText = promptPanelFactory.getCombinedText()
-            Messages.showInfoMessage(combinedText, "CombinedText")
+            val selectedTabText = getSelectedTabText(tabbedPane)
+            Messages.showInfoMessage(selectedTabText, "Selected Tab Text")
         }
         panel.add(runPromptBtn)
 
@@ -49,5 +56,16 @@ class ButtonPanelFactory(project: Project) {
         } catch (e: Exception) {
             thisLogger().error("ButtonPanelFactory", e)
         }
+    }
+
+    private fun getSelectedTabText(tabbedPane: JTabbedPane): String? {
+        val selectedTabIndex = tabbedPane.selectedIndex
+        if (selectedTabIndex != -1) {
+            val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
+            if (!selectedTabTitle.isNullOrEmpty()) {
+                return GlobalData.tabNameToContentPromptTextMap[selectedTabTitle]
+            }
+        }
+        return null
     }
 }
