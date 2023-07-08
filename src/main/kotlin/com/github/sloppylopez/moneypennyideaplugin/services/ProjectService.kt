@@ -3,7 +3,6 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -15,9 +14,9 @@ import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.openapi.wm.WindowManager
 import com.intellij.psi.PsiFile
 import java.io.File
+import java.util.*
 import javax.swing.Icon
 
 @Service(Service.Level.PROJECT)
@@ -119,14 +118,32 @@ class ProjectService(project: Project) {
 
     fun expandFolders(fileList: List<*>): List<File> {
         val expandedFileList = mutableListOf<File>()
+        val stack = Stack<Any>()
+        stack.addAll(fileList)
 
-        for (file in fileList) {
+        while (stack.isNotEmpty()) {
+            val file = stack.pop()
+
             try {
-                if (file is File) {
-                    if (file.isDirectory) {
-                        expandedFileList.addAll(expandFolders(file.listFiles()?.toList() ?: emptyList<String>()))
-                    } else {
-                        expandedFileList.add(file)
+                when (file) {
+                    is File -> {
+                        if (file.isDirectory) {
+                            val files = file.listFiles()
+                            if (files != null) {
+                                stack.addAll(files.toList())
+                            }
+                        } else {
+                            expandedFileList.add(file)
+                        }
+                    }
+
+                    is VirtualFile -> {
+                        if (file.isDirectory) {
+                            val children = file.children.toList()
+                            stack.addAll(children)
+                        } else {
+                            expandedFileList.add(virtualFileToFile(file)!!)
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -136,6 +153,7 @@ class ProjectService(project: Project) {
 
         return expandedFileList
     }
+
 
     fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
         normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()

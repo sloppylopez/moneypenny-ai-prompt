@@ -46,7 +46,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
         val project = e.getData(CommonDataKeys.PROJECT)
         val fileEditorManager = FileEditorManager.getInstance(project!!)
         editor = fileEditorManager.selectedTextEditor
-        file = fileEditorManager.selectedFiles.firstOrNull()
+        file = fileEditorManager.selectedFiles.firstOrNull()//With this we get the selected file from the file editor
         e.presentation.isEnabled = editor != null && file != null
     }
 
