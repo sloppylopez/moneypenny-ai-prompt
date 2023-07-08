@@ -2,7 +2,8 @@ package com.github.sloppylopez.moneypennyideaplugin.intentions
 
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
-import com.intellij.codeInsight.intention.*
+import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.intention.IntentionManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -13,13 +14,13 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 
 private const val CUSTOM_INTENTIONS = "Custom Intentions"
-
 private const val SEND_TO_MONEY_PENNY = "Send to MoneyPenny"
 
 @Service(Service.Level.PROJECT)
 class RefactorIntentionFactory(private val project: Project) {
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
+
     fun addIntentionToAllEditors() {
         try {
             val intentionManager = IntentionManager.getInstance()
@@ -47,7 +48,7 @@ class RefactorIntentionFactory(private val project: Project) {
                 intentionManager.addAction(customIntention)
             }
         } catch (e: Exception) {
-            thisLogger().error("RefactorIntentionFactory", e)
+            thisLogger().error("RefactorIntentionFactory: ", e)
         }
     }
 

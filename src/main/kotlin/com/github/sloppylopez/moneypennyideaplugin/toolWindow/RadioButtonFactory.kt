@@ -1,10 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.ButtonGroup
@@ -13,7 +10,7 @@ import javax.swing.JRadioButton
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
-class RadioButtonFactory(project: Project) {
+class RadioButtonFactory {
     fun radioButtonsPanel(
         panel: JPanel,
         prePromptTextArea: JTextArea
