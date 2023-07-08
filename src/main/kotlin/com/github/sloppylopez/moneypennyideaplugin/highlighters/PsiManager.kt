@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.highlighters
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
@@ -12,7 +13,8 @@ import com.intellij.openapi.vfs.newvfs.events.VFilePropertyChangeEvent
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 
-class PsiManager {
+@Service(Service.Level.PROJECT)
+class PsiManager(private val project: Project) {
     //    private fun createNewLinkElement(project: AllIcons.Welcome.Project, linkText: String, linkDestination: String): PsiElement? {
 //        val markdownText = "[$linkText]($linkDestination)"
 //        val newFile = MarkdownPsiElementFactory.createFile(project, markdownText)
@@ -20,7 +22,6 @@ class PsiManager {
 //        return newParentLinkElement
 //    }
     fun getListOfProjectVirtualFilesByName(
-        project: Project,
         caseSensitivity: Boolean = true,
         fileName: String = "Lambdas.kt"
     ): MutableCollection<VirtualFile> {
@@ -28,14 +29,13 @@ class PsiManager {
     }
 
     fun getListOfProjectVirtualFilesByExt(
-        project: Project,
         caseSensitivity: Boolean = true,
         extName: String = "kt"
     ): MutableCollection<VirtualFile> {
         return FilenameIndex.getAllFilesByExt(project, extName, GlobalSearchScope.projectScope(project))
     }
 
-    fun getListOfAllProjectVFiles(project: Project): MutableCollection<VirtualFile> {
+    fun getListOfAllProjectVFiles(): MutableCollection<VirtualFile> {
         val collection = mutableListOf<VirtualFile>()
         ProjectFileIndex.getInstance(project).iterateContent {
             collection += it
@@ -50,7 +50,7 @@ class PsiManager {
      * user. You may need to filter out events that aren’t relevant to your task (e.g., via
      * `ProjectFileIndex#isInContent()`). A listener for VFS events, invoked inside write-action.
      */
-    private fun attachListenerForProjectVFileChanges(project: Project): Unit {
+    private fun attachListenerForProjectVFileChanges(): Unit {
         println("MyPlugin: attachListenerForProjectFileChanges()")
 
         val connection = project.messageBus.connect(/*parentDisposable=*/ project)
@@ -61,11 +61,12 @@ class PsiManager {
             })
     }
 
-    fun handleEvent(event: VFileEvent) {
+    private fun handleEvent(event: VFileEvent) {
         when (event) {
             is VFilePropertyChangeEvent -> {
                 println("VFile property change event: $event")
             }
+
             is VFileContentChangeEvent -> {
                 println("VFile content change event: $event")
             }

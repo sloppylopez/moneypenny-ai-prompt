@@ -5,7 +5,8 @@ fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
 plugins {
-    id("java-library") // Java library support
+    id("java") // Java library support
+//    id("org.jetbrains.intellij") // IntelliJ Plugin support
 //    id("org.jetbrains.intellij") // IntelliJ Plugin support
 //    id("kotlin-library") // Kotlin support
     alias(libs.plugins.kotlin) // Kotlin support

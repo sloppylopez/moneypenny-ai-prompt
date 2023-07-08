@@ -3,6 +3,7 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 import MoneyPennyToolWindow
 import TextAreaFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.intellij.history.core.Content
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -105,14 +106,19 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         try {
             val expandedFileList = service.expandFolders(fileList)
             val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
-            val content = ContentFactory.getInstance()
+            val contentTab = ContentFactory.getInstance()
                 .createContent(
                     moneyPennyToolWindow.getContent(expandedFileList, null),
                     getDisplayName(expandedFileList),
                     true
                 )
-            currentToolWindow!!.contentManager.addContent(content, 0)
-            currentToolWindow!!.contentManager.setSelectedContent(content)
+//            Content.setCloseable(false)
+            val contentManager = currentToolWindow!!.contentManager
+            contentTab.setDisposer {
+                thisLogger().info("contentTab is disposed, contentCount: ${contentManager.contentCount}")
+            }
+            contentManager.addContent(contentTab, 0)
+            contentManager.setSelectedContent(contentTab)
             expandedFileList.forEach {
                 val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
                 service.highlightTextInEditor(currentProject, fileContents)
@@ -121,6 +127,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             thisLogger().error("PromptPanelFactory: ", e)
         }
     }
+
 
     private fun getDisplayName(expandedFileList: List<File>): String {
         val prefix = if (expandedFileList.isEmpty()) "Prompt" else

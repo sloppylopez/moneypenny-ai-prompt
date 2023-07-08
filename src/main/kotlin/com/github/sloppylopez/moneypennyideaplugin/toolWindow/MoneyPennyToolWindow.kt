@@ -57,7 +57,7 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
                     thisLogger().error(e)
                 }
             } as String
-            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
+//            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
             ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
         }
 

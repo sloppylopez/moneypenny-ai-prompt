@@ -123,6 +123,7 @@
     <li><a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/360002476840-How-to-auto-start-initialize-plugin-on-project-loaded-">Idea Plugin Advanced Tutorial</a></li>
     <li><a href="https://developerlife.com/2021/03/13/ij-idea-plugin-advanced/#psi-access-and-mutation">Idea Plugin Advanced Tutorial</a></li>
     <li><a href="https://plugins.jetbrains.com/docs/intellij/psi-files.html#how-do-i-get-a-psi-file">Psi files</a></li>
+    <li><a href="https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html?from=jetbrains.org#bundled-and-other-plugins">Plugins Support</a></li>
   </ul>
 
 <h2>Contributing</h2>
