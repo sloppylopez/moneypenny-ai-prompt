@@ -1,7 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-//import javax.swing.JFileChooser
-//import javax.swing.JFrame
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.ui.Messages
@@ -16,7 +14,8 @@ class ButtonPanelFactory {
     ) {
         val runPromptBtn = JButton("Run")
         runPromptBtn.addActionListener { e ->
-            thisLogger().info("ButtonPanelFactory: Run" + e.actionCommand)
+            val combinedText = promptPanelFactory.getCombinedText()
+            Messages.showInfoMessage(combinedText, "Vamos pepooo")
         }
         panel.add(runPromptBtn)
 

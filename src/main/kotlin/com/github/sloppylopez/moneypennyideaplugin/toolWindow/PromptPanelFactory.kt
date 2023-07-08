@@ -186,4 +186,22 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             }
         }
     }
+
+    fun getCombinedText(): String {
+        val prePromptText = prePromptTextArea?.text ?: ""
+        val contentPromptText = contentPromptTextArea?.text ?: ""
+        val postPromptText = postPromptTextArea?.text ?: ""
+        return prePromptText + contentPromptText + postPromptText
+    }
+
+//    private fun preserveIndentation(text: String): String {
+//        val lines = text.split("\r\n|\r|\n")
+//        val preservedLines = lines.map { line ->
+//            val indentation = line.takeWhile { it == ' ' }
+//            val trimmedLine = line.trimStart()
+//            "$indentation$trimmedLine"
+//        }
+//        return preservedLines.joinToString(System.lineSeparator())
+//    }
+
 }
