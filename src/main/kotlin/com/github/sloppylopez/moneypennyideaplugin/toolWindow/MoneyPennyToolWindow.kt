@@ -19,7 +19,10 @@ import java.io.File
 import javax.swing.*
 import javax.swing.event.ChangeListener
 
-class MoneyPennyToolWindow(private val project: Project, private val toolWindow: ToolWindow) {
+class MoneyPennyToolWindow(
+    project: Project,
+    private val toolWindow: ToolWindow
+) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
@@ -57,7 +60,6 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
                     thisLogger().error(e)
                 }
             } as String
-//            service.showNotification(project, "$selectedTab Change $fileContents", filePath.toString())
             ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
         }
 

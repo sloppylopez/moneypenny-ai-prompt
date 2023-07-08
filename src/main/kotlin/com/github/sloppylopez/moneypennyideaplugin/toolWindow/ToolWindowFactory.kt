@@ -14,7 +14,8 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
-import javax.swing.*
+import javax.swing.ImageIcon
+import javax.swing.SwingUtilities
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 
@@ -51,10 +52,10 @@ class ToolWindowFactory : ToolWindowFactory {
             )
 
             // Create a custom tab component with a close button
-            val tabComponent = createTabComponent(content.displayName, tabbedPane)
+            val tabComponent = ButtonTabComponent(tabbedPane)
 
             // Add the content and custom tab component to the tabbed pane
-            tabbedPane.addTab(null, content.component)
+            tabbedPane.addTab(content.displayName, content.component)
             tabbedPane.setTabComponentAt(tabbedPane.tabCount - 1, tabComponent)
 
             val contentManager = toolWindow.contentManager
@@ -66,7 +67,7 @@ class ToolWindowFactory : ToolWindowFactory {
             // Add a change listener to handle tab close events
             tabbedPane.addChangeListener { e ->
                 val source = e.source
-                if (source is JTabbedPane && source.selectedComponent == null) {
+                if (source is JBTabbedPane && source.selectedComponent == null) {
                     // Tab was closed, remove the content
                     val selectedIndex = source.selectedIndex
                     if (selectedIndex != -1) {
@@ -92,27 +93,5 @@ class ToolWindowFactory : ToolWindowFactory {
             Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())
         }
         return ImageIcon()
-    }
-
-    private fun createTabComponent(tabTitle: String, tabbedPane: JTabbedPane): JPanel {
-        val tabLabel = JLabel(tabTitle, SwingConstants.LEFT)
-        val closeButton = JButton("x").apply {
-            border = BorderFactory.createEmptyBorder(1, 4, 1, 4) // Set padding for the button
-            isFocusable = false // Remove focus border around the button
-            addActionListener {
-                val index = tabbedPane.indexOfTabComponent(this.parent)
-                if (index != -1) {
-                    tabbedPane.removeTabAt(index)
-                }
-            }
-        }
-
-        val tabComponent = JPanel().apply {
-            isOpaque = false
-            add(tabLabel)
-            add(closeButton)
-        }
-
-        return tabComponent
     }
 }
