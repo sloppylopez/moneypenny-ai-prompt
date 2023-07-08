@@ -1,3 +1,4 @@
+package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService

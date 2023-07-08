@@ -1,6 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import MoneyPennyToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
@@ -16,8 +15,6 @@ import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
 import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
-import javax.swing.event.ChangeEvent
-import javax.swing.event.ChangeListener
 
 class ToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(
