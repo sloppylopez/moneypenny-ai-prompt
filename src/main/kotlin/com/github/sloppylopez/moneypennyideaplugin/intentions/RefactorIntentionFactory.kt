@@ -43,9 +43,11 @@ class RefactorIntentionFactory(private val project: Project) {
             // Add Custom Intention to all editors
             val instance = FileEditorManager.getInstance(project) ?: return
             val editor = instance.openFiles[0]
-            val psiFile = PsiManager.getInstance(project).findFile(editor)
-            if (psiFile != null) {
-                intentionManager.addAction(customIntention)
+            if (editor != null) {
+                val psiFile = PsiManager.getInstance(project).findFile(editor)
+                if (psiFile != null) {
+                    intentionManager.addAction(customIntention)
+                }
             }
         } catch (e: Exception) {
             thisLogger().error("RefactorIntentionFactory: ", e)

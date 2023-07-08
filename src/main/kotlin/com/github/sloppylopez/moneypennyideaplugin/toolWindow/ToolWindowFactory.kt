@@ -14,13 +14,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
-import javax.swing.ImageIcon
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JTabbedPane
-import javax.swing.JPanel
-import javax.swing.SwingConstants
-import javax.swing.SwingUtilities
+import javax.swing.*
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 
@@ -70,20 +64,18 @@ class ToolWindowFactory : ToolWindowFactory {
             contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
 
             // Add a change listener to handle tab close events
-            tabbedPane.addChangeListener(object : ChangeListener {
-                override fun stateChanged(e: ChangeEvent) {
-                    val source = e.source
-                    if (source is JTabbedPane && source.selectedComponent == null) {
-                        // Tab was closed, remove the content
-                        val selectedIndex = source.selectedIndex
-                        if (selectedIndex != -1) {
-                            val removedContent = contentManager.getContent(selectedIndex)
-                            if (removedContent != null)
-                                contentManager.removeContent(removedContent, true)
-                        }
+            tabbedPane.addChangeListener { e ->
+                val source = e.source
+                if (source is JTabbedPane && source.selectedComponent == null) {
+                    // Tab was closed, remove the content
+                    val selectedIndex = source.selectedIndex
+                    if (selectedIndex != -1) {
+                        val removedContent = contentManager.getContent(selectedIndex)
+                        if (removedContent != null)
+                            contentManager.removeContent(removedContent, true)
                     }
                 }
-            })
+            }
         } catch (e: Exception) {
             Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())
         }
@@ -105,6 +97,8 @@ class ToolWindowFactory : ToolWindowFactory {
     private fun createTabComponent(tabTitle: String, tabbedPane: JTabbedPane): JPanel {
         val tabLabel = JLabel(tabTitle, SwingConstants.LEFT)
         val closeButton = JButton("x").apply {
+            border = BorderFactory.createEmptyBorder(1, 4, 1, 4) // Set padding for the button
+            isFocusable = false // Remove focus border around the button
             addActionListener {
                 val index = tabbedPane.indexOfTabComponent(this.parent)
                 if (index != -1) {
