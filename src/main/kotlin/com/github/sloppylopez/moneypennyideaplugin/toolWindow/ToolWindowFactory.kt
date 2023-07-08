@@ -42,28 +42,21 @@ class ToolWindowFactory : ToolWindowFactory {
 
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-
             val tabbedPane = JBTabbedPane()
-
             val content = ContentFactory.getInstance().createContent(
                 moneyPennyToolWindow.getContent(),
                 "Prompt",
                 true
             )
-
             // Create a custom tab component with a close button
             val tabComponent = ButtonTabComponent(tabbedPane)
-
             // Add the content and custom tab component to the tabbed pane
             tabbedPane.addTab(content.displayName, content.component)
             tabbedPane.setTabComponentAt(tabbedPane.tabCount - 1, tabComponent)
-
             val contentManager = toolWindow.contentManager
             val toolWindowContent = SimpleToolWindowPanel(true)
             toolWindowContent.setContent(tabbedPane)
-
             contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
-
             // Add a change listener to handle tab close events
             tabbedPane.addChangeListener { e ->
                 val source = e.source

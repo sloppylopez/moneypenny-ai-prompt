@@ -3,7 +3,6 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 import MoneyPennyToolWindow
 import TextAreaFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.intellij.history.core.Content
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -12,6 +11,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
+import com.intellij.util.ui.JBUI
+import java.awt.Insets
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -22,6 +23,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.nio.file.Files
+import javax.swing.BorderFactory
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
@@ -44,7 +46,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     var postPromptTextArea: JTextArea? = JTextArea()
         private set
 
-
     fun promptPanel(
         panel: JPanel,
         toolWindow: ToolWindow? = null,
@@ -54,27 +55,43 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         try {
             promptPanel = panel
             currentToolWindow = toolWindow
-            prePromptTextArea = textAreaFactory.createTextArea("", 2, 79)
-            contentPromptTextArea =
-                textAreaFactory.createTextArea("Paste text, drag a file, copy folder path...", 10, 79)
-            postPromptTextArea = textAreaFactory.createTextArea("", 5, 79)
+
+            prePromptTextArea = createPaddedTextArea("", 2, 79)
+            contentPromptTextArea = createPaddedTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+            postPromptTextArea = createPaddedTextArea("", 5, 79)
+
             radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
 
-            val prePromptScrollPane = JBScrollPane(prePromptTextArea)
-            panel.add(prePromptScrollPane)
-            val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
-            addTextToContentPrompt(file, contentPromptText)
-            panel.add(contentPromptScrollPane)
-            val postPromptScrollPane = JBScrollPane(postPromptTextArea)
-            panel.add(postPromptScrollPane)
-            checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
-            contentPromptTextArea!!.dropTarget = DropTarget(contentPromptTextArea, this)
+            if (contentPromptTextArea != null) {
+                val prePromptScrollPane = JBScrollPane(prePromptTextArea)
+                panel.add(prePromptScrollPane)
+
+                val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
+                contentPromptTextArea?.text = getText(file, contentPromptText)
+                panel.add(contentPromptScrollPane)
+
+                val postPromptScrollPane = JBScrollPane(postPromptTextArea)
+                panel.add(postPromptScrollPane)
+
+                checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
+
+                contentPromptTextArea?.dropTarget = DropTarget(contentPromptTextArea, this)
+            }
         } catch (e: Exception) {
             thisLogger().error(e)
         }
     }
 
-    private fun addTextToContentPrompt(file: File?, message: String?) {
+    private fun createPaddedTextArea(text: String, rows: Int, columns: Int): JTextArea {
+        val textArea = textAreaFactory.createTextArea(text, rows, columns)
+        val padding = JBUI.insets(5) // Adjust the padding values as needed
+        val border = BorderFactory.createEmptyBorder(padding.top, padding.left, padding.bottom, padding.right)
+        textArea.border = border
+        return textArea
+    }
+
+
+    private fun getText(file: File?, message: String?): String {
         if (file != null && message == null) {
             val reader = BufferedReader(FileReader(file))
             reader.use {
@@ -84,12 +101,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     contents.append(line).append(System.lineSeparator())
                     line = reader.readLine()
                 }
-                contentPromptTextArea?.text = contents.toString()
+                return contents.toString()
             }
-        } else {
-            if (message != null)
-                contentPromptTextArea?.text = message
+        } else if (message != null) {
+            return message
         }
+        return ""
     }
 
     override fun drop(dtde: DropTargetDropEvent) {
