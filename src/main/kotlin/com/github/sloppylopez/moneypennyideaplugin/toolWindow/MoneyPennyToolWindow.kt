@@ -63,7 +63,7 @@ class MoneyPennyToolWindow(private val project: Project, private val toolWindow:
 
         for (i in 0..tabCount) {
             if (fileList.isNotEmpty()) {
-                file = service.readFile(fileList, i, this.javaClass.name)
+                file = service.readFile(fileList, i)
             }
             val panel = JPanel(GridBagLayout())
 

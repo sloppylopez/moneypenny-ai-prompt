@@ -20,11 +20,7 @@ import java.util.*
 import javax.swing.Icon
 
 @Service(Service.Level.PROJECT)
-class ProjectService(project: Project) {
-
-    init {
-        thisLogger().info(Bundle.message("projectService", project.name))
-    }
+class ProjectService {
 
     fun getRandomNumber() = (1..100).random()
 
@@ -57,7 +53,7 @@ class ProjectService(project: Project) {
         )
     }
 
-    fun readFile(fileList: List<*>, i: Int, className: String): File? {
+    fun readFile(fileList: List<*>, i: Int): File? {
         try {
             if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
                 val file = fileList[i] as File
@@ -79,14 +75,6 @@ class ProjectService(project: Project) {
             message, title,
         )
     }
-
-//    fun logError(className: String, e: Exception) {
-//        Logger.getInstance(className).error(e.stackTraceToString())
-//    }
-//
-//    fun logInfo(className: String, info: String) {
-//        Logger.getInstance(className).info(info)
-//    }
 
     fun showNotification(project: Project?, title: String, content: String) {
         val notification = Notification(

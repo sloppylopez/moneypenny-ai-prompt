@@ -32,6 +32,8 @@ dependencies {
     implementation("com.google.api:gax:2.30.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
     implementation("org.jetbrains:annotations:23.0.0")
+//    implementation("io.github.origin-energy:java-snapshot-testing-junit5:4.0.6")
+//    implementation("io.github.origin-energy:java-snapshot-testing-plugin-jackson:4.0.6")
 //    implementation(kotlin("stdlib-jdk8"))
 //    implementation("com.intellij:java:2023.1.1")
 //    implementation(files("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\build\\libs\\moneypenny-idea-plugin-0.0.1.jar"))
