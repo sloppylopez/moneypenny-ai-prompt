@@ -12,7 +12,6 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBUI
-import java.awt.Insets
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -38,13 +37,9 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private val textAreaFactory = project.service<TextAreaFactory>()
     private val service = project.service<ProjectService>()
     private var tabCounter = 0
-
-    var prePromptTextArea: JTextArea? = JTextArea()
-        private set
-    var contentPromptTextArea: JTextArea? = JTextArea()
-        private set
-    var postPromptTextArea: JTextArea? = JTextArea()
-        private set
+    private var prePromptTextArea: JTextArea? = JTextArea()
+    private var contentPromptTextArea: JTextArea? = JTextArea()
+    private var postPromptTextArea: JTextArea? = JTextArea()
 
     fun promptPanel(
         panel: JPanel,
@@ -181,8 +176,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 } catch (e: Exception) {
                     thisLogger().error(e)
                 }
-            } else {
-                thisLogger().warn("No text selected")
             }
         }
     }
@@ -193,15 +186,4 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         val postPromptText = postPromptTextArea?.text ?: ""
         return prePromptText + contentPromptText + postPromptText
     }
-
-//    private fun preserveIndentation(text: String): String {
-//        val lines = text.split("\r\n|\r|\n")
-//        val preservedLines = lines.map { line ->
-//            val indentation = line.takeWhile { it == ' ' }
-//            val trimmedLine = line.trimStart()
-//            "$indentation$trimmedLine"
-//        }
-//        return preservedLines.joinToString(System.lineSeparator())
-//    }
-
 }

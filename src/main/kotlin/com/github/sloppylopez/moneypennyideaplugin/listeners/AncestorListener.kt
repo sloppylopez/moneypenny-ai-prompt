@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.listeners
 
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
+import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger

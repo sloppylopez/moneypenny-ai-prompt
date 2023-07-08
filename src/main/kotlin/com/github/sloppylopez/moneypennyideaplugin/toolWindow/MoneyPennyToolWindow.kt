@@ -2,7 +2,7 @@ import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ComboBoxPanelFactory
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.FileEditorManager
+import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -127,7 +127,7 @@ class MoneyPennyToolWindow(
         when (panelIndex) {
             1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
 
-            2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, this.promptPanelFactory)
+            2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, this.promptPanelFactory)
 
             3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
 

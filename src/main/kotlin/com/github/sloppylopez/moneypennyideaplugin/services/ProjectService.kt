@@ -14,6 +14,7 @@ import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.wm.ToolWindow
 import com.intellij.psi.PsiFile
 import java.io.File
 import java.util.*
@@ -74,17 +75,6 @@ class ProjectService {
         Messages.showInfoMessage(
             message, title,
         )
-    }
-
-    fun showNotification(project: Project?, title: String, content: String) {
-        val notification = Notification(
-            "MoneyPenny",
-            title,
-            content,
-            NotificationType.INFORMATION
-        )
-
-        Notifications.Bus.notify(notification, project)
     }
 
     fun highlightTextInEditor(project: Project, contentPromptText: String) {
@@ -163,5 +153,34 @@ class ProjectService {
         }
         return selectedText1
     }
+
+    fun getTextFromToolWindow(toolWindow: ToolWindow): String {
+        val textAreaElements = mutableListOf<String>()
+        val toolWindowComponent = toolWindow.component
+        collectTextAreas(toolWindowComponent, textAreaElements)
+        return textAreaElements.joinToString("\n")
+    }
+
+    private fun collectTextAreas(component: java.awt.Component, textAreaElements: MutableList<String>) {
+        if (component is javax.swing.JTextArea) {
+            val text = component.text
+            textAreaElements.add(text)
+        }
+
+        if (component is java.awt.Container) {
+            for (childComponent in component.components) {
+                collectTextAreas(childComponent, textAreaElements)
+            }
+        }
+
+        if (component is javax.swing.JTabbedPane) {
+            val tabCount = component.tabCount
+            for (i in 1 until tabCount) {
+                val tabComponent = component.getComponentAt(i)
+                collectTextAreas(tabComponent, textAreaElements)
+            }
+        }
+    }
+
 
 }
