@@ -18,9 +18,12 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManager
 import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
+import kotlin.random.Random
 
 class ToolWindowHelper {
     companion object {
+        private const val MAX_CONTENT_TABS = 3
+
         fun addTabbedPaneToToolWindow(project: Project, toolWindow: ToolWindow) {
             val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
             sendToPromptFileFolderTreeAction.registerFolderTreeAction()
@@ -40,22 +43,30 @@ class ToolWindowHelper {
             val tabbedPane = JBTabbedPane()
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-            val contentTab = ContentFactory.getInstance().createContent(
-                moneyPennyToolWindow.getContent(),
-                "Prompt",
-                true
-            )
+
+            // Generate a random number of content tabs (between 1 and 3)
+            val numContentTabs = Random.nextInt(1, MAX_CONTENT_TABS + 1)
+
+            for (i in 1..numContentTabs) {
+                val contentTab = ContentFactory.getInstance().createContent(
+                    moneyPennyToolWindow.getContent(),
+                    "Prompt $i",
+                    true
+                )
+                // Add each content tab to the tabbed pane
+                tabbedPane.addTab(contentTab.displayName, contentTab.component)
+            }
+
             val toolWindowContent = SimpleToolWindowPanel(true)
             val contentManager = toolWindow.contentManager
             contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
-            contentTab.setDisposer {
-                thisLogger().info("contentTab is disposed, contentCount: ${contentManager.contentCount}")
+
+            // Create a custom tab component with a close button for each tab
+            for (i in 0 until tabbedPane.tabCount) {
+                val tabComponent = ButtonTabComponent(tabbedPane)
+                tabbedPane.setTabComponentAt(i, tabComponent)
             }
-            // Create a custom tab component with a close button
-            val tabComponent = ButtonTabComponent(tabbedPane)
-            // Add the content and custom tab component to the tabbed pane
-            tabbedPane.addTab(contentTab.displayName, contentTab.component)
-            tabbedPane.setTabComponentAt(tabbedPane.tabCount - 1, tabComponent)
+
             toolWindowContent.setContent(tabbedPane)
             // Add a change listener to handle tab close events
             addChangeListenerToTabbedPane(tabbedPane, contentManager)
