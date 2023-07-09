@@ -98,7 +98,10 @@ class ProjectService {
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
 
-    fun expandFolders(fileList: List<*>): List<File> {
+    fun expandFolders(fileList: List<*>? = null): List<File> {
+        if (fileList == null) {
+            return emptyList()
+        }
         val expandedFileList = mutableListOf<File>()
         val stack = Stack<Any>()
         stack.addAll(fileList)

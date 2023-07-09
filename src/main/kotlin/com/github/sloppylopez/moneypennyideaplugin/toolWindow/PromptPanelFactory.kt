@@ -6,12 +6,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindow
-import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
-import com.intellij.ui.content.ContentManager
 import com.intellij.util.ui.JBUI
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -26,6 +22,7 @@ import java.nio.file.Files
 import javax.swing.BorderFactory
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import kotlin.reflect.jvm.internal.impl.resolve.calls.inference.CapturedType
 
 
 @Service(Service.Level.PROJECT)
@@ -113,35 +110,40 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         val transferable: Transferable = dtde.transferable
 
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-            val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-            createContentFromFiles(fileList)
+            val transferData = transferable.getTransferData(DataFlavor.javaFileListFlavor)
+            if (transferData is List<*>) {
+                createContentFromFiles(transferData)
+            }
         }
     }
 
     fun createContentFromFiles(
-        fileList: List<*>,
+        fileList: List<*>? = null
     ) {
         try {
             val project = service.getCurrentProject()
             val toolWindow = service.getToolWindow()
-            val expandedFileList = service.expandFolders(fileList)
-            val moneyPennyToolWindow = MoneyPennyToolWindow(project!!, toolWindow!!)
-            val contentTab = ContentFactory.getInstance()
-                .createContent(
-                    moneyPennyToolWindow.getContent(expandedFileList, null),
-                    getDisplayName(expandedFileList),
-                    true
-                )
-            val contentManager = toolWindow.contentManager
-            contentManager.addContent(contentTab, 0)
-            contentManager.setSelectedContent(contentTab)
-            contentTab.setDisposer {
-                thisLogger().info("contentTab is disposed, contentCount: ${contentManager.contentCount}")
+            if (!fileList.isNullOrEmpty()) {
+                val expandedFileList = service.expandFolders(fileList)
+                val moneyPennyToolWindow = MoneyPennyToolWindow(project!!, toolWindow!!)
+                val contentTab = ContentFactory.getInstance()
+                    .createContent(
+                        moneyPennyToolWindow.getContent(expandedFileList, null),
+                        getDisplayName(expandedFileList),
+                        true
+                    )
+                val contentManager = toolWindow.contentManager
+                contentManager.addContent(contentTab, 0)
+                contentManager.setSelectedContent(contentTab)
+                contentTab.setDisposer {
+                    thisLogger().info("contentTab is disposed, contentCount: ${contentManager.contentCount}")
+                }
+                expandedFileList.forEach {
+                    val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
+                    service.highlightTextInEditor(project, fileContents)
+                }
             }
-            expandedFileList.forEach {
-                val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
-                service.highlightTextInEditor(project, fileContents)
-            }
+
         } catch (e: Exception) {
             thisLogger().error("PromptPanelFactory: ", e)
         }

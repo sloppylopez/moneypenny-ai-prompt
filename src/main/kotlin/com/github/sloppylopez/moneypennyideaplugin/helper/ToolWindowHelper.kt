@@ -1,74 +1,53 @@
 package com.github.sloppylopez.moneypennyideaplugin.helper
 
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
-import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManager
 import java.io.File
 import javax.swing.ImageIcon
-import javax.swing.SwingUtilities
-import kotlin.random.Random
+import kotlin.reflect.jvm.internal.impl.resolve.calls.inference.CapturedType
 
 class ToolWindowHelper {
     companion object {
-        private const val MAX_CONTENT_TABS = 5
         private var tabCounter = 0
 
-        fun addTabbedPaneToToolWindow(project: Project, toolWindow: ToolWindow) {
+        fun addTabbedPaneToToolWindow(
+            project: Project, toolWindow: ToolWindow,
+            fileList: List<CapturedType>? = emptyList()
+        ) {
             val service = project.service<ProjectService>()
-            val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
-            sendToPromptFileFolderTreeAction.registerFolderTreeAction()
-            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-            sendToPromptTextEditorAction.registerFileEditorAction()
-            val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
-            SwingUtilities.invokeLater {
-                ApplicationManager.getApplication().invokeLater(
-                    {
-                        refactorIntentionFactory.removeIntentions()
-                        refactorIntentionFactory.addIntentionToAllEditors()
-                    },
-                    ModalityState.NON_MODAL
-                )
-            }
-
             val tabbedPane = JBTabbedPane()
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
 
-            // Generate a random number of content tabs (between 1 and 3)
-            val numContentTabs = Random.nextInt(1, MAX_CONTENT_TABS + 1)
-            val fileList = ArrayList<File>()
-            fileList.add(File("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\kotlin\\com\\github\\sloppylopez\\moneypennyideaplugin\\helper\\ToolWindowHelper.kt"))
-            fileList.add(File("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\kotlin\\com\\github\\sloppylopez\\moneypennyideaplugin\\services\\ProjectService.kt"))
-            val expandedFileList = service.expandFolders(fileList)
-//            for (i in 1..expandedFileList.size) {
-//                val contentTab = ContentFactory.getInstance().createContent(
-//                    moneyPennyToolWindow.getContent(),
-//                    "Prompt $i",
-//                    true
-//                )
-            val contentTab = ContentFactory.getInstance()
-                .createContent(
-                    moneyPennyToolWindow.getContent(expandedFileList, null),
-                    getDisplayName(expandedFileList),
-                    true
+            val contentTab: Content = if (fileList!!.isEmpty()) {
+                ContentFactory.getInstance().createContent(
+                    moneyPennyToolWindow.getContent(),
+                    "Prompt",
+                    true,
                 )
+            } else {
+                val expandedFileList = service.expandFolders(fileList)
+                ContentFactory.getInstance()
+                    .createContent(
+                        moneyPennyToolWindow.getContent(expandedFileList, null),
+                        getDisplayName(expandedFileList),
+                        true
+                    )
+            }
+
             // Add each content tab to the tabbed pane
             tabbedPane.addTab(contentTab.displayName, contentTab.component)
-//            }
 
             val toolWindowContent = SimpleToolWindowPanel(true)
             val contentManager = toolWindow.contentManager
