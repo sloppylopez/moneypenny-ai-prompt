@@ -124,6 +124,7 @@
     <li><a href="https://developerlife.com/2021/03/13/ij-idea-plugin-advanced/#psi-access-and-mutation">Idea Plugin Advanced Tutorial</a></li>
     <li><a href="https://plugins.jetbrains.com/docs/intellij/psi-files.html#how-do-i-get-a-psi-file">Psi files</a></li>
     <li><a href="https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html?from=jetbrains.org#bundled-and-other-plugins">Plugins Support</a></li>
+    <li><a href="https://mediamodifier.com/svg-editor#">Svg Editor</a></li>
   </ul>
 
 <h2>Contributing</h2>
