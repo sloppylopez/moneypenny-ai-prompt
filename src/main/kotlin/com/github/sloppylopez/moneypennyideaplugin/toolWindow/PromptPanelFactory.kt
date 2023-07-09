@@ -51,7 +51,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             currentToolWindow = toolWindow
 
             prePromptTextArea = createPaddedTextArea("", 2, 79)
-            contentPromptTextArea = createPaddedTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+            contentPromptTextArea = createPaddedTextArea(
+                "Paste text, drag a file, copy folder path...",
+                10,
+                79,
+                "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\pluginIcon_BIG.png"
+            )
             postPromptTextArea = createPaddedTextArea("", 5, 79)
 
             radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
@@ -76,8 +81,13 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         }
     }
 
-    private fun createPaddedTextArea(text: String, rows: Int, columns: Int): JTextArea {
-        val textArea = textAreaFactory.createTextArea(text, rows, columns)
+    private fun createPaddedTextArea(
+        text: String,
+        rows: Int,
+        columns: Int,
+        imageBackground: String? = null
+    ): JTextArea {
+        val textArea = textAreaFactory.createTextArea(text, rows, columns, imageBackground)
         val padding = JBUI.insets(5) // Adjust the padding values as needed
         val border = BorderFactory.createEmptyBorder(padding.top, padding.left, padding.bottom, padding.right)
         textArea.border = border

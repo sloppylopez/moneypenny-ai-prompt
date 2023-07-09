@@ -7,8 +7,8 @@ import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class TextAreaFactory {
-    fun createTextArea(text: String, rows: Int, columns: Int): JTextArea {
-        return MoneyPennyTextArea().apply {
+    fun createTextArea(text: String, rows: Int, columns: Int, imageBackground: String?): JTextArea {
+        return MoneyPennyTextArea(imageBackground).apply {
             this.text = text
             lineWrap = true
             wrapStyleWord = true

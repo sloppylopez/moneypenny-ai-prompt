@@ -84,8 +84,8 @@ class ToolWindowFactory : ToolWindowFactory {
 
     private fun getToolWindowIcon(): ImageIcon {
         try {
-            val customIconUrl =
-                "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\moneypenny-logo-main.jpg"
+            val imageName = "/images/moneypenny-logo-main.jpg"
+            val customIconUrl = SendToPromptFileFolderTreeAction::class.java.getResource(imageName)
             return ImageIcon(customIconUrl)
         } catch (e: Exception) {
             Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())
