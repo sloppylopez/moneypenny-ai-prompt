@@ -48,21 +48,6 @@ class MoneyPennyToolWindow(
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
         var file: File? = null
 
-        val changeListener = ChangeListener { _ ->
-            val selectedTab = tabbedPane.selectedIndex
-            val tabName = tabbedPane.getTitleAt(selectedTab)
-            val filePath = GlobalData.tabNameToFileMap[tabName]
-
-            val fileContents: String = filePath?.let {
-                try {
-                    File(it).readText()
-                } catch (e: Exception) {
-                    thisLogger().error(e)
-                }
-            } as String
-            ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
-        }
-
         for (i in 0..tabCount) {
             if (fileList.isNotEmpty()) {
                 file = service.readFile(fileList, i)
@@ -80,15 +65,29 @@ class MoneyPennyToolWindow(
                 gridBagConstraints.gridy = j - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-            setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
+            service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
         }
-
-        tabbedPane.addChangeListener(changeListener)
+        tabbedPane.addChangeListener(getChangeListener(tabbedPane))
         val ancestorListener = ancestorListener.getAncestorListener(tabbedPane)
         tabbedPane.addAncestorListener(ancestorListener)
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.CENTER)
         return mainPanel
+    }
+
+    private fun getChangeListener(tabbedPane: JBTabbedPane) = ChangeListener { _ ->
+        val selectedTab = tabbedPane.selectedIndex
+        val tabName = tabbedPane.getTitleAt(selectedTab)
+        val filePath = GlobalData.tabNameToFileMap[tabName]
+
+        val fileContents: String = filePath?.let {
+            try {
+                File(it).readText()
+            } catch (e: Exception) {
+                thisLogger().error(e)
+            }
+        } as String
+        ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
     }
 
     private fun createInnerPanel(
@@ -109,36 +108,5 @@ class MoneyPennyToolWindow(
 
         }
         return innerPanel
-    }
-
-    private fun setTabName(
-        i: Int,
-        fileList: List<*>,
-        file: File?,
-        tabbedPane: JBTabbedPane,
-        panel: JPanel,
-        contentPromptText: String?
-    ) {
-        if (i < fileList.size && file != null) {
-            val tabName = "${getNextTabName()}) ${file.name}"
-            tabbedPane.addTab(tabName, panel)
-            GlobalData.tabNameToFileMap[tabName] = file.canonicalPath
-            if (contentPromptText != null) {
-                GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
-            } else {
-                GlobalData.tabNameToContentPromptTextMap[tabName] = file.readText()
-            }
-        } else {
-            tabbedPane.addTab("No File", panel)
-        }
-
-        if (contentPromptText != null && file != null) {
-            val tabName = "${GlobalData.downerTabName}) ${file.name}"
-            GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
-        }
-    }
-
-    private fun getNextTabName(): String {
-        return GlobalData.downerTabName++.toString()
     }
 }

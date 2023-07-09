@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -16,9 +17,11 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.psi.PsiFile
+import com.intellij.ui.components.JBTabbedPane
 import java.io.File
 import java.util.*
 import javax.swing.Icon
+import javax.swing.JPanel
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
@@ -182,5 +185,34 @@ class ProjectService {
         }
     }
 
+    fun setTabName(
+        i: Int,
+        fileList: List<*>,
+        file: File?,
+        tabbedPane: JBTabbedPane,
+        panel: JPanel,
+        contentPromptText: String?
+    ) {
+        if (i < fileList.size && file != null) {
+            val tabName = "${getNextTabName()}) ${file.name}"
+            tabbedPane.addTab(tabName, panel)
+            GlobalData.tabNameToFileMap[tabName] = file.canonicalPath
+            if (contentPromptText != null) {
+                GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+            } else {
+                GlobalData.tabNameToContentPromptTextMap[tabName] = file.readText()
+            }
+        } else {
+            tabbedPane.addTab("No File", panel)
+        }
 
+        if (contentPromptText != null && file != null) {
+            val tabName = "${GlobalData.downerTabName}) ${file.name}"
+            GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+        }
+    }
+
+    private fun getNextTabName(): String {
+        return GlobalData.downerTabName++.toString()
+    }
 }
