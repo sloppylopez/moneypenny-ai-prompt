@@ -3,6 +3,7 @@ package com.github.sloppylopez.moneypennyideaplugin.helper
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
+import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.intellij.openapi.application.ApplicationManager
@@ -16,15 +17,18 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManager
+import java.io.File
 import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
 import kotlin.random.Random
 
 class ToolWindowHelper {
     companion object {
-        private const val MAX_CONTENT_TABS = 3
+        private const val MAX_CONTENT_TABS = 5
+        private var tabCounter = 0
 
         fun addTabbedPaneToToolWindow(project: Project, toolWindow: ToolWindow) {
+            val service = project.service<ProjectService>()
             val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
             sendToPromptFileFolderTreeAction.registerFolderTreeAction()
             val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
@@ -46,16 +50,25 @@ class ToolWindowHelper {
 
             // Generate a random number of content tabs (between 1 and 3)
             val numContentTabs = Random.nextInt(1, MAX_CONTENT_TABS + 1)
-
-            for (i in 1..numContentTabs) {
-                val contentTab = ContentFactory.getInstance().createContent(
-                    moneyPennyToolWindow.getContent(),
-                    "Prompt $i",
+            val fileList = ArrayList<File>()
+            fileList.add(File("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\kotlin\\com\\github\\sloppylopez\\moneypennyideaplugin\\helper\\ToolWindowHelper.kt"))
+            fileList.add(File("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\kotlin\\com\\github\\sloppylopez\\moneypennyideaplugin\\services\\ProjectService.kt"))
+            val expandedFileList = service.expandFolders(fileList)
+//            for (i in 1..expandedFileList.size) {
+//                val contentTab = ContentFactory.getInstance().createContent(
+//                    moneyPennyToolWindow.getContent(),
+//                    "Prompt $i",
+//                    true
+//                )
+            val contentTab = ContentFactory.getInstance()
+                .createContent(
+                    moneyPennyToolWindow.getContent(expandedFileList, null),
+                    getDisplayName(expandedFileList),
                     true
                 )
-                // Add each content tab to the tabbed pane
-                tabbedPane.addTab(contentTab.displayName, contentTab.component)
-            }
+            // Add each content tab to the tabbed pane
+            tabbedPane.addTab(contentTab.displayName, contentTab.component)
+//            }
 
             val toolWindowContent = SimpleToolWindowPanel(true)
             val contentManager = toolWindow.contentManager
@@ -99,6 +112,16 @@ class ToolWindowHelper {
                     }
                 }
             }
+        }
+
+        private fun getDisplayName(expandedFileList: List<File>): String {
+            val prefix = if (expandedFileList.isEmpty()) "Prompt" else
+                "${expandedFileList.size} Arch"
+            return "${getNextTabName()}) $prefix"
+        }
+
+        private fun getNextTabName(): String {
+            return tabCounter++.toString()
         }
     }
 }
