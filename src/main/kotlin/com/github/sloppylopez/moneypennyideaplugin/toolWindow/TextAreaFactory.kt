@@ -1,3 +1,4 @@
+package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 import com.github.sloppylopez.moneypennyideaplugin.components.MoneyPennyTextArea
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service

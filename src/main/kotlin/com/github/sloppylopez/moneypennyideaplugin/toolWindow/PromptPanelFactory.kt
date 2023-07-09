@@ -1,6 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import TextAreaFactory
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -8,8 +7,11 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.ContentFactory
+import com.intellij.ui.content.ContentManager
 import com.intellij.util.ui.JBUI
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -28,9 +30,6 @@ import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class PromptPanelFactory(project: Project) : DropTargetAdapter() {
-    private var promptPanel = JPanel()
-    private var currentProject = project
-    private var currentToolWindow: ToolWindow? = null
     private val checkBoxFactory = project.service<CheckBoxFactory>()
     private val radioButtonFactory = project.service<RadioButtonFactory>()
     private val textAreaFactory = project.service<TextAreaFactory>()
@@ -42,22 +41,18 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
 
     fun promptPanel(
         panel: JPanel,
-        toolWindow: ToolWindow? = null,
         file: File?,
         contentPromptText: String?
     ) {
         try {
-            promptPanel = panel
-            currentToolWindow = toolWindow
-
             prePromptTextArea = createPaddedTextArea("", 2, 79)
-            contentPromptTextArea = createPaddedTextArea(
-                "Paste text, drag a file, copy folder path...",
-                10,
+            contentPromptTextArea = createPaddedTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+            postPromptTextArea = createPaddedTextArea(
+                "",
+                5,
                 79,
                 "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\pluginIcon_BIG.png"
             )
-            postPromptTextArea = createPaddedTextArea("", 5, 79)
 
             radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
 
@@ -117,23 +112,27 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         dtde.acceptDrop(DnDConstants.ACTION_COPY)
         val transferable: Transferable = dtde.transferable
 
-        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {//TODO: Use DataFlavor.getTextPlainUnicodeFlavor()??? better
+        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
             createContentFromFiles(fileList)
         }
     }
 
-    fun createContentFromFiles(fileList: List<*>) {
+    fun createContentFromFiles(
+        fileList: List<*>,
+    ) {
         try {
+            val project = service.getCurrentProject()
+            val toolWindow = service.getToolWindow()
             val expandedFileList = service.expandFolders(fileList)
-            val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
+            val moneyPennyToolWindow = MoneyPennyToolWindow(project!!, toolWindow!!)
             val contentTab = ContentFactory.getInstance()
                 .createContent(
                     moneyPennyToolWindow.getContent(expandedFileList, null),
                     getDisplayName(expandedFileList),
                     true
                 )
-            val contentManager = currentToolWindow!!.contentManager
+            val contentManager = toolWindow.contentManager
             contentManager.addContent(contentTab, 0)
             contentManager.setSelectedContent(contentTab)
             contentTab.setDisposer {
@@ -141,7 +140,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             }
             expandedFileList.forEach {
                 val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
-                service.highlightTextInEditor(currentProject, fileContents)
+                service.highlightTextInEditor(project, fileContents)
             }
         } catch (e: Exception) {
             thisLogger().error("PromptPanelFactory: ", e)
@@ -164,13 +163,15 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         isSnippet: Boolean? = false,
     ) {
         editor?.let { selectedEditor ->
+            val project = service.getCurrentProject()
+            val toolWindow = service.getToolWindow()
             var selectedText = selectedEditor.selectionModel.selectedText
             if (selectedText.isNullOrEmpty()) {
                 selectedText = service.getSelectedText(selectedEditor, selectedText)
             }
             if (!selectedText.isNullOrEmpty()) {
                 try {
-                    val moneyPennyToolWindow = MoneyPennyToolWindow(currentProject, currentToolWindow!!)
+                    val moneyPennyToolWindow = MoneyPennyToolWindow(project!!, toolWindow!!)
                     val content = ContentFactory.getInstance().createContent(
                         moneyPennyToolWindow.getContent(listOf(file), selectedText),
                         if (isSnippet == true) "Snippet_${getNextTabName()}" else
@@ -178,7 +179,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                         true
                     )
 
-                    val contentManager = currentToolWindow!!.contentManager
+                    val contentManager = toolWindow.contentManager
                     contentManager.addContent(content, 0)
                     contentManager.setSelectedContent(content) // Set the newly added content as selected
                 } catch (e: Exception) {
@@ -186,12 +187,5 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 }
             }
         }
-    }
-
-    fun getCombinedText(): String {
-        val prePromptText = prePromptTextArea?.text ?: ""
-        val contentPromptText = contentPromptTextArea?.text ?: ""
-        val postPromptText = postPromptTextArea?.text ?: ""
-        return prePromptText + contentPromptText + postPromptText
     }
 }

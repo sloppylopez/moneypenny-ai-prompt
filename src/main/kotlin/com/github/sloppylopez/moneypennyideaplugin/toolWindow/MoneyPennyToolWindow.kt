@@ -98,7 +98,7 @@ class MoneyPennyToolWindow(
             innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
-            1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
+            1 -> promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, tabbedPane)
 

@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
 import java.io.File
@@ -236,5 +237,13 @@ class ProjectService {
 
     private fun getNextTabName(): String {
         return GlobalData.downerTabName++.toString()
+    }
+
+    fun getCurrentProject(): Project? {
+        return com.intellij.openapi.project.ProjectManager.getInstance().openProjects.firstOrNull()
+    }
+
+    fun getToolWindow(): ToolWindow? {
+        return ToolWindowManager.getInstance(getCurrentProject()!!).getToolWindow("MoneyPenny AI")
     }
 }
