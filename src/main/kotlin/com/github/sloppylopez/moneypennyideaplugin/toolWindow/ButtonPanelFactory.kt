@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.services.GitService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -11,15 +12,15 @@ import com.intellij.openapi.wm.ToolWindow
 import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
-import javax.swing.text.JTextComponent
 
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
     private val service = project.service<ProjectService>()
+    private val gitService = project.service<GitService>()
+    private val prompts = mutableMapOf<String, List<String>>() // Modified
 
     fun buttonPanel(
         panel: JPanel,
-        promptPanelFactory: PromptPanelFactory,
         toolWindow: ToolWindow?,
         tabbedPane: JTabbedPane
     ) {
@@ -30,7 +31,7 @@ class ButtonPanelFactory(project: Project) {
         }
         panel.add(runPromptBtn)
 
-        addRunAllButton(promptPanelFactory, panel, toolWindow)
+        addRunAllButton(panel, toolWindow)
 
         val showDiffBtn = JButton("Show Diff")
         showDiffBtn.addActionListener { e ->
@@ -40,8 +41,8 @@ class ButtonPanelFactory(project: Project) {
     }
 
     private fun addRunAllButton(
-        promptPanelFactory: PromptPanelFactory,
-        panel: JPanel, toolWindow: ToolWindow?
+        panel: JPanel,
+        toolWindow: ToolWindow?
     ) {
         try {
             val runAllPromptBtn = JButton("Run All")
@@ -49,6 +50,8 @@ class ButtonPanelFactory(project: Project) {
                 // Usage of the recursive method to retrieve the text
                 if (toolWindow != null) {
                     val textFromToolWindow = service.getTextFromToolWindow(toolWindow)
+                    val shortSha = gitService.getShortSha(textFromToolWindow)
+                        prompts[shortSha] = listOf(textFromToolWindow) // Modified
                     Messages.showInfoMessage(textFromToolWindow, "Text from ToolWindow:")
                 }
             }

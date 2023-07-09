@@ -1,11 +1,3 @@
-package com.github.sloppylopez.moneypennyideaplugin.toolWindow
-
-import com.intellij.ui.JBColor
-import java.awt.*
-import java.awt.event.*
-import javax.swing.*
-import javax.swing.plaf.basic.BasicButtonUI
-
 /*
  * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
  *
@@ -37,13 +29,19 @@ import javax.swing.plaf.basic.BasicButtonUI
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-
 /**
  * Component to be used as tabComponent;
  * Contains a JLabel to show the text and
  * a JButton to close the tab it belongs to
  */
+package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+
+import com.intellij.ui.JBColor
+import java.awt.*
+import java.awt.event.*
+import javax.swing.*
+import javax.swing.plaf.basic.BasicButtonUI
+
 class ButtonTabComponent(pane: JTabbedPane?) : JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)) {
     private val pane: JTabbedPane
 

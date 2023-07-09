@@ -20,8 +20,7 @@ import javax.swing.*
 import javax.swing.event.ChangeListener
 
 class MoneyPennyToolWindow(
-    project: Project,
-    private val toolWindow: ToolWindow
+    project: Project, private val toolWindow: ToolWindow
 ) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
@@ -31,8 +30,7 @@ class MoneyPennyToolWindow(
     private val service = project.service<ProjectService>()
 
     fun getContent(
-        fileList: List<*>? = emptyList<Any>(),
-        contentPromptText: String? = null
+        fileList: List<*>? = emptyList<Any>(), contentPromptText: String? = null
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
             add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText))
@@ -40,9 +38,7 @@ class MoneyPennyToolWindow(
     }
 
     private fun moneyPennyPromptPanel(
-        toolWindow: ToolWindow? = null,
-        fileList: List<*>,
-        contentPromptText: String? = null
+        toolWindow: ToolWindow? = null, fileList: List<*>, contentPromptText: String? = null
     ): JComponent {
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
@@ -98,11 +94,13 @@ class MoneyPennyToolWindow(
         tabbedPane: JBTabbedPane
     ): JPanel {
         val innerPanel = JPanel()
+        if (panelIndex == 1)
+            innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
             1 -> promptPanelFactory.promptPanel(innerPanel, toolWindow, file, contentPromptText)
 
-            2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, this.promptPanelFactory, tabbedPane)
+            2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, tabbedPane)
 
             3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
 

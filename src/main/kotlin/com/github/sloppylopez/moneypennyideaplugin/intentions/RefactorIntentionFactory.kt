@@ -42,6 +42,7 @@ class RefactorIntentionFactory(private val project: Project) {
 
             // Add Custom Intention to all editors
             val instance = FileEditorManager.getInstance(project) ?: return
+            if(instance.openFiles.isEmpty()) return
             val editor = instance.openFiles[0]
             if (editor != null) {
                 val psiFile = PsiManager.getInstance(project).findFile(editor)

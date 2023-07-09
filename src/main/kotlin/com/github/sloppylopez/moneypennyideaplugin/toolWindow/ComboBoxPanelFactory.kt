@@ -15,7 +15,6 @@ class ComboBoxPanelFactory(project: Project) {
     fun comboBoxPanel(
         panel: JPanel,
         toolWindow: ToolWindow?,
-        promptPanelFactory: PromptPanelFactory,
         tabbedPane: JBTabbedPane
     ) {
         val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
@@ -28,7 +27,7 @@ class ComboBoxPanelFactory(project: Project) {
         languages.selectedIndex = selectedIndex
         nestedPanel.add(models)
         nestedPanel.add(languages)
-        buttonPanelFactory.buttonPanel(nestedPanel, promptPanelFactory, toolWindow!!, tabbedPane)
+        buttonPanelFactory.buttonPanel(nestedPanel, toolWindow!!, tabbedPane)
         panel.add(nestedPanel)
     }
 }

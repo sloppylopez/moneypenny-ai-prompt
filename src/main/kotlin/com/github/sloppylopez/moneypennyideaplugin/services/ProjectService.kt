@@ -157,6 +157,13 @@ class ProjectService {
         return selectedText1
     }
 
+    fun getTextFromToolWindow2(toolWindow: ToolWindow): String {
+        val textAreaElements = mutableListOf<String>()
+        val toolWindowComponent = toolWindow.component
+        collectTextAreas(toolWindowComponent, textAreaElements)
+        return textAreaElements.joinToString("\n")
+    }
+
     fun getTextFromToolWindow(toolWindow: ToolWindow): String {
         val textAreaElements = mutableListOf<String>()
         val toolWindowComponent = toolWindow.component
@@ -164,13 +171,21 @@ class ProjectService {
         return textAreaElements.joinToString("\n")
     }
 
-    private fun collectTextAreas(component: java.awt.Component, textAreaElements: MutableList<String>) {
+    private fun collectTextAreas(
+        component: java.awt.Component,
+        textAreaElements: MutableList<String>
+    ) {
         if (component is javax.swing.JTextArea) {
             val text = component.text
             textAreaElements.add(text)
         }
 
         if (component is java.awt.Container) {
+            if (component is JPanel && !component.name.isNullOrBlank()) {
+                textAreaElements.add(component.name.split("\\").last())//Component name = File name
+                textAreaElements.add(component.name)//Component fullpath = File fullpath
+            }
+
             for (childComponent in component.components) {
                 collectTextAreas(childComponent, textAreaElements)
             }
@@ -178,12 +193,19 @@ class ProjectService {
 
         if (component is javax.swing.JTabbedPane) {
             val tabCount = component.tabCount
-            for (i in 1 until tabCount) {
+//            if (!component.name.isNullOrBlank()) {
+//                textAreaElements.add(component.name)
+//            }
+            for (i in 1 until tabCount) {//This 1 is important, if you put 0 we get the same panel info twice
                 val tabComponent = component.getComponentAt(i)
+//                if (!tabComponent.name.isNullOrBlank()) {
+//                    textAreaElements.add(tabComponent.name)
+//                }
                 collectTextAreas(tabComponent, textAreaElements)
             }
         }
     }
+
 
     fun setTabName(
         i: Int,

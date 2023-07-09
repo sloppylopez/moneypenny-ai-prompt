@@ -134,11 +134,11 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     true
                 )
             val contentManager = currentToolWindow!!.contentManager
+            contentManager.addContent(contentTab, 0)
+            contentManager.setSelectedContent(contentTab)
             contentTab.setDisposer {
                 thisLogger().info("contentTab is disposed, contentCount: ${contentManager.contentCount}")
             }
-            contentManager.addContent(contentTab, 0)
-            contentManager.setSelectedContent(contentTab)
             expandedFileList.forEach {
                 val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
                 service.highlightTextInEditor(currentProject, fileContents)
