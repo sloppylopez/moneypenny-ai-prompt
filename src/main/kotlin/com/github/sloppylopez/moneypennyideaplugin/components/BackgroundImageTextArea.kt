@@ -8,7 +8,7 @@ import java.io.IOException
 import javax.imageio.ImageIO
 import javax.swing.JTextArea
 
-class MoneyPennyTextArea(imageBackground: String? = null) : JTextArea(20, 20) {
+class BackgroundImageTextArea(imageBackground: String? = null) : JTextArea(20, 20) {
     private var image: BufferedImage? = null
 
     init {

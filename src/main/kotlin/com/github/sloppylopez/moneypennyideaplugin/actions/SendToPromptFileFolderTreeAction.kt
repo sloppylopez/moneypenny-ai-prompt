@@ -1,18 +1,16 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.getIcon
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import javax.swing.ImageIcon
 
 @Service(Service.Level.PROJECT)
 class SendToPromptFileFolderTreeAction(private var project: Project? = null) : AnAction() {
     private val promptPanelFactory = project?.service<PromptPanelFactory>()
-    private val service = project?.service<ProjectService>()
 
     companion object {
         private const val ACTION_ID =
@@ -20,10 +18,7 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
     }
 
     init {
-        val imageUrl = "/images/MoneyPenny-Icon_13x13.jpg"
-        val url = SendToPromptFileFolderTreeAction::class.java.getResource(imageUrl)
-        val icon = ImageIcon(url)
-        templatePresentation.icon = icon
+        templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13.jpg")
         templatePresentation.text = "Send To MoneyPenny"
     }
 
@@ -31,12 +26,6 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
         try {
             val selectedFiles = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY)?.toList() // Convert array to list
             if (!selectedFiles.isNullOrEmpty()) {
-//                val firstSelectedFile = selectedFiles.first()
-//                promptPanelFactory?.sendToContentPrompt(
-//                    null,
-//                    service?.virtualFileToFile(firstSelectedFile),
-//                    false
-//                )
                 promptPanelFactory?.createContentFromFiles(
                     selectedFiles
                 )

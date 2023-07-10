@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -19,13 +20,12 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.util.ui.JBUI
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 import java.util.*
-import javax.swing.BorderFactory
 import javax.swing.Icon
 import javax.swing.JPanel
-import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
@@ -45,6 +45,24 @@ class ProjectService {
         return file?.virtualFile?.let { virtualFile ->
             File(virtualFile.path)
         }
+    }
+
+    fun getText(file: File?, message: String?): String {
+        if (file != null && message == null) {
+            val reader = BufferedReader(FileReader(file))
+            reader.use {
+                val contents = StringBuilder()
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    contents.append(line).append(System.lineSeparator())
+                    line = reader.readLine()
+                }
+                return contents.toString()
+            }
+        } else if (message != null) {
+            return message
+        }
+        return ""
     }
 
 
@@ -85,7 +103,7 @@ class ProjectService {
     }
 
     fun highlightTextInEditor(project: Project, contentPromptText: String) {
-        val editor = getCurrentEditor(project)
+        val editor = getCurrentEditor()
         editor?.let {
             val document = editor.document
             val textOffset = document.text.indexOf(contentPromptText)
@@ -96,7 +114,8 @@ class ProjectService {
         }
     }
 
-    private fun getCurrentEditor(project: Project): Editor? {
+    private fun getCurrentEditor(): Editor? {
+        val project = this.getProject()!!
         val file = FileEditorManager.getInstance(project)?.selectedFiles?.firstOrNull()
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
@@ -267,6 +286,32 @@ class ProjectService {
 
     fun getToolWindow(): ToolWindow? {
         return ToolWindowManager.getInstance(getProject()!!).getToolWindow("MoneyPenny AI")
+    }
+
+    fun sendToContentPrompt2(
+        editor: Editor?,
+        file: File?,
+    ) {
+        try {
+            editor?.let { selectedEditor ->
+                val project = this.getProject()
+                val toolWindow = this.getToolWindow()
+                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+                if (selectedTextFromEditor.isNullOrEmpty()) {
+                    selectedTextFromEditor = this.getSelectedText2(selectedEditor)
+                }
+                if (!selectedTextFromEditor.isNullOrEmpty()) {
+                    ToolWindowHelper.addTabbedPaneToToolWindow(
+                        project!!,
+                        toolWindow!!,
+                        listOf(file),
+                        selectedTextFromEditor
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            thisLogger().error(e)
+        }
     }
 
     // DON'T DELETE this might be useful so we dont have to have global maps to access data gracefully

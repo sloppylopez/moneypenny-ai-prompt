@@ -7,7 +7,7 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
-
+//W.I.P
 class EditorReplaceTextAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val editor: Editor = e.getRequiredData(CommonDataKeys.EDITOR)

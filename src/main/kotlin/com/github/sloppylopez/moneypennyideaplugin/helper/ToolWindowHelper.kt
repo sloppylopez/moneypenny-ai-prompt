@@ -6,6 +6,7 @@ import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.NlsSafe
@@ -31,42 +32,48 @@ class ToolWindowHelper {
             fileList: List<*>? = emptyList<Any>(),
             selectedText: @NlsSafe String? = null
         ) {
-            if (moneyPennyToolWindow == null) {//We only want to do this once
-                moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-                toolWindowContent.toolTipText = "MoneyPenny ToolWindowContent"
-                toolWindowContent.background = JBColor.YELLOW
-                toolWindow.contentManager.addContent(
-                    toolWindow.contentManager.factory.createContent(
-                        toolWindowContent,
-                        null,
-                        true
+            try {
+                if (moneyPennyToolWindow == null) {//We only want to do this once
+                    moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
+                    toolWindowContent.toolTipText = "MoneyPenny ToolWindowContent"
+                    toolWindowContent.background = JBColor.YELLOW
+                    toolWindow.contentManager.addContent(
+                        toolWindow.contentManager.factory.createContent(
+                            toolWindowContent,
+                            null,
+                            true
+                        )
                     )
+                }
+                val service = project.service<ProjectService>()
+                toolWindow.setIcon(getIcon("/images/moneypenny-logo-main.jpg"))
+                val contentTab: Content = getContentTab(
+                    fileList,
+                    moneyPennyToolWindow!!,
+                    service,
+                    selectedText
                 )
-            }
-            val service = project.service<ProjectService>()
-            toolWindow.setIcon(getToolWindowIcon())
-            val contentTab: Content = getContentTab(
-                fileList, moneyPennyToolWindow!!,
-                service, selectedText ?: ""
-            )
-            // Add each content tab to the tabbed pane
-            tabbedPane.addTab(contentTab.displayName, contentTab.component)
-            // Create a custom tab component with a close button for each tab
-            for (i in 0 until tabbedPane.tabCount) {
-                val tabComponent = ButtonTabComponent(tabbedPane)
-                tabbedPane.setTabComponentAt(i, tabComponent)
-            }
+                // Add each content tab to the tabbed pane
+                tabbedPane.addTab(contentTab.displayName, contentTab.component)
+                // Create a custom tab component with a close button for each tab
+                for (i in 0 until tabbedPane.tabCount) {
+                    val tabComponent = ButtonTabComponent(tabbedPane)
+                    tabbedPane.setTabComponentAt(i, tabComponent)
+                }
 
-            toolWindowContent.setContent(tabbedPane)
-            // Add a change listener to handle tab close events
-            addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
+                toolWindowContent.setContent(tabbedPane)
+                // Add a change listener to handle tab close events
+                addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
+            } catch (e: Exception) {
+                thisLogger().error(e.stackTraceToString())
+            }
         }
 
         private fun getContentTab(
             fileList: List<*>?,
             moneyPennyToolWindow: MoneyPennyToolWindow,
             service: ProjectService,
-            selectedText: @NlsSafe String
+            selectedText: @NlsSafe String? = null
         ): Content {
             val contentTab: Content = if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
@@ -86,13 +93,11 @@ class ToolWindowHelper {
             return contentTab
         }
 
-        private fun getToolWindowIcon(): ImageIcon {
+        fun getIcon(imageName: String): ImageIcon {
             try {
-                val imageName = "/images/moneypenny-logo-main.jpg"
-                val customIconUrl = SendToPromptFileFolderTreeAction::class.java.getResource(imageName)
-                return ImageIcon(customIconUrl)
+                return ImageIcon(SendToPromptFileFolderTreeAction::class.java.getResource(imageName))
             } catch (e: Exception) {
-                Logger.getInstance("ToolWindowFactory").error(e.stackTraceToString())
+                thisLogger().error(e.stackTraceToString())
             }
             return ImageIcon()
         }

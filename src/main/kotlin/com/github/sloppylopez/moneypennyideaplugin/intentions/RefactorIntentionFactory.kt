@@ -1,7 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.intentions
 
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.IntentionManager
 import com.intellij.openapi.components.Service
@@ -18,7 +17,6 @@ private const val SEND_TO_MONEY_PENNY = "Send to MoneyPenny"
 
 @Service(Service.Level.PROJECT)
 class RefactorIntentionFactory(private val project: Project) {
-    private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val service = project.service<ProjectService>()
 
     fun addIntentionToAllEditors() {
@@ -34,7 +32,7 @@ class RefactorIntentionFactory(private val project: Project) {
                 override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = true
 
                 override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
-                    promptPanelFactory.sendToContentPrompt2(editor, service.psiFileToFile(file!!))
+                    service.sendToContentPrompt2(editor, service.psiFileToFile(file!!))
                 }
 
                 override fun startInWriteAction(): Boolean = false
@@ -42,7 +40,7 @@ class RefactorIntentionFactory(private val project: Project) {
 
             // Add Custom Intention to all editors
             val instance = FileEditorManager.getInstance(project) ?: return
-            if(instance.openFiles.isEmpty()) return
+            if (instance.openFiles.isEmpty()) return
             val editor = instance.openFiles[0]
             if (editor != null) {
                 val psiFile = PsiManager.getInstance(project).findFile(editor)
@@ -51,7 +49,7 @@ class RefactorIntentionFactory(private val project: Project) {
                 }
             }
         } catch (e: Exception) {
-            thisLogger().error("RefactorIntentionFactory: ", e)
+            thisLogger().error(e.stackTraceToString())
         }
     }
 

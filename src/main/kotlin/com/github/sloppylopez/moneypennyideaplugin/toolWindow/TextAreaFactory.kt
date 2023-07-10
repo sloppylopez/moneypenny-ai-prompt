@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.components.MoneyPennyTextArea
+import com.github.sloppylopez.moneypennyideaplugin.components.BackgroundImageTextArea
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import com.intellij.ui.JBColor
@@ -11,7 +11,7 @@ import javax.swing.JTextArea
 @Service(Service.Level.PROJECT)
 class TextAreaFactory {
     private fun createTextArea(text: String, rows: Int, columns: Int, imageBackground: String?): JTextArea {
-        return MoneyPennyTextArea(imageBackground).apply {
+        return BackgroundImageTextArea(imageBackground).apply {
             this.text = text
             lineWrap = true
             wrapStyleWord = true
@@ -21,7 +21,7 @@ class TextAreaFactory {
         }
     }
 
-    fun createPaddedTextArea(
+    fun createDefaultTextArea(
         text: String,
         rows: Int,
         columns: Int,
@@ -29,8 +29,7 @@ class TextAreaFactory {
         textArea: JTextArea? = this.createTextArea(text, rows, columns, imageBackground)
     ): JTextArea {
         val padding = JBUI.insets(5) // Adjust the padding values as needed
-        val border = BorderFactory.createEmptyBorder(padding.top, padding.left, padding.bottom, padding.right)
-        textArea?.border = border
+        textArea?.border = BorderFactory.createEmptyBorder(padding.top, padding.left, padding.bottom, padding.right)
         return textArea!!
     }
 }
