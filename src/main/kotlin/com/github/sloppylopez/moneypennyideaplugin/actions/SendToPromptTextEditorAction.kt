@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.actionSystem.*
@@ -33,7 +34,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
     override fun actionPerformed(e: AnActionEvent) {
         editor?.let { editor ->
             file?.let { file: VirtualFile ->
-                promptPanelFactory?.sendToContentPrompt(
+                promptPanelFactory?.sendToContentPrompt2(
                     editor,
                     service?.virtualFileToFile(file)
                 )

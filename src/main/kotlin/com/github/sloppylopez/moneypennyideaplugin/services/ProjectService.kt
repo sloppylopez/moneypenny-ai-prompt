@@ -161,6 +161,22 @@ class ProjectService {
         return selectedText1
     }
 
+    fun getSelectedText2(
+        selectedEditor: Editor
+    ): @NlsSafe String? {
+        var selectedText: @NlsSafe String? = ""
+        val project: Project? = selectedEditor.project
+        val fileEditorManager = FileEditorManager.getInstance(project!!)
+        val selectedFile = fileEditorManager.selectedFiles.firstOrNull()
+        if (selectedFile != null) {
+            val virtualFile = VirtualFileManager.getInstance().findFileByUrl(selectedFile.url)
+            val openFileDescriptor = OpenFileDescriptor(project, virtualFile!!)
+            val document = openFileDescriptor.file.let { FileDocumentManager.getInstance().getDocument(it) }
+            selectedText = document?.text
+        }
+        return selectedText
+    }
+
     fun getTextFromToolWindow2(toolWindow: ToolWindow): String {
         val textAreaElements = mutableListOf<String>()
         val toolWindowComponent = toolWindow.component
@@ -242,12 +258,12 @@ class ProjectService {
         return GlobalData.downerTabName++.toString()
     }
 
-    fun getCurrentProject(): Project? {
+    fun getProject(): Project? {
         return com.intellij.openapi.project.ProjectManager.getInstance().openProjects.firstOrNull()
     }
 
     fun getToolWindow(): ToolWindow? {
-        return ToolWindowManager.getInstance(getCurrentProject()!!).getToolWindow("MoneyPenny AI")
+        return ToolWindowManager.getInstance(getProject()!!).getToolWindow("MoneyPenny AI")
     }
 
     // DON'T DELETE this might be useful so we dont have to have global maps to access data gracefully

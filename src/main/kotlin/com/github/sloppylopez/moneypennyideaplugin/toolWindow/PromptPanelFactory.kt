@@ -1,7 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
-import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow2
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -121,11 +120,11 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         fileList: List<*>? = null
     ) {
         try {
-            val project = service.getCurrentProject()
+            val project = service.getProject()
             val toolWindow = service.getToolWindow()
             if (!fileList.isNullOrEmpty()) {
                 val expandedFileList = service.expandFolders(fileList)
-                addTabbedPaneToToolWindow2(project!!, toolWindow!!, expandedFileList)
+                addTabbedPaneToToolWindow(project!!, toolWindow!!, expandedFileList)
                 expandedFileList.forEach {
                     val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
                     service.highlightTextInEditor(project, fileContents)
@@ -136,14 +135,41 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         }
     }
 
-    private fun getDisplayName(expandedFileList: List<File>): String {
-        val prefix = if (expandedFileList.isEmpty()) "Prompt" else
-            "${expandedFileList.size} Arch"
-        return "${getNextTabName()}) $prefix"
-    }
-
     private fun getNextTabName(): String {
         return tabCounter++.toString()
+    }
+
+    fun sendToContentPrompt2(
+        editor: Editor?,
+        file: File?,
+        isSnippet: Boolean? = false,
+    ) {
+        editor?.let { selectedEditor ->
+            val project = service.getProject()
+            val toolWindow = service.getToolWindow()
+            var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+            if (selectedTextFromEditor.isNullOrEmpty()) {
+                selectedTextFromEditor = service.getSelectedText2(selectedEditor)
+            }
+            if (!selectedTextFromEditor.isNullOrEmpty()) {
+                try {
+                    addTabbedPaneToToolWindow(project!!, toolWindow!!, listOf(file), selectedTextFromEditor)
+//                    val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
+//                    val content = ContentFactory.getInstance().createContent(
+//                        moneyPennyToolWindow.getContent(listOf(file), selectedText),
+//                        if (isSnippet == true) "Snippet_${getNextTabName()}" else
+//                            "${getNextTabName()}) 1 Arch",
+//                        true
+//                    )
+//
+//                    val contentManager = toolWindow.contentManager
+//                    contentManager.addContent(content, 0)
+//                    contentManager.setSelectedContent(content) // Set the newly added content as selected
+                } catch (e: Exception) {
+                    thisLogger().error(e)
+                }
+            }
+        }
     }
 
     fun sendToContentPrompt(
@@ -152,7 +178,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         isSnippet: Boolean? = false,
     ) {
         editor?.let { selectedEditor ->
-            val project = service.getCurrentProject()
+            val project = service.getProject()
             val toolWindow = service.getToolWindow()
             var selectedText = selectedEditor.selectionModel.selectedText
             if (selectedText.isNullOrEmpty()) {

@@ -10,7 +10,7 @@ class CheckBoxFactory {
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
         val checkboxPanel = JPanel()
         val checkboxLabels =
-            arrayOf("Add", "Create", "Modify", "Remove", "Replace", "Update", "Why", "Gives", "With")
+            arrayOf("Add", "Create", "Modify", "Remove", "Replace", "Update", "As Reference", "Gives", "With")
 
         checkboxLabels.forEach { label ->
             val checkBox = createCheckBox(label, false, postPromptTextArea)

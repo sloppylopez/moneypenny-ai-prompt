@@ -65,8 +65,8 @@ class RadioButtonFactory {
                 prePromptTextArea.text = "Write E2E for Code:\n"
             }
 
-            "DRY" -> {
-                prePromptTextArea.text = "DRY Code:\n"
+            "As Reference" -> {
+                prePromptTextArea.text = "Using this code as reference:\n"
             }
 
             "Explain" -> {

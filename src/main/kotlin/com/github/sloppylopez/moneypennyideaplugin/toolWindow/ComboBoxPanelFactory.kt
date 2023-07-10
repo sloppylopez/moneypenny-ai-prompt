@@ -1,4 +1,4 @@
-package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+    package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
