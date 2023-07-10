@@ -5,13 +5,11 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.wm.ToolWindow
-import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
@@ -33,34 +31,27 @@ class ToolWindowHelper {
             selectedText: @NlsSafe String? = null
         ) {
             try {
-                if (moneyPennyToolWindow == null) {//We only want to do this once
-                    moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-                    toolWindowContent.toolTipText = "MoneyPenny ToolWindowContent"
-                    toolWindowContent.background = JBColor.YELLOW
-                    toolWindow.contentManager.addContent(
-                        toolWindow.contentManager.factory.createContent(
-                            toolWindowContent,
-                            null,
-                            true
-                        )
-                    )
-                }
                 val service = project.service<ProjectService>()
+                if (moneyPennyToolWindow == null) {//We only want to do this once
+                    initMoneyPennyToolWindow(project, toolWindow)
+                }
+                //Set tool window icon
                 toolWindow.setIcon(getIcon("/images/moneypenny-logo-main.jpg"))
+                //Get content tab
                 val contentTab: Content = getContentTab(
                     fileList,
                     moneyPennyToolWindow!!,
                     service,
                     selectedText
                 )
-                // Add each content tab to the tabbed pane
+                //Add content tab to tabbed pane
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
+                tabbedPane.selectedIndex = tabCounter
                 // Create a custom tab component with a close button for each tab
                 for (i in 0 until tabbedPane.tabCount) {
                     val tabComponent = ButtonTabComponent(tabbedPane)
                     tabbedPane.setTabComponentAt(i, tabComponent)
                 }
-
                 toolWindowContent.setContent(tabbedPane)
                 // Add a change listener to handle tab close events
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
@@ -69,13 +60,24 @@ class ToolWindowHelper {
             }
         }
 
+        private fun initMoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
+            moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
+            toolWindow.contentManager.addContent(
+                toolWindow.contentManager.factory.createContent(
+                    toolWindowContent,
+                    null,
+                    true
+                )
+            )
+        }
+
         private fun getContentTab(
             fileList: List<*>?,
             moneyPennyToolWindow: MoneyPennyToolWindow,
             service: ProjectService,
             selectedText: @NlsSafe String? = null
         ): Content {
-            val contentTab: Content = if (fileList!!.isEmpty()) {
+            return if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
                     moneyPennyToolWindow.getContent(),
                     "Prompt",
@@ -90,7 +92,6 @@ class ToolWindowHelper {
                         true
                     )
             }
-            return contentTab
         }
 
         fun getIcon(imageName: String): ImageIcon {

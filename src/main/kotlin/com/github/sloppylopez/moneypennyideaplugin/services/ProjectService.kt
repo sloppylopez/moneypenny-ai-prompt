@@ -65,7 +65,6 @@ class ProjectService {
         return ""
     }
 
-
     fun showDialog(
         message: String, title: String,
         buttons: Array<String>, defaultOptionIndex:
@@ -81,7 +80,8 @@ class ProjectService {
 
     fun readFile(fileList: List<*>, i: Int): File? {
         try {
-            if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
+            if (i < fileList.size && fileList.isNotEmpty() &&
+                null != fileList[i]) {
                 val file = fileList[i] as File
                 thisLogger().info(Bundle.message("projectService", "File $file"))
                 return file
