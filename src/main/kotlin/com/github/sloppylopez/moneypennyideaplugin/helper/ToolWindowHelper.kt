@@ -9,6 +9,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
@@ -29,7 +30,6 @@ class ToolWindowHelper {
             val tabbedPane = JBTabbedPane()
             toolWindow.setIcon(getToolWindowIcon())
             val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-
             val contentTab: Content = if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
                     moneyPennyToolWindow.getContent(),
@@ -45,14 +45,18 @@ class ToolWindowHelper {
                         true
                     )
             }
-
+//            contentTab.putUserData(
+//                "fileList",
+//                fileList
+//            )
             // Add each content tab to the tabbed pane
             tabbedPane.addTab(contentTab.displayName, contentTab.component)
-
+            tabbedPane.background = JBColor.WHITE
             val toolWindowContent = SimpleToolWindowPanel(true)
             val contentManager = toolWindow.contentManager
             contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
-
+            val blueTabbedPane = toolWindowContent.component as? JBTabbedPane
+            blueTabbedPane?.background = JBColor.BLUE
             // Create a custom tab component with a close button for each tab
             for (i in 0 until tabbedPane.tabCount) {
                 val tabComponent = ButtonTabComponent(tabbedPane)
