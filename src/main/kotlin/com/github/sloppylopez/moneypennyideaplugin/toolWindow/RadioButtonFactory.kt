@@ -16,7 +16,7 @@ class RadioButtonFactory {
         prePromptTextArea: JTextArea
     ) {
         val radioButtonPanel = JPanel()
-        val buttonLabels = arrayOf("Refactor", "Unit", "E2E", "DRY", "Explain", "FreeStyle")
+        val buttonLabels = arrayOf("Refactor", "Unit", "E2E", "As Reference", "Explain", "FreeStyle")
 
         val actionListener = ActionListener { event ->
             val selectedRadioButton = event.source as? JRadioButton

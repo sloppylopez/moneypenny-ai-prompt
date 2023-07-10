@@ -42,14 +42,17 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         contentPromptText: String?
     ) {
         try {
-            prePromptTextArea = createPaddedTextArea("", 2, 79)
-            contentPromptTextArea = createPaddedTextArea("Paste text, drag a file, copy folder path...", 10, 79)
-            postPromptTextArea = createPaddedTextArea(
-                "",
-                5,
-                79,
-                "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\pluginIcon_BIG.png"
-            )
+            prePromptTextArea = textAreaFactory
+                .createPaddedTextArea("", 2, 79)
+            contentPromptTextArea = textAreaFactory
+                .createPaddedTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+            postPromptTextArea = textAreaFactory
+                .createPaddedTextArea(
+                    "",
+                    5,
+                    79,
+                    "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\pluginIcon_BIG.png"
+                )
 
             radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
 
@@ -71,19 +74,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         } catch (e: Exception) {
             thisLogger().error(e)
         }
-    }
-
-    private fun createPaddedTextArea(
-        text: String,
-        rows: Int,
-        columns: Int,
-        imageBackground: String? = null
-    ): JTextArea {
-        val textArea = textAreaFactory.createTextArea(text, rows, columns, imageBackground)
-        val padding = JBUI.insets(5) // Adjust the padding values as needed
-        val border = BorderFactory.createEmptyBorder(padding.top, padding.left, padding.bottom, padding.right)
-        textArea.border = border
-        return textArea
     }
 
     private fun getText(file: File?, message: String?): String {
@@ -131,76 +121,32 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 }
             }
         } catch (e: Exception) {
-            thisLogger().error("PromptPanelFactory: ", e)
+            thisLogger().error(e)
         }
-    }
-
-    private fun getNextTabName(): String {
-        return tabCounter++.toString()
     }
 
     fun sendToContentPrompt2(
         editor: Editor?,
         file: File?,
-        isSnippet: Boolean? = false,
     ) {
-        editor?.let { selectedEditor ->
-            val project = service.getProject()
-            val toolWindow = service.getToolWindow()
-            var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
-            if (selectedTextFromEditor.isNullOrEmpty()) {
-                selectedTextFromEditor = service.getSelectedText2(selectedEditor)
-            }
-            if (!selectedTextFromEditor.isNullOrEmpty()) {
-                try {
+        try {
+            editor?.let { selectedEditor ->
+                val project = service.getProject()
+                val toolWindow = service.getToolWindow()
+                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+                if (selectedTextFromEditor.isNullOrEmpty()) {
+                    selectedTextFromEditor = service.getSelectedText2(selectedEditor)
+                }
+                if (!selectedTextFromEditor.isNullOrEmpty()) {
                     addTabbedPaneToToolWindow(project!!, toolWindow!!, listOf(file), selectedTextFromEditor)
-//                    val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
-//                    val content = ContentFactory.getInstance().createContent(
-//                        moneyPennyToolWindow.getContent(listOf(file), selectedText),
-//                        if (isSnippet == true) "Snippet_${getNextTabName()}" else
-//                            "${getNextTabName()}) 1 Arch",
-//                        true
-//                    )
-//
-//                    val contentManager = toolWindow.contentManager
-//                    contentManager.addContent(content, 0)
-//                    contentManager.setSelectedContent(content) // Set the newly added content as selected
-                } catch (e: Exception) {
-                    thisLogger().error(e)
                 }
             }
+        } catch (e: Exception) {
+            thisLogger().error(e)
         }
     }
 
-    fun sendToContentPrompt(
-        editor: Editor?,
-        file: File?,
-        isSnippet: Boolean? = false,
-    ) {
-        editor?.let { selectedEditor ->
-            val project = service.getProject()
-            val toolWindow = service.getToolWindow()
-            var selectedText = selectedEditor.selectionModel.selectedText
-            if (selectedText.isNullOrEmpty()) {
-                selectedText = service.getSelectedText(selectedEditor, selectedText)
-            }
-            if (!selectedText.isNullOrEmpty()) {
-                try {
-                    val moneyPennyToolWindow = MoneyPennyToolWindow(project!!, toolWindow!!)
-                    val content = ContentFactory.getInstance().createContent(
-                        moneyPennyToolWindow.getContent(listOf(file), selectedText),
-                        if (isSnippet == true) "Snippet_${getNextTabName()}" else
-                            "${getNextTabName()}) 1 Arch",
-                        true
-                    )
-
-                    val contentManager = toolWindow.contentManager
-                    contentManager.addContent(content, 0)
-                    contentManager.setSelectedContent(content) // Set the newly added content as selected
-                } catch (e: Exception) {
-                    thisLogger().error(e)
-                }
-            }
-        }
+    private fun getNextTabName(): String {
+        return tabCounter++.toString()
     }
 }

@@ -19,10 +19,13 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.util.ui.JBUI
 import java.io.File
 import java.util.*
+import javax.swing.BorderFactory
 import javax.swing.Icon
 import javax.swing.JPanel
+import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
