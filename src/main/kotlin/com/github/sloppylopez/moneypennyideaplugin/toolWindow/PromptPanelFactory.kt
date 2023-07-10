@@ -1,5 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow2
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -22,7 +24,6 @@ import java.nio.file.Files
 import javax.swing.BorderFactory
 import javax.swing.JPanel
 import javax.swing.JTextArea
-import kotlin.reflect.jvm.internal.impl.resolve.calls.inference.CapturedType
 
 
 @Service(Service.Level.PROJECT)
@@ -86,7 +87,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         return textArea
     }
 
-
     private fun getText(file: File?, message: String?): String {
         if (file != null && message == null) {
             val reader = BufferedReader(FileReader(file))
@@ -125,25 +125,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             val toolWindow = service.getToolWindow()
             if (!fileList.isNullOrEmpty()) {
                 val expandedFileList = service.expandFolders(fileList)
-                val moneyPennyToolWindow = MoneyPennyToolWindow(project!!, toolWindow!!)
-                val contentTab = ContentFactory.getInstance()
-                    .createContent(
-                        moneyPennyToolWindow.getContent(expandedFileList, null),
-                        getDisplayName(expandedFileList),
-                        true
-                    )
-                val contentManager = toolWindow.contentManager
-                contentManager.addContent(contentTab, 0)
-                contentManager.setSelectedContent(contentTab)
-                contentTab.setDisposer {
-                    thisLogger().info("contentTab is disposed, contentCount: ${contentManager.contentCount}")
-                }
+                addTabbedPaneToToolWindow2(project!!, toolWindow!!, expandedFileList)
                 expandedFileList.forEach {
                     val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
                     service.highlightTextInEditor(project, fileContents)
                 }
             }
-
         } catch (e: Exception) {
             thisLogger().error("PromptPanelFactory: ", e)
         }

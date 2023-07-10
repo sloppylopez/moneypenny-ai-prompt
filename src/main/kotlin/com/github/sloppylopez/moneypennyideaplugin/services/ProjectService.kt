@@ -249,4 +249,10 @@ class ProjectService {
     fun getToolWindow(): ToolWindow? {
         return ToolWindowManager.getInstance(getCurrentProject()!!).getToolWindow("MoneyPenny AI")
     }
+
+    // DON'T DELETE this might be useful so we dont have to have global maps to access data gracefully
+//            contentTab.putUserData(
+//                "fileList",
+//                fileList
+//            )
 }

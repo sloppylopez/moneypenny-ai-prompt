@@ -21,15 +21,74 @@ import kotlin.reflect.jvm.internal.impl.resolve.calls.inference.CapturedType
 class ToolWindowHelper {
     companion object {
         private var tabCounter = 0
+        private val toolWindowContent = SimpleToolWindowPanel(true)
+        private var moneyPennyToolWindow: MoneyPennyToolWindow? = null
+        private var tabbedPane = JBTabbedPane()
 
         fun addTabbedPaneToToolWindow(
-            project: Project, toolWindow: ToolWindow,
-            fileList: List<CapturedType>? = emptyList()
+            project: Project,
+            toolWindow: ToolWindow,
+            fileList: List<*>? = emptyList<Any>()
+        ) {
+            if (moneyPennyToolWindow == null) {
+                moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
+            }
+            val service = project.service<ProjectService>()
+            toolWindow.setIcon(getToolWindowIcon())
+            val contentTab: Content = getContentTab(fileList, moneyPennyToolWindow!!, service)
+            // Add each content tab to the tabbed pane
+            tabbedPane.addTab(contentTab.displayName, contentTab.component)
+            tabbedPane.background = JBColor.WHITE
+            toolWindowContent.toolTipText = "MoneyPenny ToolWindowContent"
+            toolWindowContent.background = JBColor.YELLOW
+            val contentManager = toolWindow.contentManager
+            contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
+            // Create a custom tab component with a close button for each tab
+            for (i in 0 until tabbedPane.tabCount) {
+                val tabComponent = ButtonTabComponent(tabbedPane)
+                tabComponent.background = JBColor.PINK
+                tabbedPane.setTabComponentAt(i, tabComponent)
+            }
+
+            toolWindowContent.setContent(tabbedPane)
+            // Add a change listener to handle tab close events
+            addChangeListenerToTabbedPane(tabbedPane, contentManager)
+        }
+
+        fun addTabbedPaneToToolWindow2(
+            project: Project,
+            toolWindow: ToolWindow,
+            fileList: List<*>? = emptyList<Any>()
         ) {
             val service = project.service<ProjectService>()
-            val tabbedPane = JBTabbedPane()
             toolWindow.setIcon(getToolWindowIcon())
-            val moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
+
+            val contentTab: Content = getContentTab(fileList, moneyPennyToolWindow!!, service)
+            // Add each content tab to the tabbed pane
+            tabbedPane.addTab(contentTab.displayName, contentTab.component)
+            tabbedPane.background = JBColor.WHITE
+            toolWindowContent.toolTipText = "MoneyPenny ToolWindowContent"
+            toolWindowContent.background = JBColor.YELLOW
+            val contentManager = toolWindow.contentManager
+            //TODO don't DELETE use this to add a icon for run all!!
+//            contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
+            // Create a custom tab component with a close button for each tab
+            for (i in 0 until tabbedPane.tabCount) {
+                val tabComponent = ButtonTabComponent(tabbedPane)
+                tabComponent.background = JBColor.PINK
+                tabbedPane.setTabComponentAt(i, tabComponent)
+            }
+
+            toolWindowContent.setContent(tabbedPane)
+            // Add a change listener to handle tab close events
+            addChangeListenerToTabbedPane(tabbedPane, contentManager)
+        }
+
+        private fun getContentTab(
+            fileList: List<*>?,
+            moneyPennyToolWindow: MoneyPennyToolWindow,
+            service: ProjectService
+        ): Content {
             val contentTab: Content = if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
                     moneyPennyToolWindow.getContent(),
@@ -45,27 +104,7 @@ class ToolWindowHelper {
                         true
                     )
             }
-//            contentTab.putUserData(
-//                "fileList",
-//                fileList
-//            )
-            // Add each content tab to the tabbed pane
-            tabbedPane.addTab(contentTab.displayName, contentTab.component)
-            tabbedPane.background = JBColor.WHITE
-            val toolWindowContent = SimpleToolWindowPanel(true)
-            val contentManager = toolWindow.contentManager
-            contentManager.addContent(contentManager.factory.createContent(toolWindowContent, null, true))
-            val blueTabbedPane = toolWindowContent.component as? JBTabbedPane
-            blueTabbedPane?.background = JBColor.BLUE
-            // Create a custom tab component with a close button for each tab
-            for (i in 0 until tabbedPane.tabCount) {
-                val tabComponent = ButtonTabComponent(tabbedPane)
-                tabbedPane.setTabComponentAt(i, tabComponent)
-            }
-
-            toolWindowContent.setContent(tabbedPane)
-            // Add a change listener to handle tab close events
-            addChangeListenerToTabbedPane(tabbedPane, contentManager)
+            return contentTab
         }
 
         private fun getToolWindowIcon(): ImageIcon {
