@@ -26,12 +26,12 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
         try {
             val selectedFiles = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY)?.toList() // Convert array to list
             if (!selectedFiles.isNullOrEmpty()) {
-                promptPanelFactory?.createContentFromFiles(
+                promptPanelFactory?.openFilesAndSendContentToPrompt(
                     selectedFiles
                 )
             }
         } catch (e: Exception) {
-            thisLogger().error("Error sending file to MoneyPenny", e)
+            thisLogger().error(e.stackTraceToString())
         }
     }
 

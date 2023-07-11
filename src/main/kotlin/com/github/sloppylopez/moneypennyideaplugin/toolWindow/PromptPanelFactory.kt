@@ -52,7 +52,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
                 val prePromptScrollPane = JBScrollPane(prePromptTextArea)
                 panel.add(prePromptScrollPane)
-                //Set text in content prompt text area, add drop target
+                //Set text in content prompt text area, then add drop target
                 val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
                 contentPromptTextArea?.text = service.getText(file, contentPromptText)
                 panel.add(contentPromptScrollPane)
@@ -63,7 +63,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
             }
         } catch (e: Exception) {
-            thisLogger().error(e)
+            thisLogger().error(e.stackTraceToString())
         }
     }
 
@@ -72,27 +72,25 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         val transferable: Transferable = dtde.transferable
 
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-            val transferData = transferable.getTransferData(DataFlavor.javaFileListFlavor)
-            if (transferData is List<*>) {
-                createContentFromFiles(transferData)
-            }
+            openFilesAndSendContentToPrompt(
+                transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+            )
         }
     }
-
-    fun createContentFromFiles(fileList: List<*>? = null) {
+    //TODO this is too clever, split in 2
+    fun openFilesAndSendContentToPrompt(fileList: List<*>? = null) {
         try {
             if (!fileList.isNullOrEmpty()) {
                 val project = service.getProject()
-                val toolWindow = service.getToolWindow()
                 val expandedFileList = service.expandFolders(fileList)
-                addTabbedPaneToToolWindow(project!!, toolWindow!!, expandedFileList)
+                addTabbedPaneToToolWindow(project!!, expandedFileList)
                 expandedFileList.forEach {
                     val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
                     service.highlightTextInEditor(project, fileContents)
                 }
             }
         } catch (e: Exception) {
-            thisLogger().error(e)
+            thisLogger().error(e.stackTraceToString())
         }
     }
 }

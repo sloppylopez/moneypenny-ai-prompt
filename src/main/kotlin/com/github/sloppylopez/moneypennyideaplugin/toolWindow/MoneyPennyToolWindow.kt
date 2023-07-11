@@ -2,10 +2,9 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
-import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
+import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
@@ -64,26 +63,19 @@ class MoneyPennyToolWindow(
             service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
         }
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
-        val ancestorListener = ancestorListener.getAncestorListener(tabbedPane)
-        tabbedPane.addAncestorListener(ancestorListener)
+        tabbedPane.addAncestorListener(ancestorListener.getAncestorListener(tabbedPane))
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(tabbedPane, BorderLayout.CENTER)
         return mainPanel
     }
 
     private fun getChangeListener(tabbedPane: JBTabbedPane) = ChangeListener { _ ->
-        val selectedTab = tabbedPane.selectedIndex
-        val tabName = tabbedPane.getTitleAt(selectedTab)
-        val filePath = GlobalData.tabNameToFileMap[tabName]
-
-        val fileContents: String = filePath?.let {
-            try {
-                File(it).readText()
-            } catch (e: Exception) {
-                thisLogger().error(e)
-            }
-        } as String
-        ancestorListener.fileEditorManager.openFileInEditor(filePath, fileContents)
+        val filePath = GlobalData.tabNameToFilePathMap[tabbedPane
+            .getTitleAt(tabbedPane.selectedIndex)]
+        service.invokeLater {
+            ancestorListener.fileEditorManager
+                .openFileInEditor(filePath, service.getFileContents(filePath))
+        }
     }
 
     private fun createInnerPanel(
@@ -94,15 +86,14 @@ class MoneyPennyToolWindow(
         tabbedPane: JBTabbedPane
     ): JPanel {
         val innerPanel = JPanel()
-        if (panelIndex == 1)
-            innerPanel.name = file?.canonicalPath ?: "Prompt"
+        if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
             1 -> promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
 
             2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, tabbedPane)
 
-            3 -> fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText)
+            3 -> service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
 
         }
         return innerPanel

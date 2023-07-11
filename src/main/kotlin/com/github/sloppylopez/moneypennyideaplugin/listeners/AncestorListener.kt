@@ -1,16 +1,14 @@
 package com.github.sloppylopez.moneypennyideaplugin.listeners
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
+import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBTabbedPane
-import java.io.File
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
@@ -18,39 +16,28 @@ import javax.swing.event.AncestorListener
 class AncestorListener(project: Project) {
     val fileEditorManager = project.service<FileEditorManager>()
     val service = project.service<ProjectService>()
-    fun getAncestorListener(
-        tabbedPane: JBTabbedPane
-    ) =
-        object : AncestorListener {
-
-            override fun ancestorAdded(e: AncestorEvent?) {
-                try {
-                    val selectedTab = tabbedPane.selectedIndex
-                    val tabName = tabbedPane.getTitleAt(selectedTab)
-                    val filePath = GlobalData.tabNameToFileMap[tabName]
-                    var virtualFile: VirtualFile? = null
-                    if (filePath != null) {
-                        virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
-                    }
-                    val contentPromptText = GlobalData.tabNameToContentPromptTextMap[tabName]
-                    val normalizedSelectedText = contentPromptText?.replace("\r\n", "\n")
-                    val normalizedFileContent =
-                        virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)?.replace("\r\n", "\n")
-                    val isSnippet = service.getIsSnippet(normalizedFileContent, normalizedSelectedText)
-                    fileEditorManager.openFileInEditor(filePath, contentPromptText, isSnippet)
-                } catch (e: Exception) {
-                    thisLogger().error(e)
+    fun getAncestorListener(tabbedPane: JBTabbedPane) = object : AncestorListener {
+        override fun ancestorAdded(e: AncestorEvent?) {
+            try {
+                val tabName = tabbedPane.getTitleAt(tabbedPane.selectedIndex)
+                service.invokeLater {
+                    fileEditorManager.openFileInEditor(
+                        tabNameToFilePathMap[tabName], tabNameToContentPromptTextMap[tabName]
+                    )
                 }
-            }
-
-            override fun ancestorMoved(e: AncestorEvent?) {
-                thisLogger().info("Ancestor Moved")
-            }
-
-            override fun ancestorRemoved(e: AncestorEvent?) {
-                thisLogger().info("Ancestor Removed")
+            } catch (e: Exception) {
+                thisLogger().error(e.stackTraceToString())
             }
         }
+
+        override fun ancestorMoved(e: AncestorEvent?) {
+            thisLogger().info("Ancestor Moved")
+        }
+
+        override fun ancestorRemoved(e: AncestorEvent?) {
+            thisLogger().info("Ancestor Removed")
+        }
+    }
 }
 
 

@@ -23,10 +23,10 @@ class FileEditorManagerTest : BasePlatformTestCase() {
         val isSnippet = true
 
         // Act
-        fileEditorManager.openFileInEditor(filePath, contentPromptText, isSnippet)
+        fileEditorManager.openFileInEditor(filePath, contentPromptText)
 
         // Assert
-        verify(fileEditorManager).openFileInEditor(filePath, contentPromptText, isSnippet)
+        verify(fileEditorManager).openFileInEditor(filePath, contentPromptText)
         verifyNoMoreInteractions(fileEditorManager)
     }
 

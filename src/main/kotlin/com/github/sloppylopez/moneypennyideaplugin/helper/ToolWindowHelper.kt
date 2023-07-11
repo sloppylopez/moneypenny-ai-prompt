@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.helper
 
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
@@ -19,19 +20,18 @@ import javax.swing.ImageIcon
 
 class ToolWindowHelper {
     companion object {
-        private var tabCounter = 0
         private val toolWindowContent = SimpleToolWindowPanel(true)
         private var moneyPennyToolWindow: MoneyPennyToolWindow? = null
         private var tabbedPane = JBTabbedPane()
 
         fun addTabbedPaneToToolWindow(
             project: Project,
-            toolWindow: ToolWindow,
             fileList: List<*>? = emptyList<Any>(),
             selectedText: @NlsSafe String? = null
         ) {
             try {
                 val service = project.service<ProjectService>()
+                val toolWindow = service.getToolWindow()!!
                 if (moneyPennyToolWindow == null) {//We only want to do this once
                     initMoneyPennyToolWindow(project, toolWindow)
                 }
@@ -46,7 +46,7 @@ class ToolWindowHelper {
                 )
                 //Add content tab to tabbed pane
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
-                tabbedPane.selectedIndex = tabCounter
+                tabbedPane.selectedIndex = GlobalData.tabCounter
                 // Create a custom tab component with a close button for each tab
                 for (i in 0 until tabbedPane.tabCount) {
                     val tabComponent = ButtonTabComponent(tabbedPane)
@@ -128,7 +128,7 @@ class ToolWindowHelper {
         }
 
         private fun getNextTabName(): String {
-            return tabCounter++.toString()
+            return GlobalData.tabCounter++.toString()
         }
     }
 }

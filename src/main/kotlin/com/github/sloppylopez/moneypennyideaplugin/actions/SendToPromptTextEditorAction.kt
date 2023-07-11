@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -9,11 +9,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import javax.swing.ImageIcon
 
 @Service(Service.Level.PROJECT)
 class SendToPromptTextEditorAction(private var project: Project? = null) : AnAction("Send To MoneyPenny") {
-    private val promptPanelFactory = project?.service<PromptPanelFactory>()
     private val service = project?.service<ProjectService>()
     private var editor: Editor? = null
     private var file: VirtualFile? = null
@@ -23,17 +21,14 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
     }
 
     init {
-        val imageUrl = "/images/MoneyPenny-Icon_13x13.jpg"
-        val url = SendToPromptFileFolderTreeAction::class.java.getResource(imageUrl)
-        val icon = ImageIcon(url)
-        templatePresentation.icon = icon
+        templatePresentation.icon = ToolWindowHelper.getIcon("/images/MoneyPenny-Icon_13x13.jpg")
         templatePresentation.text = "Send To MoneyPenny"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
         editor?.let { editor ->
             file?.let { file: VirtualFile ->
-                service?.sendToContentPrompt2(
+                service?.sendFileToContentPrompt(
                     editor,
                     service.virtualFileToFile(file)
                 )
