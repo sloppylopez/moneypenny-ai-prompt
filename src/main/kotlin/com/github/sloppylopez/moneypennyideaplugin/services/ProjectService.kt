@@ -1,9 +1,13 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.intellij.notification.*
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -15,17 +19,28 @@ import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.openapi.wm.WindowManager
+import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
+import com.intellij.ui.components.JBTabbedPane
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
+import java.util.*
 import javax.swing.Icon
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 @Service(Service.Level.PROJECT)
-class ProjectService(project: Project) {
+class ProjectService {
 
-    init {
-        thisLogger().info(Bundle.message("projectService", project.name))
-    }
+    fun getFileContents(filePath: String?) = filePath?.let {
+        try {
+            File(it).readText()
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
+        }
+    } as String
 
     fun getRandomNumber() = (1..100).random()
 
@@ -44,6 +59,23 @@ class ProjectService(project: Project) {
         }
     }
 
+    fun getText(file: File?, message: String?): String {
+        if (file != null && message == null) {
+            val reader = BufferedReader(FileReader(file))
+            reader.use {
+                val contents = StringBuilder()
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    contents.append(line).append(System.lineSeparator())
+                    line = reader.readLine()
+                }
+                return contents.toString()
+            }
+        } else if (message != null) {
+            return message
+        }
+        return ""
+    }
 
     fun showDialog(
         message: String, title: String,
@@ -58,9 +90,11 @@ class ProjectService(project: Project) {
         )
     }
 
-    fun readFile(fileList: List<*>, i: Int, className: String): File? {
+    fun readFile(fileList: List<*>, i: Int): File? {
         try {
-            if (i < fileList.size && fileList.isNotEmpty() && null != fileList[i]) {
+            if (i < fileList.size && fileList.isNotEmpty() &&
+                null != fileList[i]
+            ) {
                 val file = fileList[i] as File
                 thisLogger().info(Bundle.message("projectService", "File $file"))
                 return file
@@ -81,27 +115,8 @@ class ProjectService(project: Project) {
         )
     }
 
-//    fun logError(className: String, e: Exception) {
-//        Logger.getInstance(className).error(e.stackTraceToString())
-//    }
-//
-//    fun logInfo(className: String, info: String) {
-//        Logger.getInstance(className).info(info)
-//    }
-
-    fun showNotification(project: Project?, title: String, content: String) {
-        val notification = Notification(
-            "MoneyPenny",
-            title,
-            content,
-            NotificationType.INFORMATION
-        )
-
-        Notifications.Bus.notify(notification, project)
-    }
-
     fun highlightTextInEditor(project: Project, contentPromptText: String) {
-        val editor = getCurrentEditor(project)
+        val editor = getCurrentEditor()
         editor?.let {
             val document = editor.document
             val textOffset = document.text.indexOf(contentPromptText)
@@ -112,40 +127,66 @@ class ProjectService(project: Project) {
         }
     }
 
-    private fun getCurrentEditor(project: Project): Editor? {
+    private fun getCurrentEditor(): Editor? {
+        val project = this.getProject()!!
         val file = FileEditorManager.getInstance(project)?.selectedFiles?.firstOrNull()
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
 
-    fun expandFolders(fileList: List<*>): List<File> {
+    fun expandFolders(fileList: List<*>? = null): List<File> {
+        if (fileList == null) {
+            return emptyList()
+        }
         val expandedFileList = mutableListOf<File>()
+        val stack = Stack<Any>()
+        stack.addAll(fileList)
 
-        for (file in fileList) {
-            try {
-                if (file is File) {
-                    if (file.isDirectory) {
-                        expandedFileList.addAll(expandFolders(file.listFiles()?.toList() ?: emptyList<String>()))
-                    } else {
-                        expandedFileList.add(file)
-                    }
-                }
-            } catch (e: Exception) {
-                thisLogger().error(e)
-            }
+        while (stack.isNotEmpty()) {
+            expand(stack, expandedFileList)
         }
 
         return expandedFileList
     }
 
+    private fun expand(
+        stack: Stack<Any>,
+        expandedFileList: MutableList<File>
+    ) {
+        val file = stack.pop()
+        try {
+            when (file) {
+                is File -> {
+                    if (file.isDirectory) {
+                        val files = file.listFiles()
+                        if (files != null) {
+                            stack.addAll(files.toList())
+                        }
+                    } else {
+                        expandedFileList.add(file)
+                    }
+                }
+
+                is VirtualFile -> {
+                    if (file.isDirectory) {
+                        val children = file.children.toList()
+                        stack.addAll(children)
+                    } else {
+                        expandedFileList.add(virtualFileToFile(file)!!)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            thisLogger().error(e)
+        }
+    }
+
     fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
         normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
 
-
-    fun getSelectedText(
-        selectedEditor: Editor,
-        selectedText: @NlsSafe String?
+    private fun getSelectedText(
+        selectedEditor: Editor
     ): @NlsSafe String? {
-        var selectedText1 = selectedText
+        var selectedText: @NlsSafe String? = ""
         val project: Project? = selectedEditor.project
         val fileEditorManager = FileEditorManager.getInstance(project!!)
         val selectedFile = fileEditorManager.selectedFiles.firstOrNull()
@@ -153,9 +194,135 @@ class ProjectService(project: Project) {
             val virtualFile = VirtualFileManager.getInstance().findFileByUrl(selectedFile.url)
             val openFileDescriptor = OpenFileDescriptor(project, virtualFile!!)
             val document = openFileDescriptor.file.let { FileDocumentManager.getInstance().getDocument(it) }
-            selectedText1 = document?.text
+            selectedText = document?.text
         }
-        return selectedText1
+        return selectedText
     }
 
+    fun getTextFromToolWindow(toolWindow: ToolWindow): String {
+        val textAreaElements = mutableListOf<String>()
+        val toolWindowComponent = toolWindow.component
+        collectTextAreas(toolWindowComponent, textAreaElements)
+        return textAreaElements.joinToString("\n")
+    }
+
+    private fun collectTextAreas(
+        component: java.awt.Component,
+        textAreaElements: MutableList<String>
+    ) {
+        if (component is javax.swing.JTextArea) {
+            val text = component.text
+            textAreaElements.add(text)
+        }
+
+        if (component is java.awt.Container) {
+            if (component is JPanel && !component.name.isNullOrBlank()) {
+                textAreaElements.add(component.name.split("\\").last())//Component name = File name
+                textAreaElements.add(component.name)//Component fullpath = File fullpath
+            }
+
+            for (childComponent in component.components) {
+                collectTextAreas(childComponent, textAreaElements)
+            }
+        }
+
+        if (component is javax.swing.JTabbedPane) {
+            val tabCount = component.tabCount
+//            if (!component.name.isNullOrBlank()) {
+//                textAreaElements.add(component.name)
+//            }
+            for (i in 1 until tabCount) {//This 1 is important, if you put 0 we get the same panel info twice
+                val tabComponent = component.getComponentAt(i)
+//                if (!tabComponent.name.isNullOrBlank()) {
+//                    textAreaElements.add(tabComponent.name)
+//                }
+                collectTextAreas(tabComponent, textAreaElements)
+            }
+        }
+    }
+
+
+    fun setTabName(
+        i: Int,
+        fileList: List<*>,
+        file: File?,
+        tabbedPane: JBTabbedPane,
+        panel: JPanel,
+        contentPromptText: String?
+    ) {
+        if (i < fileList.size && file != null) {
+            val tabName = "${getNextTabName()}) ${file.name}"
+            tabbedPane.addTab(tabName, panel)
+            GlobalData.tabNameToFilePathMap[tabName] = file.canonicalPath
+            if (contentPromptText != null) {
+                GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+            } else {
+                GlobalData.tabNameToContentPromptTextMap[tabName] = file.readText()
+            }
+        } else {
+            tabbedPane.addTab("No File", panel)
+        }
+
+        if (contentPromptText != null && file != null) {
+            val tabName = "${GlobalData.downerTabName}) ${file.name}"
+            GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+        }
+    }
+
+    private fun getNextTabName(): String {
+        return GlobalData.downerTabName++.toString()
+    }
+
+    fun getProject(): Project? {
+        return com.intellij.openapi.project.ProjectManager.getInstance().openProjects.firstOrNull()
+    }
+
+    fun getToolWindow(): ToolWindow? {
+        return ToolWindowManager.getInstance(getProject()!!).getToolWindow("MoneyPenny AI")
+    }
+
+    fun sendFileToContentPrompt(
+        editor: Editor?,
+        file: File?,
+    ) {
+        try {
+            editor?.let { selectedEditor ->
+                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+                if (selectedTextFromEditor.isNullOrEmpty()) {
+                    selectedTextFromEditor = this.getSelectedText(selectedEditor)
+                }
+                if (!selectedTextFromEditor.isNullOrEmpty()) {
+                    addTabbedPaneToToolWindow(
+                        this.getProject()!!,
+                        listOf(file),
+                        selectedTextFromEditor
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
+        }
+    }
+
+    fun invokeLater(functionsToRunLater: () -> Unit) {
+        SwingUtilities.invokeLater {
+            ApplicationManager.getApplication().invokeLater(
+                functionsToRunLater,
+                ModalityState.NON_MODAL
+            )
+        }
+    }
+
+    fun isSnippet(contentPromptText: String?, virtualFile: VirtualFile?): Boolean {
+        val normalizedSelectedText = contentPromptText?.replace("\r\n", "\n")
+        val normalizedFileContent =
+            virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)?.replace("\r\n", "\n")
+        return this.getIsSnippet(normalizedFileContent, normalizedSelectedText)
+    }
+
+    // DON'T DELETE this might be useful so we dont have to have global maps to access data gracefully
+//            contentTab.putUserData(
+//                "fileList",
+//                fileList
+//            )
 }

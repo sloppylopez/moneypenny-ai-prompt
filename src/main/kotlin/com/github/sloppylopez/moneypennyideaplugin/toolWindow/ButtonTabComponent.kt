@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.intellij.ui.JBColor
 import java.awt.*
 import java.awt.event.*
@@ -72,6 +73,7 @@ class ButtonTabComponent(pane: JTabbedPane?) : JPanel(FlowLayout(FlowLayout.LEFT
             val i = pane.indexOfTabComponent(this@ButtonTabComponent)
             if (i != -1) {
                 pane.remove(i)
+                GlobalData.tabCounter--
             }
         }
 

@@ -1,4 +1,4 @@
-package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+package com.github.sloppylopez.moneypennyideaplugin.managers
 
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
@@ -13,20 +13,19 @@ import java.io.File
 class FileEditorManager(private val project: Project) {
     private val service = project.service<ProjectService>()
     fun openFileInEditor(
-        filePath: String?,
-        contentPromptText: String? = null,
-        isSnippet: Boolean? = false
+        filePath: String?, contentPromptText: String? = null
     ) {
-        service.highlightTextInEditor(project, "") //Reset previous highlight
+        service.highlightTextInEditor(
+            project, ""
+        ) //Reset previous highlight, this is required for the GUI to match selection properly
         if (filePath != null) {
             val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
-            val fileEditorManager = FileEditorManager.getInstance(project)
-
             if (virtualFile != null) {
                 val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
-                fileEditorManager.openEditor(openFileDescriptor, true)
+                FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true)
+//                service.invokeLater { FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true) }
                 if (!contentPromptText.isNullOrBlank()) {
-                    if (isSnippet!!) {
+                    if (service.isSnippet(contentPromptText, virtualFile)) {
                         service.highlightTextInEditor(project, contentPromptText)
                     }
                 }

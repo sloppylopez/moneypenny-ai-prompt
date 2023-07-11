@@ -8,6 +8,16 @@
 <!--    <depends>com.intellij.modules.java</depends>-->
 
     <resource-bundle>messages.Bundle</resource-bundle>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="2023.*" />
+    <!--
+      Declare dependency on IntelliJ module `com.intellij.modules.platform` which provides the following:
+      Messaging, UI Themes, UI Components, Files, Documents, Actions, Components, Services, Extensions, Editors
+      More info: https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+    -->
+    <depends>com.intellij.modules.platform</depends>
+    <!-- Markdown plugin. -->
+    <depends>org.intellij.plugins.markdown</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory"
@@ -17,6 +27,10 @@
 <!--            <language name="JAVA"/>-->
 <!--            <className/>-->
 <!--        </intentionAction>-->
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="Markdown" implementationClass="ui.MarkdownLineMarkerProvider" />
     </extensions>
 
     <applicationListeners>

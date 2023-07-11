@@ -1,26 +1,37 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-//import javax.swing.JFileChooser
-//import javax.swing.JFrame
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.services.GitService
+import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.wm.ToolWindow
 import javax.swing.JButton
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 
 @Service(Service.Level.PROJECT)
-class ButtonPanelFactory {
+class ButtonPanelFactory(project: Project) {
+    private val service = project.service<ProjectService>()
+    private val gitService = project.service<GitService>()
+    private val prompts = mutableMapOf<String, List<String>>() // Modified
+
     fun buttonPanel(
         panel: JPanel,
-        promptPanelFactory: PromptPanelFactory
+        toolWindow: ToolWindow?,
+        tabbedPane: JTabbedPane
     ) {
         val runPromptBtn = JButton("Run")
-        runPromptBtn.addActionListener { e ->
-            thisLogger().info("ButtonPanelFactory: Run" + e.actionCommand)
+        runPromptBtn.addActionListener {
+            val selectedTabText = getSelectedTabText(tabbedPane)
+            Messages.showInfoMessage(selectedTabText, "Selected Tab Text")
         }
         panel.add(runPromptBtn)
 
-        addRunAllButton(promptPanelFactory, panel)
+        addRunAllButton(panel, toolWindow)
 
         val showDiffBtn = JButton("Show Diff")
         showDiffBtn.addActionListener { e ->
@@ -29,22 +40,35 @@ class ButtonPanelFactory {
         panel.add(showDiffBtn)
     }
 
-    private fun addRunAllButton(promptPanelFactory: PromptPanelFactory, panel: JPanel) {
+    private fun addRunAllButton(
+        panel: JPanel,
+        toolWindow: ToolWindow?
+    ) {
         try {
             val runAllPromptBtn = JButton("Run All")
             runAllPromptBtn.addActionListener {
-                val prePromptText = promptPanelFactory.prePromptTextArea?.text
-                val contentPromptText = promptPanelFactory.contentPromptTextArea?.text
-                val postPromptText = promptPanelFactory.postPromptTextArea?.text
-
-                val textArray = arrayOf(prePromptText, contentPromptText, postPromptText)
-                Messages.showInfoMessage(
-                    textArray.joinToString(), "W.I.P TBI    ",
-                )
+                // Usage of the recursive method to retrieve the text
+                if (toolWindow != null) {
+                    val textFromToolWindow = service.getTextFromToolWindow(toolWindow)
+                    val shortSha = gitService.getShortSha(textFromToolWindow)
+                        prompts[shortSha] = listOf(textFromToolWindow) // Modified
+                    Messages.showInfoMessage(textFromToolWindow, "Text from ToolWindow:")
+                }
             }
             panel.add(runAllPromptBtn)
         } catch (e: Exception) {
             thisLogger().error("ButtonPanelFactory", e)
         }
+    }
+
+    private fun getSelectedTabText(tabbedPane: JTabbedPane): String? {
+        val selectedTabIndex = tabbedPane.selectedIndex
+        if (selectedTabIndex != -1) {
+            val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
+            if (!selectedTabTitle.isNullOrEmpty()) {
+                return GlobalData.tabNameToContentPromptTextMap[selectedTabTitle]
+            }
+        }
+        return null
     }
 }

@@ -16,7 +16,7 @@ class RadioButtonFactory {
         prePromptTextArea: JTextArea
     ) {
         val radioButtonPanel = JPanel()
-        val buttonLabels = arrayOf("Refactor", "Unit", "E2E", "DRY", "Explain", "FreeStyle")
+        val buttonLabels = arrayOf("Refactor", "Unit", "E2E", "As Reference", "Explain", "FreeStyle")
 
         val actionListener = ActionListener { event ->
             val selectedRadioButton = event.source as? JRadioButton
@@ -57,7 +57,7 @@ class RadioButtonFactory {
                 prePromptTextArea.text = "Refactor Code:\n"
             }
 
-            "Unit Test" -> {
+            "Unit" -> {
                 prePromptTextArea.text = "Write Unit Test for Code:\n"
             }
 
@@ -65,8 +65,8 @@ class RadioButtonFactory {
                 prePromptTextArea.text = "Write E2E for Code:\n"
             }
 
-            "DRY" -> {
-                prePromptTextArea.text = "DRY Code:\n"
+            "As Reference" -> {
+                prePromptTextArea.text = "Using this code as reference:\n"
             }
 
             "Explain" -> {

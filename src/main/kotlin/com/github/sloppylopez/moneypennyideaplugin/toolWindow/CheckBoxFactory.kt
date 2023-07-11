@@ -1,4 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+
 import com.intellij.openapi.components.Service
 import javax.swing.JCheckBox
 import javax.swing.JPanel
@@ -10,7 +11,7 @@ class CheckBoxFactory {
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
         val checkboxPanel = JPanel()
         val checkboxLabels =
-            arrayOf("Add", "Create", "Modify", "Remove", "Replace", "Update", "Why", "Gives", "With")
+            arrayOf("DRY", "Add", "Create", "Modify", "Remove", "Replace", "Update", "Gives", "With")
 
         checkboxLabels.forEach { label ->
             val checkBox = createCheckBox(label, false, postPromptTextArea)
