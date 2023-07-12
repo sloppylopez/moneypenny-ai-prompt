@@ -29,9 +29,9 @@
 <!--        </intentionAction>-->
     </extensions>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <codeInsight.lineMarkerProvider language="Markdown" implementationClass="ui.MarkdownLineMarkerProvider" />
-    </extensions>
+<!--    <extensions defaultExtensionNs="com.intellij">-->
+<!--        <codeInsight.lineMarkerProvider language="Markdown" implementationClass="ui.MarkdownLineMarkerProvider" />-->
+<!--    </extensions>-->
 
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"

@@ -18,9 +18,9 @@ class ButtonPanelFactory(project: Project) {
         panel: JPanel,
         tabbedPane: JTabbedPane
     ) {
-        addRunButton(tabbedPane, panel)
+//        addRunButton(tabbedPane, panel) //TBI
         addRunAllButton(panel)
-        addShowDiffButton(panel)
+//        addShowDiffButton(panel) //TBI
     }
 
     private fun addRunButton(tabbedPane: JTabbedPane, panel: JPanel) {
