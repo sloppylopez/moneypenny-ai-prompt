@@ -28,7 +28,8 @@ class MoneyPennyToolWindow(
     private val service = project.service<ProjectService>()
 
     fun getContent(
-        fileList: List<*>? = emptyList<Any>(), contentPromptText: String? = null
+        fileList: List<*>? = emptyList<Any>(),
+        contentPromptText: String? = null
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
             add(moneyPennyPromptPanel(fileList!!, contentPromptText))

@@ -346,50 +346,24 @@ class ProjectService(project: Project) {
         content.getUserData(key)
     }
 
-    fun copyContentTabsToClipboard() {
-        // Get the tool window by its ID
-        val toolWindow: ToolWindow? = this.getToolWindow()
-
-        // Retrieve the content manager of the tool window
-        val contentManager: ContentManager? = toolWindow?.contentManager
-
-        // Collect the content tab information
-        val contents: Array<Content>? = contentManager?.contents
-        contents?.get(0)?.component?.getUserData(CURRENT_PROCESS_PROMPT)
-        contents?.get(0)?.component?.getUserData(CURRENT_PROCESS_PROMPT)
-
-        // Extract the TabInfo from the Content objects
-//        val tabInfos: List<TabInfo>? = contents?.flatMap<Content, TabInfo> { content ->
-//            content.getUserData(Key.create("All Processed Prompt"))?.let { listOf(it) } ?: emptyList()
-//        }
-
-        // Concatenate the content tab titles into a single string
-//        val result = tabInfos?.joinToString(separator = "") { it.text ?: "" }
-
-        // Copy the result to the clipboard
-//        val clipboard = CopyPasteManager.getInstance()
-//        clipboard.setContents(StringSelection(result), null)
-    }
-
-    fun findContentTabAndCallGetUserData(): ArrayList<Pair<String, String>> {
+    fun findContentTabAndCallGetUserData(tabName: String? = null): String {
         val contentManager = getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
         for (i in 0 until contentCount!!) {
             val content = contentManager.getContent(i)
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
-                val textAreas: ArrayList<Pair<String, String>> = ArrayList()
+                val textAreas: ArrayList<String> = ArrayList()
                 findTextAreas(simpleToolWindowPanel, textAreas)
-                val result = textAreas.joinToString("\n")
-                saveDataToExtensionFolder(getPromptsAsJson(prompts))
-                copyToClipboard(result)
-                return textAreas
+                val promptsAsJson = getPromptsAsJson(prompts)
+                saveDataToExtensionFolder(promptsAsJson)
+                return textAreas.joinToString("\n")
             }
         }
-        return ArrayList()
+        return ""
     }
 
-    private fun findTextAreas(container: Container, textAreas: ArrayList<Pair<String, String>>) {
+    private fun findTextAreas(container: Container, textAreas: ArrayList<String>) {
         val components = container.components
         for (component in components) {
             if (component is JTextArea) {
@@ -407,7 +381,7 @@ class ProjectService(project: Project) {
     private fun extractPromptInfo(
         parentTabbedPane: JTabbedPane,
         text: String,
-        textAreas: ArrayList<Pair<String, String>>
+        textAreas: ArrayList<String>
     ) {
         val tabName = parentTabbedPane.getTitleAt(0)
         if (!tabName.isNullOrEmpty() &&
@@ -418,7 +392,7 @@ class ProjectService(project: Project) {
             val promptList = promptMap.getOrDefault(tabName, listOf())
 
             prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
-            textAreas.add(Pair(tabName, text))
+            textAreas.add(text)
         }
     }
 
