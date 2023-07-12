@@ -15,21 +15,24 @@ class FileEditorManager(private val project: Project) {
     fun openFileInEditor(
         filePath: String?, contentPromptText: String? = null
     ) {
-        service.highlightTextInEditor(
-            project, ""
-        ) //Reset previous highlight, this is required for the GUI to match selection properly
+        resetFileEditorText()
         if (filePath != null) {
             val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
             if (virtualFile != null) {
                 val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
                 FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true)
-//                service.invokeLater { FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true) }
-                if (!contentPromptText.isNullOrBlank()) {
-                    if (service.isSnippet(contentPromptText, virtualFile)) {
-                        service.highlightTextInEditor(project, contentPromptText)
-                    }
+                if (!contentPromptText.isNullOrBlank() &&
+                    service.isSnippet(contentPromptText, virtualFile)
+                ) {
+                    service.highlightTextInEditor(contentPromptText)
                 }
             }
         }
+    }
+
+    private fun resetFileEditorText() {
+        service.highlightTextInEditor(
+            ""
+        )
     }
 }

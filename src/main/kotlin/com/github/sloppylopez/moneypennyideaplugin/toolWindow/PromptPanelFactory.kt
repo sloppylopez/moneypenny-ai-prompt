@@ -86,7 +86,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 addTabbedPaneToToolWindow(project!!, expandedFileList)
                 expandedFileList.forEach {
                     val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
-                    service.highlightTextInEditor(project, fileContents)
+                    service.highlightTextInEditor(fileContents)
                 }
             }
         } catch (e: Exception) {

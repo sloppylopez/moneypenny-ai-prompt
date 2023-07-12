@@ -1,9 +1,11 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
+import com.intellij.icons.AllIcons
 import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -14,7 +16,11 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.ui.getUserData
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
@@ -23,17 +29,20 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.content.Content
+import com.intellij.ui.content.ContentManager
+import java.awt.Container
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
-import javax.swing.Icon
-import javax.swing.JPanel
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
-
+    private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
     fun getFileContents(filePath: String?) = filePath?.let {
         try {
             File(it).readText()
@@ -78,14 +87,17 @@ class ProjectService {
     }
 
     fun showDialog(
-        message: String, title: String,
-        buttons: Array<String>, defaultOptionIndex:
-        Int, icon: Icon
+        message: String,
+        title: String,
+        buttons: Array<String>? = emptyArray<String>(),
+        defaultOptionIndex: Int? = 0,
+        icon: Icon? = AllIcons.Icons.Ide.NextStep
     ) {
         Messages.showDialog(
-            message, title,
-            buttons,
-            defaultOptionIndex,
+            message,
+            title,
+            buttons!!,
+            defaultOptionIndex!!,
             icon
         )
     }
@@ -107,6 +119,20 @@ class ProjectService {
         return null
     }
 
+    fun showNotification(
+        @NlsSafe title: String,
+        @NlsSafe message: String
+    ) {
+        val notification = Notification(
+            "MoneyPenny",
+            title,
+            message,
+            NotificationType.INFORMATION
+        )
+
+        Notifications.Bus.notify(notification, this.getProject()!!)
+    }
+
     fun showMessage(
         message: String, title: String
     ) {
@@ -115,7 +141,7 @@ class ProjectService {
         )
     }
 
-    fun highlightTextInEditor(project: Project, contentPromptText: String) {
+    fun highlightTextInEditor(contentPromptText: String) {
         val editor = getCurrentEditor()
         editor?.let {
             val document = editor.document
@@ -180,10 +206,10 @@ class ProjectService {
         }
     }
 
-    fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
+    private fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
         normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
 
-    private fun getSelectedText(
+    private fun getSelectedTextFromOpenedFileInEditor(
         selectedEditor: Editor
     ): @NlsSafe String? {
         var selectedText: @NlsSafe String? = ""
@@ -199,26 +225,29 @@ class ProjectService {
         return selectedText
     }
 
-    fun getTextFromToolWindow(toolWindow: ToolWindow): String {
-        val textAreaElements = mutableListOf<String>()
-        val toolWindowComponent = toolWindow.component
-        collectTextAreas(toolWindowComponent, textAreaElements)
-        return textAreaElements.joinToString("\n")
+    data class TextAreaData(val pre: String, val content: String, val post: String)
+
+    fun getTextFromToolWindow(): List<TextAreaData> {
+        val textAreaElements = mutableListOf<TextAreaData>()
+        val toolWindowComponent = this.getToolWindow()?.component
+        collectTextAreas(toolWindowComponent!!, textAreaElements)
+        return textAreaElements
     }
 
     private fun collectTextAreas(
         component: java.awt.Component,
-        textAreaElements: MutableList<String>
+        textAreaElements: MutableList<TextAreaData>
     ) {
         if (component is javax.swing.JTextArea) {
             val text = component.text
-            textAreaElements.add(text)
+            textAreaElements.add(TextAreaData("", text, ""))
         }
 
         if (component is java.awt.Container) {
             if (component is JPanel && !component.name.isNullOrBlank()) {
-                textAreaElements.add(component.name.split("\\").last())//Component name = File name
-                textAreaElements.add(component.name)//Component fullpath = File fullpath
+                val componentName = component.name.split("\\").last()
+                val componentFullPath = component.name
+                textAreaElements.add(TextAreaData(componentName, "", componentFullPath))
             }
 
             for (childComponent in component.components) {
@@ -228,19 +257,12 @@ class ProjectService {
 
         if (component is javax.swing.JTabbedPane) {
             val tabCount = component.tabCount
-//            if (!component.name.isNullOrBlank()) {
-//                textAreaElements.add(component.name)
-//            }
-            for (i in 1 until tabCount) {//This 1 is important, if you put 0 we get the same panel info twice
+            for (i in 1 until tabCount) {
                 val tabComponent = component.getComponentAt(i)
-//                if (!tabComponent.name.isNullOrBlank()) {
-//                    textAreaElements.add(tabComponent.name)
-//                }
                 collectTextAreas(tabComponent, textAreaElements)
             }
         }
     }
-
 
     fun setTabName(
         i: Int,
@@ -253,28 +275,28 @@ class ProjectService {
         if (i < fileList.size && file != null) {
             val tabName = "${getNextTabName()}) ${file.name}"
             tabbedPane.addTab(tabName, panel)
-            GlobalData.tabNameToFilePathMap[tabName] = file.canonicalPath
+            tabNameToFilePathMap[tabName] = file.canonicalPath
             if (contentPromptText != null) {
-                GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+                tabNameToContentPromptTextMap[tabName] = contentPromptText
             } else {
-                GlobalData.tabNameToContentPromptTextMap[tabName] = file.readText()
+                tabNameToContentPromptTextMap[tabName] = file.readText()
             }
         } else {
             tabbedPane.addTab("No File", panel)
         }
 
         if (contentPromptText != null && file != null) {
-            val tabName = "${GlobalData.downerTabName}) ${file.name}"
-            GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+            val tabName = "$downerTabName) ${file.name}"
+            tabNameToContentPromptTextMap[tabName] = contentPromptText
         }
     }
 
     private fun getNextTabName(): String {
-        return GlobalData.downerTabName++.toString()
+        return downerTabName++.toString()
     }
 
     fun getProject(): Project? {
-        return com.intellij.openapi.project.ProjectManager.getInstance().openProjects.firstOrNull()
+        return ProjectManager.getInstance().openProjects.firstOrNull()
     }
 
     fun getToolWindow(): ToolWindow? {
@@ -289,7 +311,7 @@ class ProjectService {
             editor?.let { selectedEditor ->
                 var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
                 if (selectedTextFromEditor.isNullOrEmpty()) {
-                    selectedTextFromEditor = this.getSelectedText(selectedEditor)
+                    selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
                 }
                 if (!selectedTextFromEditor.isNullOrEmpty()) {
                     addTabbedPaneToToolWindow(
@@ -320,9 +342,101 @@ class ProjectService {
         return this.getIsSnippet(normalizedFileContent, normalizedSelectedText)
     }
 
-    // DON'T DELETE this might be useful so we dont have to have global maps to access data gracefully
-//            contentTab.putUserData(
-//                "fileList",
-//                fileList
-//            )
+    fun copyToClipboard(text: String? = null) {
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        val stringSelection = StringSelection(text)
+        clipboard.setContents(stringSelection, null)
+    }
+
+    fun getSelectedTabText(tabbedPane: JTabbedPane): String? {
+        val selectedTabIndex = tabbedPane.selectedIndex
+        if (selectedTabIndex != -1) {
+            val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
+            if (!selectedTabTitle.isNullOrEmpty()) {
+                return tabNameToContentPromptTextMap[selectedTabTitle]
+            }
+        }
+        return null
+    }
+
+    fun putUserDataInProject(fileList: List<*>) {
+        this.getProject()?.putUserData(Key.create("All Processed Prompt"), fileList)
+    }
+
+    fun getUserDataFromProject(key: Key<List<*>>) {
+        this.getProject()?.getUserData(key)
+    }
+
+    fun putUserDataInComponent(fileList: List<*>, content: Content) {
+        val myfiles = ArrayList<String>()
+        myfiles.add("hello")
+        content.putUserData(CURRENT_PROCESS_PROMPT, myfiles.toString())
+    }
+
+    fun getUserDataFromComponent(key: Key<List<*>>, content: Content) {
+        content.getUserData(key)
+    }
+
+    fun copyContentTabsToClipboard() {
+        // Get the tool window by its ID
+        val toolWindow: ToolWindow? = this.getToolWindow()
+
+        // Retrieve the content manager of the tool window
+        val contentManager: ContentManager? = toolWindow?.contentManager
+
+        // Collect the content tab information
+        val contents: Array<Content>? = contentManager?.contents
+        contents?.get(0)?.component?.getUserData(CURRENT_PROCESS_PROMPT)
+        contents?.get(0)?.component?.getUserData(CURRENT_PROCESS_PROMPT)
+
+        // Extract the TabInfo from the Content objects
+//        val tabInfos: List<TabInfo>? = contents?.flatMap<Content, TabInfo> { content ->
+//            content.getUserData(Key.create("All Processed Prompt"))?.let { listOf(it) } ?: emptyList()
+//        }
+
+        // Concatenate the content tab titles into a single string
+//        val result = tabInfos?.joinToString(separator = "") { it.text ?: "" }
+
+        // Copy the result to the clipboard
+//        val clipboard = CopyPasteManager.getInstance()
+//        clipboard.setContents(StringSelection(result), null)
+    }
+
+    fun findContentTabAndCallGetUserData() {
+        val contentManager = getToolWindow()?.contentManager
+        val contentCount = contentManager?.contentCount
+
+        for (i in 0 until contentCount!!) {
+            val content = contentManager.getContent(i)
+
+            val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
+            if (simpleToolWindowPanel != null) {
+                val textAreas = ArrayList<String>()
+
+                findTextAreas(simpleToolWindowPanel, textAreas)
+
+                val result = textAreas.joinToString("\n")
+                copyToClipboard(result)
+                return
+            }
+        }
+
+        // ContentTab not found
+        // Handle the case when the component is not found
+    }
+
+    fun findTextAreas(container: Container, textAreas: ArrayList<String>) {
+        val components = container.components
+        for (component in components) {
+            if (component is JTextArea) {
+                val text = component.text.trim()
+                if (text.isNotEmpty()) {
+                    textAreas.add(text)
+                }
+            } else if (component is Container) {
+                findTextAreas(component, textAreas)
+            }
+        }
+    }
+
 }

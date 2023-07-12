@@ -19,7 +19,7 @@ private const val SEND_TO_MONEY_PENNY = "Send to MoneyPenny"
 class RefactorIntentionFactory(private val project: Project) {
     private val service = project.service<ProjectService>()
 
-    fun addIntentionToAllEditors() {
+    fun addIntentionToEditor() {
         try {
             val intentionManager = IntentionManager.getInstance()
 
@@ -54,7 +54,7 @@ class RefactorIntentionFactory(private val project: Project) {
     }
 
     // Remove existing intentions
-    fun removeIntentions() {
+    fun removeIntentionsFromEditor() {
         val intentionManager = IntentionManager.getInstance()
         val intentions = intentionManager.intentionActions
 
