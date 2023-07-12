@@ -3,13 +3,22 @@
     <id>com.github.sloppylopez.moneypennyideaplugin</id>
     <name>MoneyPenny AI</name>
     <vendor>sloppylopez</vendor>
+    <description>MoneyPenny AI plugin for IntelliJ IDEA for PDD, Prompt Driven Development, this whole plugins was developed using ChatGPT,
+        now we can leverage that with this plugin
+    </description>
+    <!-- Add change notes for each version -->
+    <change-notes><![CDATA[
+        <p>Initial release of MoneyPenny AI plugin for IntelliJ IDEA</p>
+    ]]></change-notes>
+    <version>0.0.1</version>
+    <idea-version since-build="2023.*" />
 
     <depends>com.intellij.modules.platform</depends>
 <!--    <depends>com.intellij.modules.java</depends>-->
 
     <resource-bundle>messages.Bundle</resource-bundle>
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="2023.*" />
+
     <!--
       Declare dependency on IntelliJ module `com.intellij.modules.platform` which provides the following:
       Messaging, UI Themes, UI Components, Files, Documents, Actions, Components, Services, Extensions, Editors
@@ -29,9 +38,9 @@
 <!--        </intentionAction>-->
     </extensions>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <codeInsight.lineMarkerProvider language="Markdown" implementationClass="ui.MarkdownLineMarkerProvider" />
-    </extensions>
+<!--    <extensions defaultExtensionNs="com.intellij">-->
+<!--        <codeInsight.lineMarkerProvider language="Markdown" implementationClass="ui.MarkdownLineMarkerProvider" />-->
+<!--    </extensions>-->
 
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"

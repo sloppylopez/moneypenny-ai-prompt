@@ -1,20 +1,29 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
+import com.google.gson.Gson
+import com.intellij.icons.AllIcons
 import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.ui.getUserData
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
@@ -23,17 +32,23 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
+import com.intellij.ui.content.Content
+import com.intellij.ui.content.ContentManager
+import java.awt.Container
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
-import javax.swing.Icon
-import javax.swing.JPanel
-import javax.swing.SwingUtilities
+import javax.swing.*
+import kotlin.collections.ArrayList
 
 @Service(Service.Level.PROJECT)
-class ProjectService {
-
+class ProjectService(project: Project) {
+    private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
+    private val gitService = project.service<GitService>()
+    private val prompts = mutableMapOf<String, Map<String, List<String>>>()
     fun getFileContents(filePath: String?) = filePath?.let {
         try {
             File(it).readText()
@@ -78,14 +93,17 @@ class ProjectService {
     }
 
     fun showDialog(
-        message: String, title: String,
-        buttons: Array<String>, defaultOptionIndex:
-        Int, icon: Icon
+        message: String,
+        title: String,
+        buttons: Array<String>? = emptyArray<String>(),
+        defaultOptionIndex: Int? = 0,
+        icon: Icon? = AllIcons.Icons.Ide.NextStep
     ) {
         Messages.showDialog(
-            message, title,
-            buttons,
-            defaultOptionIndex,
+            message,
+            title,
+            buttons!!,
+            defaultOptionIndex!!,
             icon
         )
     }
@@ -107,6 +125,20 @@ class ProjectService {
         return null
     }
 
+    fun showNotification(
+        @NlsSafe title: String,
+        @NlsSafe message: String
+    ) {
+        val notification = Notification(
+            "MoneyPenny",
+            title,
+            message,
+            NotificationType.INFORMATION
+        )
+
+        Notifications.Bus.notify(notification, this.getProject()!!)
+    }
+
     fun showMessage(
         message: String, title: String
     ) {
@@ -115,7 +147,7 @@ class ProjectService {
         )
     }
 
-    fun highlightTextInEditor(project: Project, contentPromptText: String) {
+    fun highlightTextInEditor(contentPromptText: String) {
         val editor = getCurrentEditor()
         editor?.let {
             val document = editor.document
@@ -180,10 +212,10 @@ class ProjectService {
         }
     }
 
-    fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
+    private fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
         normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
 
-    private fun getSelectedText(
+    private fun getSelectedTextFromOpenedFileInEditor(
         selectedEditor: Editor
     ): @NlsSafe String? {
         var selectedText: @NlsSafe String? = ""
@@ -199,49 +231,6 @@ class ProjectService {
         return selectedText
     }
 
-    fun getTextFromToolWindow(toolWindow: ToolWindow): String {
-        val textAreaElements = mutableListOf<String>()
-        val toolWindowComponent = toolWindow.component
-        collectTextAreas(toolWindowComponent, textAreaElements)
-        return textAreaElements.joinToString("\n")
-    }
-
-    private fun collectTextAreas(
-        component: java.awt.Component,
-        textAreaElements: MutableList<String>
-    ) {
-        if (component is javax.swing.JTextArea) {
-            val text = component.text
-            textAreaElements.add(text)
-        }
-
-        if (component is java.awt.Container) {
-            if (component is JPanel && !component.name.isNullOrBlank()) {
-                textAreaElements.add(component.name.split("\\").last())//Component name = File name
-                textAreaElements.add(component.name)//Component fullpath = File fullpath
-            }
-
-            for (childComponent in component.components) {
-                collectTextAreas(childComponent, textAreaElements)
-            }
-        }
-
-        if (component is javax.swing.JTabbedPane) {
-            val tabCount = component.tabCount
-//            if (!component.name.isNullOrBlank()) {
-//                textAreaElements.add(component.name)
-//            }
-            for (i in 1 until tabCount) {//This 1 is important, if you put 0 we get the same panel info twice
-                val tabComponent = component.getComponentAt(i)
-//                if (!tabComponent.name.isNullOrBlank()) {
-//                    textAreaElements.add(tabComponent.name)
-//                }
-                collectTextAreas(tabComponent, textAreaElements)
-            }
-        }
-    }
-
-
     fun setTabName(
         i: Int,
         fileList: List<*>,
@@ -253,32 +242,34 @@ class ProjectService {
         if (i < fileList.size && file != null) {
             val tabName = "${getNextTabName()}) ${file.name}"
             tabbedPane.addTab(tabName, panel)
-            GlobalData.tabNameToFilePathMap[tabName] = file.canonicalPath
+            tabNameToFilePathMap[tabName] = file.canonicalPath
             if (contentPromptText != null) {
-                GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+                tabNameToContentPromptTextMap[tabName] = contentPromptText
             } else {
-                GlobalData.tabNameToContentPromptTextMap[tabName] = file.readText()
+                tabNameToContentPromptTextMap[tabName] = file.readText()
             }
         } else {
             tabbedPane.addTab("No File", panel)
         }
 
         if (contentPromptText != null && file != null) {
-            val tabName = "${GlobalData.downerTabName}) ${file.name}"
-            GlobalData.tabNameToContentPromptTextMap[tabName] = contentPromptText
+            val tabName = "$downerTabName) ${file.name}"
+            tabNameToContentPromptTextMap[tabName] = contentPromptText
         }
     }
 
     private fun getNextTabName(): String {
-        return GlobalData.downerTabName++.toString()
+        return downerTabName++.toString()
     }
 
     fun getProject(): Project? {
-        return com.intellij.openapi.project.ProjectManager.getInstance().openProjects.firstOrNull()
+        return ProjectManager.getInstance().openProjects.firstOrNull()
     }
 
+    private val pluginId = "MoneyPenny AI"
+
     fun getToolWindow(): ToolWindow? {
-        return ToolWindowManager.getInstance(getProject()!!).getToolWindow("MoneyPenny AI")
+        return ToolWindowManager.getInstance(getProject()!!).getToolWindow(pluginId)
     }
 
     fun sendFileToContentPrompt(
@@ -289,7 +280,7 @@ class ProjectService {
             editor?.let { selectedEditor ->
                 var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
                 if (selectedTextFromEditor.isNullOrEmpty()) {
-                    selectedTextFromEditor = this.getSelectedText(selectedEditor)
+                    selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
                 }
                 if (!selectedTextFromEditor.isNullOrEmpty()) {
                     addTabbedPaneToToolWindow(
@@ -320,9 +311,107 @@ class ProjectService {
         return this.getIsSnippet(normalizedFileContent, normalizedSelectedText)
     }
 
-    // DON'T DELETE this might be useful so we dont have to have global maps to access data gracefully
-//            contentTab.putUserData(
-//                "fileList",
-//                fileList
-//            )
+    fun copyToClipboard(text: String? = null) {
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        val stringSelection = StringSelection(text)
+        clipboard.setContents(stringSelection, null)
+    }
+
+    fun getSelectedTabText(tabbedPane: JTabbedPane): String? {
+        val selectedTabIndex = tabbedPane.selectedIndex
+        if (selectedTabIndex != -1) {
+            val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
+            if (!selectedTabTitle.isNullOrEmpty()) {
+                return tabNameToContentPromptTextMap[selectedTabTitle]
+            }
+        }
+        return null
+    }
+
+    fun putUserDataInProject(fileList: List<*>) {
+        this.getProject()?.putUserData(Key.create("All Processed Prompt"), fileList)
+    }
+
+    fun getUserDataFromProject(key: Key<List<*>>) {
+        this.getProject()?.getUserData(key)
+    }
+
+    fun putUserDataInComponent(fileList: List<*>, content: Content) {
+        val myfiles = ArrayList<String>()
+        myfiles.add("hello")
+        content.putUserData(CURRENT_PROCESS_PROMPT, myfiles.toString())
+    }
+
+    fun getUserDataFromComponent(key: Key<List<*>>, content: Content) {
+        content.getUserData(key)
+    }
+
+    fun findContentTabAndCallGetUserData(tabName: String? = null): String {
+        val contentManager = getToolWindow()?.contentManager
+        val contentCount = contentManager?.contentCount
+        for (i in 0 until contentCount!!) {
+            val content = contentManager.getContent(i)
+            val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
+            if (simpleToolWindowPanel != null) {
+                val textAreas: ArrayList<String> = ArrayList()
+                findTextAreas(simpleToolWindowPanel, textAreas)
+                val promptsAsJson = getPromptsAsJson(prompts)
+                saveDataToExtensionFolder(promptsAsJson)
+                return textAreas.joinToString("\n")
+            }
+        }
+        return ""
+    }
+
+    private fun findTextAreas(container: Container, textAreas: ArrayList<String>) {
+        val components = container.components
+        for (component in components) {
+            if (component is JTextArea) {
+                val text = component.text
+                val parentTabbedPane = component.parent.parent.parent.parent.parent
+                if (parentTabbedPane is JTabbedPane) {
+                    extractPromptInfo(parentTabbedPane, text, textAreas)
+                }
+            } else if (component is Container) {
+                findTextAreas(component, textAreas)
+            }
+        }
+    }
+
+    private fun extractPromptInfo(
+        parentTabbedPane: JTabbedPane,
+        text: String,
+        textAreas: ArrayList<String>
+    ) {
+        val tabName = parentTabbedPane.getTitleAt(0)
+        if (!tabName.isNullOrEmpty() &&
+            tabName != "No File"
+        ) {
+            val shortSha = gitService.getShortSha(tabNameToFilePathMap[tabName]!!)
+            val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
+            val promptList = promptMap.getOrDefault(tabName, listOf())
+
+            prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
+            textAreas.add(text)
+        }
+    }
+
+    fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
+        return Gson().toJson(prompts)
+    }
+
+    fun saveDataToExtensionFolder(data: String) {
+        val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
+        if (!extensionFolder.exists()) {
+            extensionFolder.mkdir()
+        }
+        val dataFile = File(extensionFolder, "prompt_history.json")
+        dataFile.writeText(data)
+    }
+
+    fun loadDataFromExtensionFolder(): String {
+        val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
+        val dataFile = File(extensionFolder, "prompt_history.txt")
+        return dataFile.readText()
+    }
 }

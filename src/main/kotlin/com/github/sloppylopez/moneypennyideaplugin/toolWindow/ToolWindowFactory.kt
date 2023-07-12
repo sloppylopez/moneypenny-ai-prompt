@@ -27,8 +27,8 @@ class ToolWindowFactory : ToolWindowFactory {
             SwingUtilities.invokeLater {
                 ApplicationManager.getApplication().invokeLater(
                     {
-                        refactorIntentionFactory.removeIntentions()
-                        refactorIntentionFactory.addIntentionToAllEditors()
+                        refactorIntentionFactory.removeIntentionsFromEditor()
+                        refactorIntentionFactory.addIntentionToEditor()
                     },
                     ModalityState.NON_MODAL
                 )

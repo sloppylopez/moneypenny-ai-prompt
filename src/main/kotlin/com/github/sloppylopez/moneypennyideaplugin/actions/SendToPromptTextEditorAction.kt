@@ -28,7 +28,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
     override fun actionPerformed(e: AnActionEvent) {
         editor?.let { editor ->
             file?.let { file: VirtualFile ->
-                service?.sendFileToContentPrompt(
+                    service?.sendFileToContentPrompt(
                     editor,
                     service.virtualFileToFile(file)
                 )

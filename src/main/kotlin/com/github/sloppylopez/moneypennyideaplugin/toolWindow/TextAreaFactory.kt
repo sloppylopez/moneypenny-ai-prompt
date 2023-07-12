@@ -1,4 +1,4 @@
-package com.github.sloppylopez.moneypennyideaplugin.toolWindow
+    package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.components.BackgroundImageTextArea
 import com.intellij.notification.*

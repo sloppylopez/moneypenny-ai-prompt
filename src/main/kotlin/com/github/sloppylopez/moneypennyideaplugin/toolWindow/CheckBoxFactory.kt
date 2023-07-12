@@ -42,9 +42,9 @@ class CheckBoxFactory {
 
     private fun updatePostPromptText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
         if (selectedCheckBox.isSelected) {
-            postPromptTextArea.append("${selectedCheckBox.text}: \n")
+            postPromptTextArea.append("${selectedCheckBox.text} \n")
         } else {
-            val checkBoxText = "${selectedCheckBox.text}:"
+            val checkBoxText = selectedCheckBox.text
             val postPromptText = postPromptTextArea.text
             val lineStartIndex = postPromptText.indexOf(checkBoxText)
             if (lineStartIndex != -1) {

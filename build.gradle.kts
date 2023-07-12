@@ -28,14 +28,12 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0-M1")
     testImplementation("org.mockito:mockito-core:5.4.0")
+    implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
-    implementation("com.google.api:gax:2.30.0")
+    implementation("com.google.api:gax:2.31.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
     implementation("org.jetbrains:annotations:23.0.0")
-//    implementation("io.github.origin-energy:java-snapshot-testing-junit5:4.0.6")
-//    implementation("io.github.origin-energy:java-snapshot-testing-plugin-jackson:4.0.6")
-//    implementation(kotlin("stdlib-jdk8"))
 //    implementation("com.intellij:java:2023.1.1")
 //    implementation(files("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\build\\libs\\moneypenny-idea-plugin-0.0.1.jar"))
 }

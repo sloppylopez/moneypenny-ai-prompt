@@ -1,7 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.helper
 
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.index
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabCounter
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
@@ -44,9 +45,10 @@ class ToolWindowHelper {
                     service,
                     selectedText
                 )
+//                service.putUserDataInComponent(fileList!!, contentTab)
                 //Add content tab to tabbed pane
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
-                tabbedPane.selectedIndex = GlobalData.tabCounter
+                tabbedPane.selectedIndex = tabCounter - 1
                 // Create a custom tab component with a close button for each tab
                 for (i in 0 until tabbedPane.tabCount) {
                     val tabComponent = ButtonTabComponent(tabbedPane)
@@ -61,7 +63,7 @@ class ToolWindowHelper {
         }
 
         private fun initMoneyPennyToolWindow(project: Project, toolWindow: ToolWindow) {
-            moneyPennyToolWindow = MoneyPennyToolWindow(project, toolWindow)
+            moneyPennyToolWindow = MoneyPennyToolWindow(project)
             toolWindow.contentManager.addContent(
                 toolWindow.contentManager.factory.createContent(
                     toolWindowContent,
@@ -77,7 +79,7 @@ class ToolWindowHelper {
             service: ProjectService,
             selectedText: @NlsSafe String? = null
         ): Content {
-            return if (fileList!!.isEmpty()) {
+            val contentTab = if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
                     moneyPennyToolWindow.getContent(),
                     "Prompt",
@@ -92,6 +94,8 @@ class ToolWindowHelper {
                         true
                     )
             }
+//            service.putUserDataInComponent(fileList, contentTab)
+            return contentTab
         }
 
         fun getIcon(imageName: String): ImageIcon {
@@ -128,7 +132,8 @@ class ToolWindowHelper {
         }
 
         private fun getNextTabName(): String {
-            return GlobalData.tabCounter++.toString()
+            tabCounter++
+            return index++.toString()
         }
     }
 }

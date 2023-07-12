@@ -39,6 +39,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 .createDefaultTextArea("", 2, 79)
             contentPromptTextArea = textAreaFactory
                 .createDefaultTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+            contentPromptTextArea?.name = "contentPromptTextArea"
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "",
@@ -86,7 +87,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 addTabbedPaneToToolWindow(project!!, expandedFileList)
                 expandedFileList.forEach {
                     val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
-                    service.highlightTextInEditor(project, fileContents)
+                    service.highlightTextInEditor(fileContents)
                 }
             }
         } catch (e: Exception) {

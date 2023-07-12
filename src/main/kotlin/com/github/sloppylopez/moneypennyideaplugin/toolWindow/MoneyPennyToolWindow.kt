@@ -6,7 +6,6 @@ import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
@@ -19,7 +18,7 @@ import javax.swing.*
 import javax.swing.event.ChangeListener
 
 class MoneyPennyToolWindow(
-    project: Project, private val toolWindow: ToolWindow
+    project: Project
 ) {
 
     private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
@@ -29,19 +28,20 @@ class MoneyPennyToolWindow(
     private val service = project.service<ProjectService>()
 
     fun getContent(
-        fileList: List<*>? = emptyList<Any>(), contentPromptText: String? = null
+        fileList: List<*>? = emptyList<Any>(),
+        contentPromptText: String? = null
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(toolWindow, fileList!!, contentPromptText))
+            add(moneyPennyPromptPanel(fileList!!, contentPromptText))
         }
     }
 
     private fun moneyPennyPromptPanel(
-        toolWindow: ToolWindow? = null, fileList: List<*>, contentPromptText: String? = null
+        fileList: List<*>, contentPromptText: String? = null
     ): JComponent {
+        var file: File? = null
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
-        var file: File? = null
 
         for (i in 0..tabCount) {
             if (fileList.isNotEmpty()) {
@@ -54,7 +54,7 @@ class MoneyPennyToolWindow(
             gridBagConstraints.insets = JBUI.insets(2)
 
             for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, toolWindow, file, contentPromptText, tabbedPane)
+                val innerPanel = createInnerPanel(j, file, contentPromptText, tabbedPane)
                 innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
                 gridBagConstraints.gridy = j - 1
@@ -80,7 +80,6 @@ class MoneyPennyToolWindow(
 
     private fun createInnerPanel(
         panelIndex: Int,
-        toolWindow: ToolWindow? = null,
         file: File?,
         contentPromptText: String?,
         tabbedPane: JBTabbedPane
@@ -89,9 +88,9 @@ class MoneyPennyToolWindow(
         if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
-            1 -> promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
+            1 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, tabbedPane)
 
-            2 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, toolWindow, tabbedPane)
+            2 -> promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
 
             3 -> service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
 
