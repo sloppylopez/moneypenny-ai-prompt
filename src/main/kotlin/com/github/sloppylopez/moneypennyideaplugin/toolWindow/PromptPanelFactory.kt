@@ -39,6 +39,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 .createDefaultTextArea("", 2, 79)
             contentPromptTextArea = textAreaFactory
                 .createDefaultTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+            contentPromptTextArea?.name = "contentPromptTextArea"
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "",

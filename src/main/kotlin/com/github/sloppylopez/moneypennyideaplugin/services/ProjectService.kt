@@ -5,11 +5,14 @@ import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabNa
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
+import com.google.gson.Gson
 import com.intellij.icons.AllIcons
 import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -39,10 +42,13 @@ import java.io.File
 import java.io.FileReader
 import java.util.*
 import javax.swing.*
+import kotlin.collections.ArrayList
 
 @Service(Service.Level.PROJECT)
-class ProjectService {
+class ProjectService(project: Project) {
     private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
+    private val gitService = project.service<GitService>()
+    private val prompts = mutableMapOf<String, Map<String, List<String>>>()
     fun getFileContents(filePath: String?) = filePath?.let {
         try {
             File(it).readText()
@@ -225,45 +231,6 @@ class ProjectService {
         return selectedText
     }
 
-    data class TextAreaData(val pre: String, val content: String, val post: String)
-
-    fun getTextFromToolWindow(): List<TextAreaData> {
-        val textAreaElements = mutableListOf<TextAreaData>()
-        val toolWindowComponent = this.getToolWindow()?.component
-        collectTextAreas(toolWindowComponent!!, textAreaElements)
-        return textAreaElements
-    }
-
-    private fun collectTextAreas(
-        component: java.awt.Component,
-        textAreaElements: MutableList<TextAreaData>
-    ) {
-        if (component is javax.swing.JTextArea) {
-            val text = component.text
-            textAreaElements.add(TextAreaData("", text, ""))
-        }
-
-        if (component is java.awt.Container) {
-            if (component is JPanel && !component.name.isNullOrBlank()) {
-                val componentName = component.name.split("\\").last()
-                val componentFullPath = component.name
-                textAreaElements.add(TextAreaData(componentName, "", componentFullPath))
-            }
-
-            for (childComponent in component.components) {
-                collectTextAreas(childComponent, textAreaElements)
-            }
-        }
-
-        if (component is javax.swing.JTabbedPane) {
-            val tabCount = component.tabCount
-            for (i in 1 until tabCount) {
-                val tabComponent = component.getComponentAt(i)
-                collectTextAreas(tabComponent, textAreaElements)
-            }
-        }
-    }
-
     fun setTabName(
         i: Int,
         fileList: List<*>,
@@ -299,8 +266,10 @@ class ProjectService {
         return ProjectManager.getInstance().openProjects.firstOrNull()
     }
 
+    private val pluginId = "MoneyPenny AI"
+
     fun getToolWindow(): ToolWindow? {
-        return ToolWindowManager.getInstance(getProject()!!).getToolWindow("MoneyPenny AI")
+        return ToolWindowManager.getInstance(getProject()!!).getToolWindow(pluginId)
     }
 
     fun sendFileToContentPrompt(
@@ -402,36 +371,32 @@ class ProjectService {
 //        clipboard.setContents(StringSelection(result), null)
     }
 
-    fun findContentTabAndCallGetUserData() {
+    fun findContentTabAndCallGetUserData(): ArrayList<Pair<String, String>> {
         val contentManager = getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
-
         for (i in 0 until contentCount!!) {
             val content = contentManager.getContent(i)
-
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
-                val textAreas = ArrayList<String>()
-
+                val textAreas: ArrayList<Pair<String, String>> = ArrayList()
                 findTextAreas(simpleToolWindowPanel, textAreas)
-
                 val result = textAreas.joinToString("\n")
+                saveDataToExtensionFolder(getPromptsAsJson(prompts))
                 copyToClipboard(result)
-                return
+                return textAreas
             }
         }
-
-        // ContentTab not found
-        // Handle the case when the component is not found
+        return ArrayList()
     }
 
-    fun findTextAreas(container: Container, textAreas: ArrayList<String>) {
+    private fun findTextAreas(container: Container, textAreas: ArrayList<Pair<String, String>>) {
         val components = container.components
         for (component in components) {
             if (component is JTextArea) {
-                val text = component.text.trim()
-                if (text.isNotEmpty()) {
-                    textAreas.add(text)
+                val text = component.text
+                val parentTabbedPane = component.parent.parent.parent.parent.parent
+                if (parentTabbedPane is JTabbedPane) {
+                    extractPromptInfo(parentTabbedPane, text, textAreas)
                 }
             } else if (component is Container) {
                 findTextAreas(component, textAreas)
@@ -439,4 +404,40 @@ class ProjectService {
         }
     }
 
+    private fun extractPromptInfo(
+        parentTabbedPane: JTabbedPane,
+        text: String,
+        textAreas: ArrayList<Pair<String, String>>
+    ) {
+        val tabName = parentTabbedPane.getTitleAt(0)
+        if (!tabName.isNullOrEmpty() &&
+            tabName != "No File"
+        ) {
+            val shortSha = gitService.getShortSha(tabNameToFilePathMap[tabName]!!)
+            val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
+            val promptList = promptMap.getOrDefault(tabName, listOf())
+
+            prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
+            textAreas.add(Pair(tabName, text))
+        }
+    }
+
+    fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
+        return Gson().toJson(prompts)
+    }
+
+    fun saveDataToExtensionFolder(data: String) {
+        val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
+        if (!extensionFolder.exists()) {
+            extensionFolder.mkdir()
+        }
+        val dataFile = File(extensionFolder, "prompt_history.json")
+        dataFile.writeText(data)
+    }
+
+    fun loadDataFromExtensionFolder(): String {
+        val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
+        val dataFile = File(extensionFolder, "prompt_history.txt")
+        return dataFile.readText()
+    }
 }

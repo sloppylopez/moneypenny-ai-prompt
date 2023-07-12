@@ -40,12 +40,15 @@ class ButtonPanelFactory(project: Project) {
             val runAllPromptBtn = JButton("Run All")
             runAllPromptBtn.addActionListener {
                 // Usage of the recursive method to retrieve the text
-                val textFromToolWindow = service.getTextFromToolWindow()
-                service.findContentTabAndCallGetUserData()
+//                val textFromToolWindow = service.getTextFromToolWindow()
+                val prompts = service.findContentTabAndCallGetUserData()
 //                val shortSha = gitService.getShortSha(textFromToolWindow)
 //                prompts[shortSha] = listOf(textFromToolWindow) // Modified
 //                service.copyToClipboard(textFromToolWindow)
-//                service.showNotification("Selected Tab Text", textFromToolWindow)
+                service.showNotification(
+                    "Copied Prompts to clipboard",
+                    prompts.toString()
+                )//TODO improve notification
                 println()
             }
             panel.add(runAllPromptBtn)
