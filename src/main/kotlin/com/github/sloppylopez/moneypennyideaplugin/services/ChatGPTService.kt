@@ -6,6 +6,9 @@ import com.google.gson.Gson
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -26,15 +29,14 @@ class ChatGPTService(project: Project) {
     private val client = OkHttpClient()
     private val gson = Gson()  // Create Gson instance
 
-    fun sendChatPrompt(prompt: String): ChatGptChoice? {  // Update the return type
+    fun sendChatPrompt(prompt: String, callback: (ChatGptChoice?) -> Unit) {
         val mediaType = "application/json; charset=utf-8".toMediaType()
-        // Escape newline and indentation characters in the prompt string
         val escapedPrompt = prompt.replace(Regex("[\n\r\t]")) { matchResult ->
             when (matchResult.value) {
                 "\n" -> "\\n"
                 "\r" -> "\\r"
                 "\t" -> "\\t"
-                else -> matchResult.value // For any other characters, keep them as they are
+                else -> matchResult.value
             }
         }
         val requestBody = """
@@ -51,22 +53,25 @@ class ChatGPTService(project: Project) {
             .post(requestBody)
             .build()
 
-        try {
-            val response = client.newCall(request).execute()
-            if (response.isSuccessful) {
-                val responseBody = response.body.string()
-                val chatCompletion = gson.fromJson(
-                    responseBody,
-                    ChatGptCompletion::class.java
-                )
-                return chatCompletion.choices[0]  // Convert response body to ChatGptCompletion object
-            } else {
-                service.showNotification("Error", "Error: ${response.code} ${response.message}")
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    val responseBody = response.body.string()
+                    val chatCompletion = gson.fromJson(
+                        responseBody,
+                        ChatGptCompletion::class.java
+                    )
+                    val choice = chatCompletion.choices[0]
+                    callback(choice)
+                } else {
+                    service.showNotification("Error", "Error: ${response.code} ${response.message}")
+                    callback(null)
+                }
+            } catch (e: Exception) {
+                service.showNotification("Error", e.message!!)
+                callback(null)
             }
-        } catch (e: Exception) {
-            service.showNotification("Error", e.message!!)
         }
-
-        return null
     }
 }

@@ -320,7 +320,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         if (selectedTabIndex != -1) {
             val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
             if (!selectedTabTitle.isNullOrEmpty()) {
-                return tabNameToContentPromptTextMap[selectedTabTitle]
+                return tabNameToContentPromptTextMap[selectedTabTitle]?: ""
             }
         }
         return null

@@ -17,40 +17,54 @@ class ButtonPanelFactory(project: Project) {
         panel: JPanel,
         tabbedPane: JTabbedPane
     ) {
-//        addRunButton(tabbedPane, panel) //TBI
+        addRunButton(tabbedPane, panel)
         addRunAllButton(panel)
 //        addShowDiffButton(panel) //TBI
     }
 
     private fun addRunButton(tabbedPane: JTabbedPane, panel: JPanel) {
-        val runPromptBtn = JButton("Run")
-        runPromptBtn.addActionListener {
-            val selectedTabText = service.getSelectedTabText(tabbedPane)
-            service.copyToClipboard(selectedTabText)
-            service.showNotification("Selected Tab Text", selectedTabText!!)
-        }
-        panel.add(runPromptBtn)
-    }
-
-    private fun addRunAllButton(
-        panel: JPanel
-    ) {
         try {
-            val runAllPromptBtn = JButton("Run All")
+            val runAllPromptBtn = JButton("Run")
+            panel.add(runAllPromptBtn)
             runAllPromptBtn.addActionListener {
                 val prompts = service.getPrompts()
-                chatGPTService.sendChatPrompt(prompts)
-                service.showNotification(
-                    "Copied Prompts to clipboard",
-                    prompts
-                )
-                service.copyToClipboard(prompts)
+                chatGPTService.sendChatPrompt(prompts) { choice ->
+                    if (choice != null) {
+                        service.showNotification("ChatGptChoice", choice.toString())
+                    } else {
+                        service.showNotification("Error", "An error occurred while processing the prompt.")
+                    }
+                    service.showNotification("Copied Prompts to clipboard", prompts)
+                    service.copyToClipboard(prompts)
+                }
             }
-            panel.add(runAllPromptBtn)
         } catch (e: Exception) {
             thisLogger().error("ButtonPanelFactory", e)
         }
     }
+
+
+    private fun addRunAllButton(panel: JPanel) {
+        try {
+            val runAllPromptBtn = JButton("Run All")
+            panel.add(runAllPromptBtn)
+            runAllPromptBtn.addActionListener {
+                val prompts = service.getPrompts()
+                chatGPTService.sendChatPrompt(prompts) { choice ->
+                    if (choice != null) {
+                        service.showNotification("ChatGptChoice", choice.toString())
+                    } else {
+                        service.showNotification("Error", "An error occurred while processing the prompt.")
+                    }
+                    service.showNotification("Copied Prompts to clipboard", prompts)
+                    service.copyToClipboard(prompts)
+                }
+            }
+        } catch (e: Exception) {
+            thisLogger().error("ButtonPanelFactory", e)
+        }
+    }
+
 
     private fun addShowDiffButton(panel: JPanel) {
         val showDiffBtn = JButton("Show Diff")
