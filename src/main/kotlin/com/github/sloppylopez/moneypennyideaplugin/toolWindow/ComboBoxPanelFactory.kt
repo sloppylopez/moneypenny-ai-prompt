@@ -25,7 +25,7 @@ class ComboBoxPanelFactory(project: Project) {
         languages.selectedIndex = selectedIndex
         nestedPanel.add(models)
         nestedPanel.add(languages)
-        buttonPanelFactory.buttonPanel(nestedPanel, tabbedPane)
+        buttonPanelFactory.buttonPanel(nestedPanel)
         panel.add(nestedPanel)
     }
 }

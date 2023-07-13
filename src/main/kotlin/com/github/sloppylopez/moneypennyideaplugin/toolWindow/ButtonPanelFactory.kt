@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.services.GitService
+import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -11,44 +12,36 @@ import javax.swing.*
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
     private val service = project.service<ProjectService>()
-    private val gitService = project.service<GitService>()
-    private val prompts = mutableMapOf<String, List<String>>()
+    private val chatGPTService = project.service<ChatGPTService>()
 
-    fun buttonPanel(
-        panel: JPanel,
-        tabbedPane: JTabbedPane
-    ) {
-//        addRunButton(tabbedPane, panel) //TBI
-        addRunAllButton(panel)
-//        addShowDiffButton(panel) //TBI
+    fun buttonPanel(panel: JPanel) {
+        addButton(panel, "Run")
+        addButton(panel, "Run All")
     }
 
-    private fun addRunButton(tabbedPane: JTabbedPane, panel: JPanel) {
-        val runPromptBtn = JButton("Run")
-        runPromptBtn.addActionListener {
-            val selectedTabText = service.getSelectedTabText(tabbedPane)
-            service.copyToClipboard(selectedTabText)
-            service.showNotification("Selected Tab Text", selectedTabText!!)
-        }
-        panel.add(runPromptBtn)
-    }
-
-    private fun addRunAllButton(
-        panel: JPanel
-    ) {
+    private fun addButton(panel: JPanel, text: String) {
         try {
-            val runAllPromptBtn = JButton("Run All")
-            runAllPromptBtn.addActionListener {
-                val prompts = service.findContentTabAndCallGetUserData()
-                service.showNotification(
-                    "Copied Prompts to clipboard",
-                    prompts
-                )
-                service.copyToClipboard(prompts)
-            }
-            panel.add(runAllPromptBtn)
+            val button = JButton(text)
+            panel.add(button)
+            addListener(button)
         } catch (e: Exception) {
-            thisLogger().error("ButtonPanelFactory", e)
+            thisLogger().error(e)
+        }
+    }
+
+    private fun addListener(runAllPromptBtn: JButton) {
+        runAllPromptBtn.addActionListener {
+            val prompts = service.getPrompts()
+            chatGPTService.sendChatPrompt(prompts, createCallback())
+        }
+    }
+
+    private fun createCallback(): ChatGPTService.ChatGptChoiceCallback {
+        return object : ChatGPTService.ChatGptChoiceCallback {
+            override fun onCompletion(choice: ChatGptMessage) {
+                service.copyToClipboard(choice.content)
+                service.showNotification("ChatGPT Response copied to clipboard: ", choice.content)
+            }
         }
     }
 

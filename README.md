@@ -12,38 +12,14 @@
       codebase with just a few clicks. Seamlessly integrated with IntelliJ IDEA.
     </p>
 </div>
-
+<iframe width="245px" height="48px" src="https://plugins.jetbrains.com/embeddable/install/22252"></iframe>
 <h3>Refactor Your Codebase with Ease at Full Speed!</h3>
 
   <img src="src/main/resources/images/MoneyPenny_ToolWindow_Prompt.png" alt="Prompt">
 
   <img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build">
   <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg" alt="Version"></a>
-  <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a>
-
-<h2>Template ToDo list</h2>
-
-  <ul>
-    <li>[x] Create a new <a href="[template]">IntelliJ Platform Plugin Template</a> project.</li>
-    <li>[ ] Get familiar with the <a href="[template]">template documentation</a>.</li>
-    <li>[ ] Adjust the <a href="./gradle.properties">pluginGroup</a>, <a href="./src/main/resources/META-INF/plugin.xml">plugin ID</a>, and <a href="./src/main/kotlin">sources package</a>.</li>
-    <li>[ ] Adjust the plugin description in <code>README</code> (see <a href="[docs:plugin-description]">Tips</a>).</li>
-    <li>[ ] Review the <a href="https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate">Legal Agreements</a>.</li>
-    <li>[ ] <a href="https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate">Publish a plugin manually</a> for the first time.</li>
-    <li>[ ] Set the <code>PLUGIN_ID</code> in the above README badges.</li>
-    <li>[ ] Set the <a href="https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate">Plugin Signing</a> related <a href="https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables">secrets</a>.</li>
-    <li>[ ] Set the <a href="https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate">Deployment Token</a>.</li>
-    <li>[ ] Click the <kbd>Watch</kbd> button on the top of the <a href="[template]">IntelliJ Platform Plugin Template</a> to be notified about releases containing new features and fixes.</li>
-  </ul>
-
-  <p>
-    This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
-    <br>
-    This specific section is a source for the <a href="/src/main/resources/META-INF/plugin.xml">plugin.xml</a> file which will be
-    extracted by the <a href="/build.gradle.kts">Gradle</a> during the build process.
-    <br>
-    To keep everything working, do not remove <code>&lt;!-- ... --&gt;</code> sections.
-  </p>
+  <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a
 
   <h1>MoneyPenny AI Prompt - Refactor Your Codebase with Ease</h1>
 
