@@ -44,9 +44,9 @@ import javax.swing.*
 import kotlin.collections.ArrayList
 
 @Service(Service.Level.PROJECT)
-class ProjectService(project: Project) {
+class ProjectService(project: Project? = ProjectManager.getInstance().openProjects[0]) {
     private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
-    private val gitService = project.service<GitService>()
+    private val gitService = project?.service<GitService>()
 
     fun getFileContents(filePath: String?) = filePath?.let {
         try {
@@ -386,7 +386,7 @@ class ProjectService(project: Project) {
         val tabName = parentTabbedPane.getTitleAt(0)
         if (!tabName.isNullOrEmpty()
         ) {
-            val shortSha = gitService.getShortSha(tabNameToFilePathMap[tabName] ?: "")
+            val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName] ?: "")!!
             val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
             val promptList = promptMap.getOrDefault(tabName, listOf())
 
