@@ -12,7 +12,7 @@
       codebase with just a few clicks. Seamlessly integrated with IntelliJ IDEA.
     </p>
 </div>
-<iframe width="245px" height="48px" src="https://plugins.jetbrains.com/embeddable/install/22252"></iframe>
+<a href="https://plugins.jetbrains.com/embeddable/install/22252">Try me</a>
 <h3>Refactor Your Codebase with Ease at Full Speed!</h3>
 
   <img src="src/main/resources/images/MoneyPenny_ToolWindow_Prompt.png" alt="Prompt">
