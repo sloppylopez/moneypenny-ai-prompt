@@ -28,10 +28,19 @@ class ChatGPTService(project: Project) {
 
     fun sendChatPrompt(prompt: String): ChatGptChoice? {  // Update the return type
         val mediaType = "application/json; charset=utf-8".toMediaType()
+        // Escape newline and indentation characters in the prompt string
+        val escapedPrompt = prompt.replace(Regex("[\n\r\t]")) { matchResult ->
+            when (matchResult.value) {
+                "\n" -> "\\n"
+                "\r" -> "\\r"
+                "\t" -> "\\t"
+                else -> matchResult.value // For any other characters, keep them as they are
+            }
+        }
         val requestBody = """
             {
                 "model": "gpt-3.5-turbo",
-                "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "Who is elvis?"}],
+                "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "$escapedPrompt"}],
                 "max_tokens": 50
             }
         """.toRequestBody(mediaType)

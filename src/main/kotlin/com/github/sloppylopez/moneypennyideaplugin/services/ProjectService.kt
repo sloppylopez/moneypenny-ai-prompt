@@ -47,6 +47,7 @@ import kotlin.collections.ArrayList
 class ProjectService(project: Project? = ProjectManager.getInstance().openProjects[0]) {
     private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
     private val gitService = project?.service<GitService>()
+    private val pluginId = "MoneyPenny AI"
 
     fun getFileContents(filePath: String?) = filePath?.let {
         try {
@@ -264,8 +265,6 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
     fun getProject(): Project? {
         return ProjectManager.getInstance().openProjects.firstOrNull()
     }
-
-    private val pluginId = "MoneyPenny AI"
 
     fun getToolWindow(): ToolWindow? {
         return ToolWindowManager.getInstance(getProject()!!).getToolWindow(pluginId)
