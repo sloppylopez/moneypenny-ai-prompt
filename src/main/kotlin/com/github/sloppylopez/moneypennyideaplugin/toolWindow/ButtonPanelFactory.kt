@@ -1,6 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.services.GitService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -11,8 +10,6 @@ import javax.swing.*
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
     private val service = project.service<ProjectService>()
-    private val gitService = project.service<GitService>()
-    private val prompts = mutableMapOf<String, List<String>>()
 
     fun buttonPanel(
         panel: JPanel,
@@ -39,7 +36,7 @@ class ButtonPanelFactory(project: Project) {
         try {
             val runAllPromptBtn = JButton("Run All")
             runAllPromptBtn.addActionListener {
-                val prompts = service.findContentTabAndCallGetUserData()
+                val prompts = service.getPrompts()
                 service.showNotification(
                     "Copied Prompts to clipboard",
                     prompts

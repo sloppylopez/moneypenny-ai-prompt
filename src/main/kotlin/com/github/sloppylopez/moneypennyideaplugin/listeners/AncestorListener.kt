@@ -22,7 +22,8 @@ class AncestorListener(project: Project) {
                 val tabName = tabbedPane.getTitleAt(tabbedPane.selectedIndex)
                 service.invokeLater {
                     fileEditorManager.openFileInEditor(
-                        tabNameToFilePathMap[tabName], tabNameToContentPromptTextMap[tabName]
+                        tabNameToFilePathMap[tabName],
+                        tabNameToContentPromptTextMap[tabName]
                     )
                 }
             } catch (e: Exception) {

@@ -10,8 +10,9 @@ class CheckBoxFactory {
 
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
         val checkboxPanel = JPanel()
-        val checkboxLabels =
-            arrayOf("DRY", "Add", "Create", "Modify", "Remove", "Replace", "Update", "Gives", "With")
+        val checkboxLabels = arrayOf(
+            "DRY", "Add", "Create", "Modify", "Remove", "Replace", "Update", "Gives", "With"
+        )
 
         checkboxLabels.forEach { label ->
             val checkBox = createCheckBox(label, false, postPromptTextArea)
@@ -21,13 +22,13 @@ class CheckBoxFactory {
         panel.add(checkboxPanel)
     }
 
-    private fun createCheckBox(text: String, selected: Boolean = false, postPromptTextArea: JTextArea): JCheckBox {
+    private fun createCheckBox(
+        text: String,
+        selected: Boolean = false,
+        postPromptTextArea: JTextArea
+    ): JCheckBox {
         val checkBox = JCheckBox(text)
         checkBox.isSelected = selected
-
-        if (checkBox.isSelected) {
-            updatePostPromptText(checkBox, postPromptTextArea)
-        }
 
         checkBox.addActionListener { event ->
             val selectedCheckBox = event.source as? JCheckBox
@@ -39,7 +40,6 @@ class CheckBoxFactory {
         return checkBox
     }
 
-
     private fun updatePostPromptText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
         if (selectedCheckBox.isSelected) {
             postPromptTextArea.append("${selectedCheckBox.text} \n")
@@ -49,8 +49,8 @@ class CheckBoxFactory {
             val lineStartIndex = postPromptText.indexOf(checkBoxText)
             if (lineStartIndex != -1) {
                 val lineEndIndex = postPromptText.indexOf('\n', lineStartIndex)
-                val updatedText = postPromptText.substring(0, lineStartIndex) +
-                        postPromptText.substring(lineEndIndex + 1)
+                val updatedText =
+                    postPromptText.substring(0, lineStartIndex) + postPromptText.substring(lineEndIndex + 1)
                 postPromptTextArea.text = updatedText
             }
         }

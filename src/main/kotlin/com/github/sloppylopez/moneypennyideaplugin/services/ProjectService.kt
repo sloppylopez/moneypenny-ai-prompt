@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.prompts
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
@@ -22,7 +23,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.intellij.openapi.ui.getUserData
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -33,7 +33,6 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
-import com.intellij.ui.content.ContentManager
 import java.awt.Container
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -48,7 +47,7 @@ import kotlin.collections.ArrayList
 class ProjectService(project: Project) {
     private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
     private val gitService = project.service<GitService>()
-    private val prompts = mutableMapOf<String, Map<String, List<String>>>()
+
     fun getFileContents(filePath: String?) = filePath?.let {
         try {
             File(it).readText()
@@ -346,7 +345,8 @@ class ProjectService(project: Project) {
         content.getUserData(key)
     }
 
-    fun findContentTabAndCallGetUserData(tabName: String? = null): String {
+    fun getPrompts(): String {
+        prompts.clear()
         val contentManager = getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
         for (i in 0 until contentCount!!) {
@@ -384,10 +384,9 @@ class ProjectService(project: Project) {
         textAreas: ArrayList<String>
     ) {
         val tabName = parentTabbedPane.getTitleAt(0)
-        if (!tabName.isNullOrEmpty() &&
-            tabName != "No File"
+        if (!tabName.isNullOrEmpty()
         ) {
-            val shortSha = gitService.getShortSha(tabNameToFilePathMap[tabName]!!)
+            val shortSha = gitService.getShortSha(tabNameToFilePathMap[tabName] ?: "")
             val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
             val promptList = promptMap.getOrDefault(tabName, listOf())
 
@@ -396,11 +395,11 @@ class ProjectService(project: Project) {
         }
     }
 
-    fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
+    private fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
         return Gson().toJson(prompts)
     }
 
-    fun saveDataToExtensionFolder(data: String) {
+    private fun saveDataToExtensionFolder(data: String) {
         val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
         if (!extensionFolder.exists()) {
             extensionFolder.mkdir()

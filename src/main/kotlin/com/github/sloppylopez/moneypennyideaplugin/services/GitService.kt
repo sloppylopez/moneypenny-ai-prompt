@@ -11,10 +11,13 @@ class GitService {
     fun getShortSha(filePath: String): String {
         var shortSHA = ""
         try {
+            if (filePath.isEmpty()) {
+                return ""
+            }
             val file = File(filePath)
             val directory = file.parentFile
 
-            val processBuilder = ProcessBuilder("git", "log", "-n", "1", "--pretty=format:%h", "--", file.name)
+            val processBuilder = ProcessBuilder("git", "log", "-n", "1", "--pretty=format:%h", "--", filePath)
             processBuilder.directory(directory)
             processBuilder.redirectErrorStream(true)
 

@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
-internal class ChatGPTService {
+internal class TokenService {
     fun countTextTokens(text: String? = ""): Int {
         return countTokens(text!!)
     }
