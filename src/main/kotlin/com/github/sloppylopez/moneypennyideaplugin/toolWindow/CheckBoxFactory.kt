@@ -22,13 +22,8 @@ class CheckBoxFactory {
         panel.add(checkboxPanel)
     }
 
-    private fun createCheckBox(
-        text: String,
-        selected: Boolean = false,
-        postPromptTextArea: JTextArea
-    ): JCheckBox {
-        val checkBox = JCheckBox(text)
-        checkBox.isSelected = selected
+    private fun createCheckBox(text: String, selected: Boolean = false, postPromptTextArea: JTextArea): JCheckBox {
+        val checkBox = JCheckBox(text, selected)
 
         checkBox.addActionListener { event ->
             val selectedCheckBox = event.source as? JCheckBox

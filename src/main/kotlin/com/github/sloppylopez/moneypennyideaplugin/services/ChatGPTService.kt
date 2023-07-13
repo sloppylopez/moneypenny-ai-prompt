@@ -1,77 +1,81 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
-import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptChoice
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
+import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.google.gson.Gson
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
+import java.time.Duration
 
 @Service(Service.Level.PROJECT)
 class ChatGPTService(project: Project) {
-    private val service = project.service<ProjectService>()
-
-    private val apiKey: String? = System.getenv("OPENAI_API_KEY")
+    private val service: ProjectService
+    private val apiKey = System.getenv("OPENAI_API_KEY")
+    private val client = HttpClient.newBuilder().build()
+    private val gson = Gson()
 
     init {
-        if (apiKey == null) {
-            throw IllegalArgumentException("API key not found in environment variables.")
-        }
+        service = project.service<ProjectService>()
+        requireNotNull(apiKey) { "API key not found in environment variables." }
     }
 
-    private val client = OkHttpClient()
-    private val gson = Gson()  // Create Gson instance
+    fun sendChatPrompt(prompt: String, callback: ChatGptChoiceCallback) {
+        val requestBody = getRequestBody(prompt)
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.openai.com/v1/chat/completions"))
+            .timeout(Duration.ofSeconds(60))
+            .header("Authorization", "Bearer $apiKey")
+            .header("Content-Type", "application/json; charset=utf-8")
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+            .build()
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .thenApply { obj: HttpResponse<String?> -> obj.body() }
+            .thenApply { responseBody: String? ->
+                gson.fromJson(
+                    responseBody,
+                    ChatGptCompletion::class.java
+                )
+            }
+            .whenComplete { choice: ChatGptCompletion?, throwable: Throwable? ->
+                if (throwable != null) {
+                    service.showNotification("Error", throwable.message!!)
+                    callback.onCompletion(ChatGptMessage("system", "Error: ${throwable.message}"))
+                } else {
+                    callback.onCompletion(choice!!.choices[0].message)
+                }
+            }
+    }
 
-    fun sendChatPrompt(prompt: String, callback: (ChatGptChoice?) -> Unit) {
-        val mediaType = "application/json; charset=utf-8".toMediaType()
-        val escapedPrompt = prompt.replace(Regex("[\n\r\t]")) { matchResult ->
+    private fun getRequestBody(prompt: String): String {
+        val escapedPrompt = prompt.replace(Regex("[\n\r\t\"]")) { matchResult ->
             when (matchResult.value) {
                 "\n" -> "\\n"
                 "\r" -> "\\r"
                 "\t" -> "\\t"
+                "\"" -> "\\\""
                 else -> matchResult.value
             }
         }
+        val promptLength = escapedPrompt.length
+        val maxTokenCount = 4096 - 1 - promptLength
+
         val requestBody = """
-            {
-                "model": "gpt-3.5-turbo",
-                "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "$escapedPrompt"}],
-                "max_tokens": 50
-            }
-        """.toRequestBody(mediaType)
-
-        val request = Request.Builder()
-            .url("https://api.openai.com/v1/chat/completions")
-            .header("Authorization", "Bearer $apiKey")
-            .post(requestBody)
-            .build()
-
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    val responseBody = response.body.string()
-                    val chatCompletion = gson.fromJson(
-                        responseBody,
-                        ChatGptCompletion::class.java
-                    )
-                    val choice = chatCompletion.choices[0]
-                    callback(choice)
-                } else {
-                    service.showNotification("Error", "Error: ${response.code} ${response.message}")
-                    callback(null)
+                {
+                    "model": "gpt-3.5-turbo",
+                    "messages": [{"role": "system", "content": "You are a helpful assistant. always answer without explanations, return only code if possible"}, {"role": "user", "content": "$escapedPrompt"}],
+                    "max_tokens": $maxTokenCount
                 }
-            } catch (e: Exception) {
-                service.showNotification("Error", e.message!!)
-                callback(null)
-            }
-        }
+            """
+        return requestBody
+    }
+
+    interface ChatGptChoiceCallback {
+        fun onCompletion(choice: ChatGptMessage)
     }
 }
