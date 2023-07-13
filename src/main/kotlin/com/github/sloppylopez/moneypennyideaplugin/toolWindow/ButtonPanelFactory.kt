@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -10,6 +11,7 @@ import javax.swing.*
 @Service(Service.Level.PROJECT)
 class ButtonPanelFactory(project: Project) {
     private val service = project.service<ProjectService>()
+    private val chatGPTService = project.service<ChatGPTService>()
 
     fun buttonPanel(
         panel: JPanel,
@@ -37,6 +39,7 @@ class ButtonPanelFactory(project: Project) {
             val runAllPromptBtn = JButton("Run All")
             runAllPromptBtn.addActionListener {
                 val prompts = service.getPrompts()
+                chatGPTService.sendChatPrompt(prompts)
                 service.showNotification(
                     "Copied Prompts to clipboard",
                     prompts
