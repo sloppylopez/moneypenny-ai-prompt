@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import java.awt.Dimension
 import javax.swing.*
 
 @Service(Service.Level.PROJECT)
@@ -23,17 +24,47 @@ class ButtonPanelFactory(project: Project) {
         try {
             val button = JButton(text)
             panel.add(button)
-            addListener(button)
+            addListener(button, panel)
         } catch (e: Exception) {
             thisLogger().error(e)
         }
     }
 
-    private fun addListener(runAllPromptBtn: JButton) {
+    private fun addListener(runAllPromptBtn: JButton, panel: JPanel) {
         runAllPromptBtn.addActionListener {
+            val jProgressBar = getProgressBar()
+            addProgressBar(panel, jProgressBar)
             val prompts = service.getPrompts()
             chatGPTService.sendChatPrompt(prompts, createCallback())
+                .whenComplete { _, _ ->
+                    run {
+                        removeProgressBar(panel, jProgressBar)
+                    }
+                }
         }
+    }
+
+    private fun addProgressBar(panel: JPanel, jProgressBar: JProgressBar) {
+        panel.add(jProgressBar)
+        panel.revalidate()
+        panel.repaint()
+    }
+
+    private fun removeProgressBar(panel: JPanel, jProgressBar: JProgressBar) {
+        jProgressBar.isIndeterminate = false
+        jProgressBar.string = "Done!"
+        panel.remove(jProgressBar)
+        panel.revalidate()
+        panel.repaint()
+    }
+
+    private fun getProgressBar(): JProgressBar {
+        val jProgressBar = JProgressBar()
+        jProgressBar.preferredSize = Dimension(250, 25)
+        jProgressBar.isStringPainted = true
+        jProgressBar.isIndeterminate = true
+        jProgressBar.string = "Waiting..."
+        return jProgressBar
     }
 
     private fun createCallback(): ChatGPTService.ChatGptChoiceCallback {

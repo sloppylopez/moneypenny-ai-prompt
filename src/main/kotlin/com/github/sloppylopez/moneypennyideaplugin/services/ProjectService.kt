@@ -320,7 +320,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         if (selectedTabIndex != -1) {
             val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
             if (!selectedTabTitle.isNullOrEmpty()) {
-                return tabNameToContentPromptTextMap[selectedTabTitle]?: ""
+                return tabNameToContentPromptTextMap[selectedTabTitle] ?: ""
             }
         }
         return null
@@ -412,50 +412,4 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         val dataFile = File(extensionFolder, "prompt_history.txt")
         return dataFile.readText()
     }
-
-    fun escapePrompt(prompt: String): String {
-        val escapedPrompt = prompt.replace(Regex("[\n\r\t\"]")) { matchResult ->
-            when (matchResult.value) {
-                "\n" -> "\\n"
-                "\r" -> "\\r"
-                "\t" -> "\\t"
-                "\"" -> "\\\""
-                else -> matchResult.value
-            }
-        }
-        return escapedPrompt
-    }
-
-    fun escapePromptLines(prompt: String): String {
-        val escapedPrompt = StringBuilder()
-        var isInsideQuotes = false
-        var isInsideSingleQuotes = false
-
-        for (char in prompt) {
-            when {
-                char == '\"' && !isInsideSingleQuotes -> {
-                    escapedPrompt.append("\\\"")
-                    isInsideQuotes = !isInsideQuotes
-                }
-                char == '\'' && !isInsideQuotes -> {
-                    escapedPrompt.append("\\\'")
-                    isInsideSingleQuotes = !isInsideSingleQuotes
-                }
-                isInsideQuotes || isInsideSingleQuotes -> {
-                    when (char) {
-                        '\n' -> escapedPrompt.append("\\n")
-                        '\r' -> escapedPrompt.append("\\r")
-                        '\t' -> escapedPrompt.append("\\t")
-                        else -> escapedPrompt.append(char)
-                    }
-                }
-                else -> escapedPrompt.append(char)
-            }
-        }
-
-        return escapedPrompt.toString()
-    }
-
-
-
 }
