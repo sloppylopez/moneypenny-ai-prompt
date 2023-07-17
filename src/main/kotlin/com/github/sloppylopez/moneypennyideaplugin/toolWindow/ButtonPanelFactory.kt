@@ -7,7 +7,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import java.awt.Dimension
 import javax.swing.*
 
 @Service(Service.Level.PROJECT)
@@ -16,25 +15,25 @@ class ButtonPanelFactory(project: Project) {
     private val chatGPTService = project.service<ChatGPTService>()
     private val progressBarFactory = project.service<ProgressBarFactory>()
 
-    fun buttonPanel(panel: JPanel) {
-        addButton(panel, "Run")
-        addButton(panel, "Run All")
+    fun buttonPanel(panel: JPanel, innerPanel: JPanel) {
+        addButton(panel, "Run", innerPanel)
+        addButton(panel, "Run All", innerPanel)
     }
 
-    private fun addButton(panel: JPanel, text: String) {
+    private fun addButton(panel: JPanel, text: String, innerPanel: JPanel) {
         try {
             val button = JButton(text)
             panel.add(button)
-            addListener(button, panel)
+            addListener(button, panel, innerPanel)
         } catch (e: Exception) {
             thisLogger().error(e)
         }
     }
 
-    private fun addListener(runAllPromptBtn: JButton, panel: JPanel) {
+    private fun addListener(runAllPromptBtn: JButton, panel: JPanel, innerPanel: JPanel) {
         runAllPromptBtn.addActionListener {
             val jProgressBar = progressBarFactory.getProgressBar()
-            progressBarFactory.addProgressBar(panel, jProgressBar)
+            progressBarFactory.addProgressBar(innerPanel, jProgressBar)
             val prompts = service.getPrompts()
             chatGPTService.sendChatPrompt(prompts, createCallback())
                 .whenComplete { _, _ ->
