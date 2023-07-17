@@ -15,8 +15,12 @@ class CheckBoxFactory {
         )
 
         checkboxLabels.forEach { label ->
-            val checkBox = createCheckBox(label, false, postPromptTextArea)
+            val checkBox = createCheckBox(label, label == "DRY", postPromptTextArea)
             checkboxPanel.add(checkBox)
+
+            if (label == "DRY") {
+                updatePostPromptText(checkBox, postPromptTextArea)
+            }
         }
 
         panel.add(checkboxPanel)
@@ -36,18 +40,22 @@ class CheckBoxFactory {
     }
 
     private fun updatePostPromptText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
-        if (selectedCheckBox.isSelected) {
+        if (selectedCheckBox.isSelected && !selectedCheckBox.text.isNullOrBlank()) {
             postPromptTextArea.append("${selectedCheckBox.text} \n")
         } else {
-            val checkBoxText = selectedCheckBox.text
-            val postPromptText = postPromptTextArea.text
-            val lineStartIndex = postPromptText.indexOf(checkBoxText)
-            if (lineStartIndex != -1) {
-                val lineEndIndex = postPromptText.indexOf('\n', lineStartIndex)
-                val updatedText =
-                    postPromptText.substring(0, lineStartIndex) + postPromptText.substring(lineEndIndex + 1)
-                postPromptTextArea.text = updatedText
-            }
+            removeLineFromPrompt(selectedCheckBox, postPromptTextArea)
+        }
+    }
+
+    private fun removeLineFromPrompt(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
+        val checkBoxText = selectedCheckBox.text
+        val postPromptText = postPromptTextArea.text
+        val lineStartIndex = postPromptText.indexOf(checkBoxText)
+        if (lineStartIndex != -1) {
+            val lineEndIndex = postPromptText.indexOf('\n', lineStartIndex)
+            val updatedText =
+                postPromptText.substring(0, lineStartIndex) + postPromptText.substring(lineEndIndex + 1)
+            postPromptTextArea.text = updatedText
         }
     }
 }
