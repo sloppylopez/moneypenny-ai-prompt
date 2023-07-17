@@ -34,8 +34,6 @@ dependencies {
     implementation("com.google.api:gax:2.31.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
     implementation("org.jetbrains:annotations:23.0.0")
-//    implementation("com.intellij:java:2023.1.1")
-//    implementation(files("C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\build\\libs\\moneypenny-idea-plugin-0.0.1.jar"))
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
