@@ -55,7 +55,7 @@ class MoneyPennyToolWindow(
             gridBagConstraints.insets = JBUI.insets(2)
             val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
             for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, file, contentPromptText, nestedPanel)
+                val innerPanel = createInnerPanel(j, file, contentPromptText, nestedPanel, tabbedPane)
                 innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
                 gridBagConstraints.gridy = j - 1
@@ -83,7 +83,8 @@ class MoneyPennyToolWindow(
         panelIndex: Int,
         file: File?,
         contentPromptText: String?,
-        nestedPanel: JPanel
+        nestedPanel: JPanel,
+        tabbedPane: JBTabbedPane
     ): JPanel {
         val innerPanel = JPanel()
         if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
@@ -98,7 +99,7 @@ class MoneyPennyToolWindow(
 
             3 -> {
                 val buttonPanelFactory = ButtonPanelFactory(service.getProject()!!)
-                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel)
+                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel, tabbedPane)
             }
         }
         return innerPanel

@@ -13,6 +13,7 @@ class ProgressBarFactory {
     }
 
     fun removeProgressBar(panel: JPanel, jProgressBar: JProgressBar) {
+        jProgressBar.isVisible = false
         jProgressBar.isIndeterminate = false
         jProgressBar.string = "Done!"
         panel.remove(jProgressBar)
