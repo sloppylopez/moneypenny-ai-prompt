@@ -40,5 +40,3 @@ class AncestorListener(project: Project) {
         }
     }
 }
-
-
