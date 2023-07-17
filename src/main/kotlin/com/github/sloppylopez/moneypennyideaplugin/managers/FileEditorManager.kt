@@ -21,8 +21,8 @@ class FileEditorManager(private val project: Project) {
             if (virtualFile != null) {
                 val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
                 FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true)
-                if (!contentPromptText.isNullOrBlank() &&
-                    service.isSnippet(contentPromptText, virtualFile)
+                if (!contentPromptText.isNullOrBlank() /*&&
+                    service.isSnippet(contentPromptText, virtualFile)*/
                 ) {
                     service.highlightTextInEditor(contentPromptText)
                 }

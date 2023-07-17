@@ -2,11 +2,14 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.google.gson.Gson
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.ui.components.JBTabbedPane
 import net.minidev.json.JSONObject
+import java.io.File
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -27,7 +30,11 @@ class ChatGPTService(project: Project) {
         requireNotNull(apiKey) { "API key not found in environment variables." }
     }
 
-    fun sendChatPrompt(prompt: String, callback: ChatGptChoiceCallback): CompletableFuture<ChatGptCompletion> {
+    fun sendChatPrompt(
+        prompt: String,
+        tabbedPane: JBTabbedPane,
+        callback: ChatGptChoiceCallback
+    ): CompletableFuture<ChatGptCompletion> {
         val requestBody = getRequestBodyJson(prompt)
         val request = createHttpRequest(requestBody)
         return sendAsyncRequest(request)
@@ -36,7 +43,7 @@ class ChatGPTService(project: Project) {
                 gson.fromJson(responseBody, ChatGptCompletion::class.java)
             }
             .whenComplete { choice: ChatGptCompletion?, throwable: Throwable? ->
-                handleCompletion(choice, throwable, callback)
+                handleCompletion(choice, throwable, callback, tabbedPane)
             }
     }
 
@@ -56,13 +63,19 @@ class ChatGPTService(project: Project) {
     private fun handleCompletion(
         choice: ChatGptCompletion?,
         throwable: Throwable?,
-        callback: ChatGptChoiceCallback
+        callback: ChatGptChoiceCallback,
+        tabbedPane: JBTabbedPane
     ) {
         if (throwable != null) {
             service.showNotification("Error", throwable.message!!)
             callback.onCompletion(ChatGptMessage("system", "Error: ${throwable.message}"))
         } else {
             val message = getMessage(choice)
+            val tabName = tabbedPane.getTitleAt(tabbedPane.selectedIndex)
+            service.modifySelectedTextInEditorByFile(
+                message.content,
+                service.fileToVirtualFile(File(tabNameToFilePathMap[tabName]!!))!!
+            )
             callback.onCompletion(message)
         }
     }

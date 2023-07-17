@@ -12,6 +12,7 @@ import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -164,6 +165,50 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         val file = FileEditorManager.getInstance(project)?.selectedFiles?.firstOrNull()
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
+
+//    fun modifySelectedTextInEditor(newText: String) {
+//        val editor = getCurrentEditor()
+//        //TODO: Here we need to open the document first
+//        editor?.let {
+//            val document = editor.document
+//            val selectionModel = editor.selectionModel
+//            val startOffset = selectionModel.selectionStart
+//            val endOffset = selectionModel.selectionEnd
+//
+//            if (startOffset != endOffset) {
+//                document.replaceString(startOffset, endOffset, newText)
+//            }
+//        }
+//    }
+
+    fun modifySelectedTextInEditorByFile(newText: String, file: VirtualFile) {
+        try {
+            val project = this.getProject() ?: return
+
+            ApplicationManager.getApplication().invokeLater {
+                val editorManager = FileEditorManager.getInstance(project)
+                val editor = editorManager.openTextEditor(OpenFileDescriptor(project, file), true)
+                editor?.let {
+                    val document = editor.document
+                    val selectionModel = editor.selectionModel
+                    val startOffset = selectionModel.selectionStart
+                    val endOffset = selectionModel.selectionEnd
+
+                    if (startOffset != endOffset) {
+                        ApplicationManager.getApplication().runWriteAction {
+                            WriteCommandAction.runWriteCommandAction(project) {
+                                document.replaceString(startOffset, endOffset, newText)
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            thisLogger().error(Bundle.message("projectService", e))
+        }
+    }
+
+
 
     fun expandFolders(fileList: List<*>? = null): List<File> {
         if (fileList == null) {
@@ -344,7 +389,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         content.getUserData(key)
     }
 
-    fun getPrompts(): String {
+    fun getPrompts(): ArrayList<String> {
         prompts.clear()
         val contentManager = getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
@@ -356,10 +401,10 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
                 findTextAreas(simpleToolWindowPanel, textAreas)
                 val promptsAsJson = getPromptsAsJson(prompts)
                 saveDataToExtensionFolder(promptsAsJson)
-                return textAreas.joinToString("\n")
+                return textAreas
             }
         }
-        return ""
+        return ArrayList() // Return an empty ArrayList<String>
     }
 
     private fun findTextAreas(container: Container, textAreas: ArrayList<String>) {
