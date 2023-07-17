@@ -11,6 +11,7 @@ import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
+import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
@@ -52,9 +53,9 @@ class MoneyPennyToolWindow(
             val gridBagConstraints = GridBagConstraints()
             gridBagConstraints.anchor = GridBagConstraints.NORTH
             gridBagConstraints.insets = JBUI.insets(2)
-
+            val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
             for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, file, contentPromptText, tabbedPane)
+                val innerPanel = createInnerPanel(j, file, contentPromptText, nestedPanel)
                 innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
                 gridBagConstraints.gridy = j - 1
@@ -82,18 +83,23 @@ class MoneyPennyToolWindow(
         panelIndex: Int,
         file: File?,
         contentPromptText: String?,
-        tabbedPane: JBTabbedPane
+        nestedPanel: JPanel
     ): JPanel {
         val innerPanel = JPanel()
         if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
-            1 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, tabbedPane)
+            1 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
 
-            2 -> promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
+            2 -> {
+                promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
+                service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
+            }
 
-            3 -> service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
-
+            3 -> {
+                val buttonPanelFactory = ButtonPanelFactory(service.getProject()!!)
+                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel)
+            }
         }
         return innerPanel
     }
