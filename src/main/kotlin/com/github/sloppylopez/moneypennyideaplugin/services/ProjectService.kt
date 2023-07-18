@@ -209,7 +209,6 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
     }
 
 
-
     fun expandFolders(fileList: List<*>? = null): List<File> {
         if (fileList == null) {
             return emptyList()
@@ -389,7 +388,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         content.getUserData(key)
     }
 
-    fun getPrompts(): ArrayList<String> {
+    fun getPrompts(): MutableMap<String, Map<String, List<String>>>? {
         prompts.clear()
         val contentManager = getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
@@ -398,26 +397,37 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
                 val textAreas: ArrayList<String> = ArrayList()
-                findTextAreas(simpleToolWindowPanel, textAreas)
+                findTextAreas(simpleToolWindowPanel, textAreas, 0)
                 val promptsAsJson = getPromptsAsJson(prompts)
                 saveDataToExtensionFolder(promptsAsJson)
-                return textAreas
+                return prompts
             }
         }
-        return ArrayList() // Return an empty ArrayList<String>
+        return null // Return an empty ArrayList<String>
     }
 
-    private fun findTextAreas(container: Container, textAreas: ArrayList<String>) {
+    private fun findTextAreas(container: Container, textAreas: ArrayList<String>, index: Int) {
         val components = container.components
+        var currentIndex = index // Create a mutable variable for the current index
         for (component in components) {
             if (component is JTextArea) {
                 val text = component.text
                 val parentTabbedPane = component.parent.parent.parent.parent.parent
                 if (parentTabbedPane is JTabbedPane) {
-                    extractPromptInfo(parentTabbedPane, text, textAreas)
+                    parentTabbedPane.components.forEach { tab ->
+                        if (tab is JPanel) {
+                            tab.components.forEach { component ->
+                                if (component is JTextArea) {
+                                    this.showNotification(parentTabbedPane.getTitleAt(currentIndex / 3), text)
+                                    extractPromptInfo(parentTabbedPane, text, textAreas, currentIndex)
+                                    currentIndex += 1  // Increment the current index
+                                }
+                            }
+                        }
+                    }
+                } else if (component is Container) {
+                    findTextAreas(component, textAreas, currentIndex)
                 }
-            } else if (component is Container) {
-                findTextAreas(component, textAreas)
             }
         }
     }
@@ -425,17 +435,23 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
     private fun extractPromptInfo(
         parentTabbedPane: JTabbedPane,
         text: String,
-        textAreas: ArrayList<String>
+        textAreas: ArrayList<String>,
+        index: Int
     ) {
-        val tabName = parentTabbedPane.getTitleAt(0)
-        if (!tabName.isNullOrEmpty()
-        ) {
-            val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName] ?: "")!!
-            val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
-            val promptList = promptMap.getOrDefault(tabName, listOf())
+        try {
+            val tabName =
+                parentTabbedPane.getTitleAt(index / 3)//This magic number makes the whole recursion work, since prompts are always 3 tabs apart
+            if (!tabName.isNullOrEmpty()
+            ) {
+                val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName]) ?: index.toString()
+                val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
+                val promptList = promptMap.getOrDefault(tabName, listOf())
 
-            prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
-            textAreas.add(text)
+                prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
+                textAreas.add(text)
+            }
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
         }
     }
 
