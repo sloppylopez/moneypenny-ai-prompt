@@ -34,6 +34,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
+import java.awt.Component
 import java.awt.Container
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -392,68 +393,104 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         prompts.clear()
         val contentManager = getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
+        val textAreas = mutableListOf<String>()
+
         for (i in 0 until contentCount!!) {
             val content = contentManager.getContent(i)
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
-                val textAreas: ArrayList<String> = ArrayList()
-                findTextAreas(simpleToolWindowPanel, textAreas, 0)
+                val jBTabbedPanes = mutableListOf<JBTabbedPane>()
+                simpleToolWindowPanel.components.forEach { component ->
+                    jBTabbedPanes.addAll(findJBTabbedPanes(component as Container))
+                }
+
+                // Find nested JBTabbedPane instances within each JBTabbedPane
+                val nestedJBTabbedPanes = mutableListOf<JBTabbedPane>()
+                jBTabbedPanes.forEach { tabbedPane ->
+                    nestedJBTabbedPanes.addAll(findNestedJBTabbedPanes(tabbedPane))
+                }
+
+                // Use the found JBTabbedPane instances (including nested ones)
+                for (tabbedPane in nestedJBTabbedPanes) {
+                    // Perform operations on each JBTabbedPane
+                    for (e in 0 until tabbedPane.tabCount) {
+                        val tabComponents = (tabbedPane.getComponentAt(e) as Container).components[1] as Container
+                        tabComponents.components.forEach { tabComponent ->
+                            if (tabComponent is JScrollPane) {
+                                val textArea = tabComponent.viewport.view as? JTextArea
+                                textArea?.let {
+                                    textAreas.add(it.text)
+                                    val tabName = tabbedPane.getTitleAt(e)
+                                    extractPromptInfo(tabName, textAreas, e, it.text)
+                                }
+                            }
+
+                        }
+                    }
+                    println("Found JBTabbedPane: $tabbedPane")
+                }
                 val promptsAsJson = getPromptsAsJson(prompts)
                 saveDataToExtensionFolder(promptsAsJson)
                 return prompts
             }
         }
-        return null // Return an empty ArrayList<String>
-    }
-
-    private fun findTextAreas(container: Container, textAreas: ArrayList<String>, index: Int) {
-        val components = container.components
-        var currentIndex = index // Create a mutable variable for the current index
-        for (component in components) {
-            if (component is JTextArea) {
-                val text = component.text
-                val parentTabbedPane = component.parent.parent.parent.parent.parent
-                if (parentTabbedPane is JTabbedPane) {
-                    parentTabbedPane.components.forEach { tab ->
-                        if (tab is JPanel) {
-                            tab.components.forEach { component ->
-                                if (component is JTextArea) {
-                                    this.showNotification(parentTabbedPane.getTitleAt(currentIndex / 3), text)
-                                    extractPromptInfo(parentTabbedPane, text, textAreas, currentIndex)
-                                    currentIndex += 1  // Increment the current index
-                                }
-                            }
-                        }
-                    }
-                } else if (component is Container) {
-                    findTextAreas(component, textAreas, currentIndex)
-                }
-            }
-        }
+        return null
     }
 
     private fun extractPromptInfo(
-        parentTabbedPane: JTabbedPane,
-        text: String,
-        textAreas: ArrayList<String>,
-        index: Int
+        tabName: String,
+        textAreas: MutableList<String>,
+        index: Int,
+        text: String
     ) {
         try {
-            val tabName =
-                parentTabbedPane.getTitleAt(index / 3)//This magic number makes the whole recursion work, since prompts are always 3 tabs apart
-            if (!tabName.isNullOrEmpty()
-            ) {
-                val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName]) ?: index.toString()
-                val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
-                val promptList = promptMap.getOrDefault(tabName, listOf())
-
-                prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
-                textAreas.add(text)
-            }
+            val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName]) ?: index.toString()
+            val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
+            val promptList = promptMap.getOrDefault(tabName, listOf())
+            prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
+            textAreas.add(text)
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
+
         }
     }
+
+    private fun findNestedJBTabbedPanes(tabbedPane: JBTabbedPane): List<JBTabbedPane> {
+        val nestedTabbedPanes = mutableListOf<JBTabbedPane>()
+
+        fun findNestedTabbedPanesRecursive(container: Container) {
+            for (component in container.components) {
+                if (component is JBTabbedPane) {
+                    nestedTabbedPanes.add(component)
+                    findNestedTabbedPanesRecursive(component)
+                } else if (component is Container) {
+                    findNestedTabbedPanesRecursive(component)
+                }
+            }
+        }
+
+        findNestedTabbedPanesRecursive(tabbedPane)
+        return nestedTabbedPanes
+    }
+
+
+    private fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
+        val tabbedPanes = mutableListOf<JBTabbedPane>()
+
+        fun findTabbedPanesRecursive(component: Component) {
+            if (component is JBTabbedPane) {
+                tabbedPanes.add(component)
+            } else if (component is Container) {
+                for (child in component.components) {
+                    findTabbedPanesRecursive(child)
+                }
+            }
+        }
+
+        findTabbedPanesRecursive(container)
+        return tabbedPanes
+    }
+
 
     private fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
         return Gson().toJson(prompts)
