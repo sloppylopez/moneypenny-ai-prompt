@@ -31,21 +31,45 @@ class ButtonPanelFactory(project: Project) {
         }
     }
 
+//    private fun addListener2(runAllPromptBtn: JButton, panel: JPanel, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
+//        runAllPromptBtn.addActionListener {
+//            val jProgressBar = progressBarFactory.getProgressBar()
+//            progressBarFactory.addProgressBar(innerPanel, jProgressBar)
+//            val prompts = service.getPrompts()
+//
+//            val promptChunks = prompts.chunked(3) // Split the prompts into groups of three
+//
+//            promptChunks.stream().forEach { chunk ->
+//                run {
+//                    if (chunk[1].isNotBlank()) {//TODO we need to save the index of every tab so we can recover it from the name
+//                        chatGPTService.sendChatPrompt(chunk.joinToString(""), tabbedPane, createCallback())
+//                            .whenComplete { _, _ ->
+//                                run {
+//                                    progressBarFactory.removeProgressBar(panel, jProgressBar)
+//                                }
+//                            }
+//                    }
+//                }
+//            }
+//        }
+//    }
+
     private fun addListener(runAllPromptBtn: JButton, panel: JPanel, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
         runAllPromptBtn.addActionListener {
             val jProgressBar = progressBarFactory.getProgressBar()
             progressBarFactory.addProgressBar(innerPanel, jProgressBar)
             val prompts = service.getPrompts()
-
-            val promptChunks = prompts.chunked(3) // Split the prompts into groups of three
-
-            promptChunks.stream().forEach { chunk ->
-                chatGPTService.sendChatPrompt(chunk.joinToString(""), tabbedPane, createCallback())
-                    .whenComplete { _, _ ->
-                        run {
+            prompts?.forEach { (_, promptMap) ->
+                promptMap.forEach { (_, promptList) ->
+                    if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
+                        chatGPTService.sendChatPrompt(
+                            promptList.joinToString(""),
+                            tabbedPane, createCallback()
+                        ).whenComplete { _, _ ->
                             progressBarFactory.removeProgressBar(panel, jProgressBar)
                         }
                     }
+                }
             }
         }
     }
