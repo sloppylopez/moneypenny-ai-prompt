@@ -473,6 +473,16 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         dataFile.writeText(data)
     }
 
+    fun getPromptListByKey(prompts: MutableMap<String, Map<String, List<String>>>, key: String): List<String> {
+        for (outerKey in prompts.keys) {
+            val innerMap = prompts[outerKey] ?: continue
+            if (innerMap.containsKey(key)) {
+                return innerMap[key] ?: emptyList()
+            }
+        }
+        return emptyList()
+    }
+
     fun loadDataFromExtensionFolder(): String {
         val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
         val dataFile = File(extensionFolder, "prompt_history.txt")

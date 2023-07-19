@@ -94,13 +94,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 expandedFileList.forEach {
                     val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
                     service.highlightTextInEditor(fileContents)
-//                    val localFileSystem = LocalFileSystem.getInstance()
-//                    val file = localFileSystem.findFileByIoFile(it)
-//                    val filePath = Paths.get(file?.path!!)
-//                    val fileContents = String(Files.readAllBytes(filePath))
-//                    val openFileDescriptor = OpenFileDescriptor(project, file)
-//                    FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true)
-//                    service.highlightTextInEditor(fileContents, 0)//When we drop we always want to highlight
                 }
             }
         } catch (e: Exception) {

@@ -6,7 +6,6 @@ import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.util.ui.JBUI
@@ -99,7 +98,7 @@ class MoneyPennyToolWindow(
 
             1 -> {
                 val buttonPanelFactory = ButtonPanelFactory(service.getProject()!!)
-                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel)
+                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel, tabbedPane)
             }
         }
         return innerPanel

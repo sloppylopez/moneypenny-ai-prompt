@@ -24,7 +24,7 @@ internal class MarkdownLineMarkerProvider : LineMarkerProvider {
                 element,
                 element.textRange,
                 icon,
-                null,
+                null,   
                 null,
                 GutterIconRenderer.Alignment.CENTER
             )

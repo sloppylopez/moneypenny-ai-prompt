@@ -1,9 +1,9 @@
 package com.github.sloppylopez.moneypennyideaplugin.components
 
+import com.intellij.openapi.diagnostic.thisLogger
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
-import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 import javax.swing.JTextArea
@@ -24,7 +24,7 @@ class BackgroundImageTextArea(imageBackground: String? = null) : JTextArea(20, 2
                 }
             }
         } catch (ex: IOException) {
-            ex.printStackTrace()
+            thisLogger().error("Error loading image", ex)
         }
     }
 

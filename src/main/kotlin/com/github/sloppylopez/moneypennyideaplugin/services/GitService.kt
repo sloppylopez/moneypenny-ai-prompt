@@ -11,7 +11,7 @@ class GitService {
     fun getShortSha(filePath: String?): String? {
         var shortSHA: String? = null
         try {
-            if (filePath!!.isEmpty()) {
+            if (filePath.isNullOrEmpty()) {
                 return null
             }
             val file = File(filePath)
@@ -27,7 +27,7 @@ class GitService {
 
             process.waitFor()
         } catch (e: Exception) {
-            thisLogger().error(e)
+            thisLogger().warn(e)
         }
         return shortSHA
     }
