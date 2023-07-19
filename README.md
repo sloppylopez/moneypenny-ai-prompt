@@ -12,8 +12,8 @@
       codebase with just a few clicks. Seamlessly integrated with IntelliJ IDEA.
     </p>
 </div>
-<a href="https://plugins.jetbrains.com/embeddable/install/22252">Try me</a>
-<h3>Refactor Your Codebase with Ease at Full Speed!</h3>
+
+<h2>Refactor Your Codebase with Ease at Full Speed!</h2>
 
   <img src="src/main/resources/images/MoneyPenny_ToolWindow_Prompt.png" alt="Prompt">
 
@@ -61,25 +61,6 @@
 
   <p>Plugin based on the <a href="[template]">IntelliJ Platform Plugin Template</a>.</p>
 
-<h2>Debugging the Plugin</h2>
-
-  <p>
-    If your IntelliJ IDEA plugin doesn't have a main class or an entry point that you can directly run and debug, you can still debug it by attaching the debugger to the running IntelliJ IDEA instance. Here's how you can do it:
-  </p>
-
-  <ol>
-    <li>Build and package your plugin into a JAR or an IntelliJ IDEA plugin format (such as a ZIP or JAR with specific plugin structure).</li>
-    <li>Install or enable your plugin in IntelliJ IDEA. You can do this by going to "File" -&gt; "Settings" -&gt; "Plugins" and selecting "Install Plugin from Disk" or "Enable" if your plugin is already installed.</li>
-    <li>Run the IntelliJ IDEA instance that has your plugin enabled.</li>
-    <li>In your IntelliJ IDEA instance, go to "Run" -&gt; "Attach to Process" to open the "Attach to Process" dialog.</li>
-    <li>In the "Attach to Process" dialog, select the IntelliJ IDEA process that you want to attach the debugger to. Make sure you choose the correct process if multiple instances are running.</li>
-    <li>Click the "OK" button to attach the debugger to the selected process.</li>
-    <li>IntelliJ IDEA will connect the debugger to the running instance, and you can now set breakpoints in your plugin code.</li>
-    <li>Trigger the functionality of your plugin within the running IntelliJ IDEA instance to hit the breakpoints and start debugging.</li>
-    <li>Use the debugging features provided by IntelliJ IDEA, such as stepping through the code, inspecting variables, and evaluating expressions, to analyze and debug your plugin.</li>
-    <li>By attaching the debugger to the running IntelliJ IDEA process, you can debug your plugin code even if it doesn't have a specific main class or entry point.</li>
-  </ol>
-
 <h2>Useful Links</h2>
 
   <p>Here are some useful links to help you make the most of MoneyPenny AI Prompt and IntelliJ IDEA:</p>
@@ -111,20 +92,30 @@
     If you would like to contribute code, please fork the repository and submit a pull request.
   </p>
 
-<h2>License</h2>
-
-  <p>
-    This plugin is licensed under the Apache License 2.0. See the <a href="LICENSE">LICENSE</a> file for more details.
-  </p>
-<p>
+<h2>Idea Plugin Description</h2>
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+MoneyPenny AI Prompt - Prompt Driven Development
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be
-extracted by the [Gradle](/build.gradle.kts) during the build process.
+Experience the future of PDD coding with MoneyPenny AI Prompt, the ultimate IntelliJ IDEA plugin, designed to elevate
+your coding experience to new heights. Here's why MoneyPenny stands out from the competition:
 
-To keep everything working, do not remove `<!-- ... -->` sections.
+Multi-File Refactoring: Refactor, add, or modify multiple files simultaneously, saving valuable time and effort. Copilot
+X lacks this powerful capability.
+
+Faster Responses, No Typewriter Effect: Enjoy lightning-fast responses without the annoying typewriter effect, providing
+a seamless coding flow. Unlike web chat-based solutions, MoneyPenny AI Prompt prioritizes speed.
+
+16000k Contextual Prompt: Our plugin taps into the extensive context of the ChatGPT model, delivering smarter,
+contextually relevant coding suggestions, surpassing the limitations of standard web chatbots.
+
+Seamless Integration & Intelligence: MoneyPenny AI Prompt effortlessly integrates into IntelliJ IDEA, enhancing your
+coding experience with intelligent code completions and predictive assistance.
+
+Continuous Evolution: We're committed to continuous improvement, ensuring MoneyPenny AI Prompt evolves with the latest
+advancements in AI and coding practices.
+
+Download MoneyPenny AI Prompt now and unlock the power of AI in your coding workflow, leaving other plugins and
+competitors in the dust. Elevate your coding efficiency and create brilliance with ease.
 <!-- Plugin description end -->
-</p>
 </body>
 </html>

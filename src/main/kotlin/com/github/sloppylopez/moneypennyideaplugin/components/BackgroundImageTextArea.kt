@@ -1,9 +1,9 @@
 package com.github.sloppylopez.moneypennyideaplugin.components
 
+import com.intellij.openapi.diagnostic.thisLogger
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
-import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 import javax.swing.JTextArea
@@ -14,11 +14,17 @@ class BackgroundImageTextArea(imageBackground: String? = null) : JTextArea(20, 2
     init {
         isOpaque = false
         try {
-            if (imageBackground != null)
-                image =
-                    ImageIO.read(File(imageBackground))
+            if (imageBackground != null) {
+                val resourceUrl = javaClass.classLoader.getResource(imageBackground)
+                if (resourceUrl != null) {
+                    image = ImageIO.read(resourceUrl)
+                } else {
+                    // Handle case when the resource is not found
+                    println("Resource not found: $imageBackground")
+                }
+            }
         } catch (ex: IOException) {
-            ex.printStackTrace()
+            thisLogger().error("Error loading image", ex)
         }
     }
 

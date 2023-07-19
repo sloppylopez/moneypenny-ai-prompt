@@ -8,11 +8,11 @@ import java.io.InputStreamReader
 
 @Service(Service.Level.PROJECT)
 class GitService {
-    fun getShortSha(filePath: String): String {
-        var shortSHA = ""
+    fun getShortSha(filePath: String?): String? {
+        var shortSHA: String? = null
         try {
-            if (filePath.isEmpty()) {
-                return ""
+            if (filePath.isNullOrEmpty()) {
+                return null
             }
             val file = File(filePath)
             val directory = file.parentFile
@@ -27,7 +27,7 @@ class GitService {
 
             process.waitFor()
         } catch (e: Exception) {
-            thisLogger().error(e)
+            thisLogger().warn(e)
         }
         return shortSHA
     }

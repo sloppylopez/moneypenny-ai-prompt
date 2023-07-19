@@ -16,6 +16,7 @@ import javax.swing.event.AncestorListener
 class AncestorListener(project: Project) {
     val fileEditorManager = project.service<FileEditorManager>()
     val service = project.service<ProjectService>()
+
     fun getAncestorListener(tabbedPane: JBTabbedPane) = object : AncestorListener {
         override fun ancestorAdded(e: AncestorEvent?) {
             try {
@@ -40,5 +41,3 @@ class AncestorListener(project: Project) {
         }
     }
 }
-
-

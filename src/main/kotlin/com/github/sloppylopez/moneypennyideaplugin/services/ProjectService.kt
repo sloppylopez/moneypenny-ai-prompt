@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
+import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.prompts
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
@@ -12,6 +13,7 @@ import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -33,6 +35,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
+import java.awt.Component
 import java.awt.Container
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -151,10 +154,11 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         val editor = getCurrentEditor()
         editor?.let {
             val document = editor.document
-            val textOffset = document.text.indexOf(contentPromptText)
+            val normalizedContentPromptText = contentPromptText.replace("\r\n", "\n")
+            val textOffset = document.text.indexOf(normalizedContentPromptText)
             if (textOffset != -1) {
                 editor.caretModel.moveToOffset(textOffset)
-                editor.selectionModel.setSelection(textOffset, textOffset + contentPromptText.length)
+                editor.selectionModel.setSelection(textOffset, textOffset + normalizedContentPromptText.length)
             }
         }
     }
@@ -164,6 +168,37 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         val file = FileEditorManager.getInstance(project)?.selectedFiles?.firstOrNull()
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
+
+    fun modifySelectedTextInEditorByFile(
+        newText: ChatGptMessage,
+        file: VirtualFile,
+    ) {
+        try {
+            val project = this.getProject() ?: return
+
+            ApplicationManager.getApplication().invokeLater {
+                val editorManager = FileEditorManager.getInstance(project)
+                val editor = editorManager.openTextEditor(OpenFileDescriptor(project, file), false)
+                editor?.let {
+                    val document = editor.document
+                    val selectionModel = editor.selectionModel
+                    val startOffset = selectionModel.selectionStart
+                    val endOffset = selectionModel.selectionEnd
+
+                    if (startOffset != endOffset) {
+                        ApplicationManager.getApplication().runWriteAction {
+                            WriteCommandAction.runWriteCommandAction(project) {
+                                document.replaceString(startOffset, endOffset, newText.content)
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            thisLogger().error(Bundle.message("projectService", e))
+        }
+    }
+
 
     fun expandFolders(fileList: List<*>? = null): List<File> {
         if (fileList == null) {
@@ -211,9 +246,6 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
             thisLogger().error(e)
         }
     }
-
-    private fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
-        normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
 
     private fun getSelectedTextFromOpenedFileInEditor(
         selectedEditor: Editor
@@ -302,28 +334,10 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         }
     }
 
-    fun isSnippet(contentPromptText: String?, virtualFile: VirtualFile?): Boolean {
-        val normalizedSelectedText = contentPromptText?.replace("\r\n", "\n")
-        val normalizedFileContent =
-            virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)?.replace("\r\n", "\n")
-        return this.getIsSnippet(normalizedFileContent, normalizedSelectedText)
-    }
-
     fun copyToClipboard(text: String? = null) {
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
         val stringSelection = StringSelection(text)
         clipboard.setContents(stringSelection, null)
-    }
-
-    fun getSelectedTabText(tabbedPane: JTabbedPane): String? {
-        val selectedTabIndex = tabbedPane.selectedIndex
-        if (selectedTabIndex != -1) {
-            val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
-            if (!selectedTabTitle.isNullOrEmpty()) {
-                return tabNameToContentPromptTextMap[selectedTabTitle]?: ""
-            }
-        }
-        return null
     }
 
     fun putUserDataInProject(fileList: List<*>) {
@@ -344,55 +358,107 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         content.getUserData(key)
     }
 
-    fun getPrompts(): String {
+    fun getPrompts(): MutableMap<String, Map<String, List<String>>>? {
         prompts.clear()
         val contentManager = getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
+        val textAreas = mutableListOf<String>()
+
         for (i in 0 until contentCount!!) {
             val content = contentManager.getContent(i)
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
-                val textAreas: ArrayList<String> = ArrayList()
-                findTextAreas(simpleToolWindowPanel, textAreas)
+                val jBTabbedPanes = mutableListOf<JBTabbedPane>()
+                simpleToolWindowPanel.components.forEach { component ->
+                    jBTabbedPanes.addAll(findJBTabbedPanes(component as Container))
+                }
+
+                // Find nested JBTabbedPane instances within each JBTabbedPane
+                val nestedJBTabbedPanes = mutableListOf<JBTabbedPane>()
+                jBTabbedPanes.forEach { tabbedPane ->
+                    nestedJBTabbedPanes.addAll(findNestedJBTabbedPanes(tabbedPane))
+                }
+
+                // Use the found JBTabbedPane instances (including nested ones)
+                for (tabbedPane in nestedJBTabbedPanes) {
+                    // Perform operations on each JBTabbedPane
+                    for (e in 0 until tabbedPane.tabCount) {
+                        val tabComponents = (tabbedPane.getComponentAt(e) as Container).components[1] as Container
+                        tabComponents.components.forEach { tabComponent ->
+                            if (tabComponent is JScrollPane) {
+                                val textArea = tabComponent.viewport.view as? JTextArea
+                                textArea?.let {
+                                    textAreas.add(it.text)
+                                    val tabName = tabbedPane.getTitleAt(e)
+                                    extractPromptInfo(tabName, textAreas, e, it.text)
+                                }
+                            }
+
+                        }
+                    }
+                }
                 val promptsAsJson = getPromptsAsJson(prompts)
                 saveDataToExtensionFolder(promptsAsJson)
-                return textAreas.joinToString("\n")
+                return prompts
             }
         }
-        return ""
-    }
-
-    private fun findTextAreas(container: Container, textAreas: ArrayList<String>) {
-        val components = container.components
-        for (component in components) {
-            if (component is JTextArea) {
-                val text = component.text
-                val parentTabbedPane = component.parent.parent.parent.parent.parent
-                if (parentTabbedPane is JTabbedPane) {
-                    extractPromptInfo(parentTabbedPane, text, textAreas)
-                }
-            } else if (component is Container) {
-                findTextAreas(component, textAreas)
-            }
-        }
+        return null
     }
 
     private fun extractPromptInfo(
-        parentTabbedPane: JTabbedPane,
-        text: String,
-        textAreas: ArrayList<String>
+        tabName: String,
+        textAreas: MutableList<String>,
+        index: Int,
+        text: String
     ) {
-        val tabName = parentTabbedPane.getTitleAt(0)
-        if (!tabName.isNullOrEmpty()
-        ) {
-            val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName] ?: "")!!
+        try {
+            val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName]) ?: index.toString()
             val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
             val promptList = promptMap.getOrDefault(tabName, listOf())
-
             prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
             textAreas.add(text)
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
+
         }
     }
+
+    private fun findNestedJBTabbedPanes(tabbedPane: JBTabbedPane): List<JBTabbedPane> {
+        val nestedTabbedPanes = mutableListOf<JBTabbedPane>()
+
+        fun findNestedTabbedPanesRecursive(container: Container) {
+            for (component in container.components) {
+                if (component is JBTabbedPane) {
+                    nestedTabbedPanes.add(component)
+                    findNestedTabbedPanesRecursive(component)
+                } else if (component is Container) {
+                    findNestedTabbedPanesRecursive(component)
+                }
+            }
+        }
+
+        findNestedTabbedPanesRecursive(tabbedPane)
+        return nestedTabbedPanes
+    }
+
+
+    private fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
+        val tabbedPanes = mutableListOf<JBTabbedPane>()
+
+        fun findTabbedPanesRecursive(component: Component) {
+            if (component is JBTabbedPane) {
+                tabbedPanes.add(component)
+            } else if (component is Container) {
+                for (child in component.components) {
+                    findTabbedPanesRecursive(child)
+                }
+            }
+        }
+
+        findTabbedPanesRecursive(container)
+        return tabbedPanes
+    }
+
 
     private fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
         return Gson().toJson(prompts)
@@ -405,6 +471,16 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         }
         val dataFile = File(extensionFolder, "prompt_history.json")
         dataFile.writeText(data)
+    }
+
+    fun getPromptListByKey(prompts: MutableMap<String, Map<String, List<String>>>, key: String): List<String> {
+        for (outerKey in prompts.keys) {
+            val innerMap = prompts[outerKey] ?: continue
+            if (innerMap.containsKey(key)) {
+                return innerMap[key] ?: emptyList()
+            }
+        }
+        return emptyList()
     }
 
     fun loadDataFromExtensionFolder(): String {
