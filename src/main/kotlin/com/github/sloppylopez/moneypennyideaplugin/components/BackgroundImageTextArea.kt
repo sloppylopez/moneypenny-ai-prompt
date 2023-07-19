@@ -14,9 +14,15 @@ class BackgroundImageTextArea(imageBackground: String? = null) : JTextArea(20, 2
     init {
         isOpaque = false
         try {
-            if (imageBackground != null)
-                image =
-                    ImageIO.read(File(imageBackground))
+            if (imageBackground != null) {
+                val resourceUrl = javaClass.classLoader.getResource(imageBackground)
+                if (resourceUrl != null) {
+                    image = ImageIO.read(resourceUrl)
+                } else {
+                    // Handle case when the resource is not found
+                    println("Resource not found: $imageBackground")
+                }
+            }
         } catch (ex: IOException) {
             ex.printStackTrace()
         }

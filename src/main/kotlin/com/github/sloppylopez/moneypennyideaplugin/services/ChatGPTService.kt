@@ -79,7 +79,7 @@ class ChatGPTService(project: Project) {
 
     private fun getRequestBodyJson(prompt: String): String {
         val promptLength = prompt.length
-        val maxTokenCount = 16000 - 1 - promptLength
+        val maxTokenCount = 16384 - 1 - promptLength
 
         val systemMessage = JSONObject().apply {
             put("role", "system")

@@ -8,7 +8,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBTabbedPane
 import java.io.File
 import javax.swing.*
 
@@ -18,22 +17,22 @@ class ButtonPanelFactory(project: Project) {
     private val chatGPTService = project.service<ChatGPTService>()
     private val progressBarFactory = project.service<ProgressBarFactory>()
 
-    fun buttonPanel(panel: JPanel, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
-        addButton(panel, "Run", innerPanel, tabbedPane)
-        addButton(panel, "Run All", innerPanel, tabbedPane)
+    fun buttonPanel(panel: JPanel, innerPanel: JPanel) {
+        addButton(panel, "Run", innerPanel)
+        addButton(panel, "Run All", innerPanel)
     }
 
-    private fun addButton(panel: JPanel, text: String, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
+    private fun addButton(panel: JPanel, text: String, innerPanel: JPanel) {
         try {
             val button = JButton(text)
             panel.add(button)
-            addListener(button, panel, innerPanel, tabbedPane)
+            addListener(button, panel, innerPanel)
         } catch (e: Exception) {
             thisLogger().error(e)
         }
     }
 
-    private fun addListener(runAllPromptBtn: JButton, panel: JPanel, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
+    private fun addListener(runAllPromptBtn: JButton, panel: JPanel, innerPanel: JPanel) {
         runAllPromptBtn.addActionListener {
             val jProgressBar = progressBarFactory.getProgressBar()
             progressBarFactory.addProgressBar(innerPanel, jProgressBar)
@@ -41,7 +40,6 @@ class ButtonPanelFactory(project: Project) {
             prompts?.forEach { (_, promptMap) ->
                 promptMap.forEach { (tabName, promptList) ->
                     if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-//                        val normalizedPromptList = promptList[1].replace("\r\n", "\n")
                         chatGPTService.sendChatPrompt(
                             promptList.joinToString(""),
                             tabName, createCallback(tabName)

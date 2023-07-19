@@ -43,14 +43,14 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             prePromptTextArea = textAreaFactory
                 .createDefaultTextArea("", 2, 79)
             contentPromptTextArea = textAreaFactory
-                .createDefaultTextArea("Paste text, drag a file, copy folder path...", 10, 79)
+                .createDefaultTextArea("Paste text, drag a file, copy folder path, use Action, use Intention...", 10, 79)
             contentPromptTextArea?.name = "contentPromptTextArea"
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "",
                     5,
                     79,
-                    "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\images\\pluginIcon_BIG.png"
+                    "images/pluginIcon_BIG.png"
                 )
 
             if (contentPromptTextArea != null) {

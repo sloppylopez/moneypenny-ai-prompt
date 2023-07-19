@@ -12,14 +12,14 @@ class ComboBoxPanelFactory(project: Project) {
         innerPanel: JPanel,
         nestedPanel: JPanel
     ) {
-        val modelStrings = arrayOf("Davinci", "Curie", "Babbage", "Ada")
-        val models = ComboBox(modelStrings)
-        val selectedIndex = 0
-        models.selectedIndex = selectedIndex
+//        val modelStrings = arrayOf("Davinci", "Curie", "Babbage", "Ada")
+//        val models = ComboBox(modelStrings)
+//        val selectedIndex = 0
+//        models.selectedIndex = selectedIndex
 //        val languageStrings = arrayOf("Kotlin", "Python", "Java", "Javascript")
 //        val languages = ComboBox(languageStrings)
 //        languages.selectedIndex = selectedIndex
-        nestedPanel.add(models)
+//        nestedPanel.add(models)
 //        nestedPanel.add(languages)
 
         innerPanel.add(nestedPanel)
