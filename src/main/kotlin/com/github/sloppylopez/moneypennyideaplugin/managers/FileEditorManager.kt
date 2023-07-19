@@ -15,7 +15,7 @@ class FileEditorManager(private val project: Project) {
     fun openFileInEditor(
         filePath: String?, contentPromptText: String? = null
     ) {
-        resetFileEditorText()
+//        resetFileEditorText()
         if (filePath != null) {
             val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
             if (virtualFile != null) {

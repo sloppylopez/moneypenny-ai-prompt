@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
+import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.prompts
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
@@ -168,28 +169,16 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         return file?.let { FileEditorManager.getInstance(project).selectedTextEditor }
     }
 
-//    fun modifySelectedTextInEditor(newText: String) {
-//        val editor = getCurrentEditor()
-//        //TODO: Here we need to open the document first
-//        editor?.let {
-//            val document = editor.document
-//            val selectionModel = editor.selectionModel
-//            val startOffset = selectionModel.selectionStart
-//            val endOffset = selectionModel.selectionEnd
-//
-//            if (startOffset != endOffset) {
-//                document.replaceString(startOffset, endOffset, newText)
-//            }
-//        }
-//    }
-
-    fun modifySelectedTextInEditorByFile(newText: String, file: VirtualFile) {
+    fun modifySelectedTextInEditorByFile(
+        newText: ChatGptMessage,
+        file: VirtualFile,
+    ) {
         try {
             val project = this.getProject() ?: return
 
             ApplicationManager.getApplication().invokeLater {
                 val editorManager = FileEditorManager.getInstance(project)
-                val editor = editorManager.openTextEditor(OpenFileDescriptor(project, file), true)
+                val editor = editorManager.openTextEditor(OpenFileDescriptor(project, file), false)
                 editor?.let {
                     val document = editor.document
                     val selectionModel = editor.selectionModel
@@ -199,7 +188,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
                     if (startOffset != endOffset) {
                         ApplicationManager.getApplication().runWriteAction {
                             WriteCommandAction.runWriteCommandAction(project) {
-                                document.replaceString(startOffset, endOffset, newText)
+                                document.replaceString(0, document.textLength, newText.content)
                             }
                         }
                     }
@@ -257,9 +246,6 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
             thisLogger().error(e)
         }
     }
-
-    private fun getIsSnippet(normalizedFileContent: String?, normalizedSelectedText: String?) =
-        normalizedFileContent != null && normalizedSelectedText?.trim() != normalizedFileContent.trim()
 
     private fun getSelectedTextFromOpenedFileInEditor(
         selectedEditor: Editor
@@ -348,28 +334,10 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         }
     }
 
-    fun isSnippet(contentPromptText: String?, virtualFile: VirtualFile?): Boolean {
-        val normalizedSelectedText = contentPromptText?.replace("\r\n", "\n")
-        val normalizedFileContent =
-            virtualFile?.contentsToByteArray()?.toString(Charsets.UTF_8)?.replace("\r\n", "\n")
-        return this.getIsSnippet(normalizedFileContent, normalizedSelectedText)
-    }
-
     fun copyToClipboard(text: String? = null) {
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
         val stringSelection = StringSelection(text)
         clipboard.setContents(stringSelection, null)
-    }
-
-    fun getSelectedTabText(tabbedPane: JTabbedPane): String? {
-        val selectedTabIndex = tabbedPane.selectedIndex
-        if (selectedTabIndex != -1) {
-            val selectedTabTitle = tabbedPane.getTitleAt(selectedTabIndex)
-            if (!selectedTabTitle.isNullOrEmpty()) {
-                return tabNameToContentPromptTextMap[selectedTabTitle] ?: ""
-            }
-        }
-        return null
     }
 
     fun putUserDataInProject(fileList: List<*>) {
@@ -428,7 +396,6 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
 
                         }
                     }
-                    println("Found JBTabbedPane: $tabbedPane")
                 }
                 val promptsAsJson = getPromptsAsJson(prompts)
                 saveDataToExtensionFolder(promptsAsJson)

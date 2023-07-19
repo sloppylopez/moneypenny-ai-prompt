@@ -7,7 +7,6 @@ import com.google.gson.Gson
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBTabbedPane
 import net.minidev.json.JSONObject
 import java.io.File
 import java.net.URI
@@ -32,7 +31,7 @@ class ChatGPTService(project: Project) {
 
     fun sendChatPrompt(
         prompt: String,
-        tabbedPane: JBTabbedPane,
+        tabName: String,
         callback: ChatGptChoiceCallback
     ): CompletableFuture<ChatGptCompletion> {
         val requestBody = getRequestBodyJson(prompt)
@@ -43,7 +42,7 @@ class ChatGPTService(project: Project) {
                 gson.fromJson(responseBody, ChatGptCompletion::class.java)
             }
             .whenComplete { choice: ChatGptCompletion?, throwable: Throwable? ->
-                handleCompletion(choice, throwable, callback, tabbedPane)
+                handleCompletion(choice, throwable, callback, tabName)
             }
     }
 
@@ -64,18 +63,13 @@ class ChatGPTService(project: Project) {
         choice: ChatGptCompletion?,
         throwable: Throwable?,
         callback: ChatGptChoiceCallback,
-        tabbedPane: JBTabbedPane
+        tabName: String
     ) {
         if (throwable != null) {
             service.showNotification("Error", throwable.message!!)
             callback.onCompletion(ChatGptMessage("system", "Error: ${throwable.message}"))
         } else {
             val message = getMessage(choice)
-            val tabName = tabbedPane.getTitleAt(tabbedPane.selectedIndex)
-            service.modifySelectedTextInEditorByFile(
-                message.content,
-                service.fileToVirtualFile(File(tabNameToFilePathMap[tabName]!!))!!
-            )
             callback.onCompletion(message)
         }
     }
@@ -85,13 +79,13 @@ class ChatGPTService(project: Project) {
 
     private fun getRequestBodyJson(prompt: String): String {
         val promptLength = prompt.length
-        val maxTokenCount = 4096 - 1 - promptLength
+        val maxTokenCount = 16000 - 1 - promptLength
 
         val systemMessage = JSONObject().apply {
             put("role", "system")
             put(
                 "content",
-                "You are a helpful assistant. Always answer without explanations, return only code if possible"
+                "You are a code refactor assistant. Always answer without explanations, return only code if possible, respect imports and class names"
             )
         }
 
@@ -101,7 +95,7 @@ class ChatGPTService(project: Project) {
         }
 
         val jsonObject = JSONObject().apply {
-            put("model", "gpt-3.5-turbo")
+            put("model", "gpt-3.5-turbo-16k")
             put("messages", listOf(systemMessage, userMessage))
             put("max_tokens", maxTokenCount)
         }

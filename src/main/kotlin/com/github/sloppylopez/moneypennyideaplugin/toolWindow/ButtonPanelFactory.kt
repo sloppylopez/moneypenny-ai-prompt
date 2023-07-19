@@ -1,6 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
@@ -8,6 +9,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTabbedPane
+import java.io.File
 import javax.swing.*
 
 @Service(Service.Level.PROJECT)
@@ -37,11 +39,12 @@ class ButtonPanelFactory(project: Project) {
             progressBarFactory.addProgressBar(innerPanel, jProgressBar)
             val prompts = service.getPrompts()
             prompts?.forEach { (_, promptMap) ->
-                promptMap.forEach { (_, promptList) ->
+                promptMap.forEach { (tabName, promptList) ->
                     if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
+//                        val normalizedPromptList = promptList[1].replace("\r\n", "\n")
                         chatGPTService.sendChatPrompt(
                             promptList.joinToString(""),
-                            tabbedPane, createCallback()
+                            tabName, createCallback(tabName)
                         ).whenComplete { _, _ ->
                             progressBarFactory.removeProgressBar(panel, jProgressBar)
                         }
@@ -51,11 +54,16 @@ class ButtonPanelFactory(project: Project) {
         }
     }
 
-    private fun createCallback(): ChatGPTService.ChatGptChoiceCallback {
+    private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 service.copyToClipboard(choice.content)
                 service.showNotification("ChatGPT Response copied to clipboard: ", choice.content)
+                val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
+                service.modifySelectedTextInEditorByFile(
+                    choice,
+                    service.fileToVirtualFile(file)!!
+                )
             }
         }
     }
