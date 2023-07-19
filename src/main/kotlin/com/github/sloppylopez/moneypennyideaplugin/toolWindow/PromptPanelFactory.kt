@@ -5,7 +5,11 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBScrollPane
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -15,6 +19,7 @@ import java.awt.dnd.DropTargetAdapter
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Paths
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
@@ -78,6 +83,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             )
         }
     }
+
     //TODO this is too clever, split in 2
     fun openFilesAndSendContentToPrompt(fileList: List<*>? = null) {
         try {
@@ -88,6 +94,13 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 expandedFileList.forEach {
                     val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
                     service.highlightTextInEditor(fileContents)
+//                    val localFileSystem = LocalFileSystem.getInstance()
+//                    val file = localFileSystem.findFileByIoFile(it)
+//                    val filePath = Paths.get(file?.path!!)
+//                    val fileContents = String(Files.readAllBytes(filePath))
+//                    val openFileDescriptor = OpenFileDescriptor(project, file)
+//                    FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true)
+//                    service.highlightTextInEditor(fileContents, 0)//When we drop we always want to highlight
                 }
             }
         } catch (e: Exception) {
