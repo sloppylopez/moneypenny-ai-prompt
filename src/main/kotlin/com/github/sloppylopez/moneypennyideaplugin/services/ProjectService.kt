@@ -153,10 +153,11 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         val editor = getCurrentEditor()
         editor?.let {
             val document = editor.document
-            val textOffset = document.text.indexOf(contentPromptText)
+            val normalizedContentPromptText = contentPromptText.replace("\r\n", "\n")
+            val textOffset = document.text.indexOf(normalizedContentPromptText)
             if (textOffset != -1) {
                 editor.caretModel.moveToOffset(textOffset)
-                editor.selectionModel.setSelection(textOffset, textOffset + contentPromptText.length)
+                editor.selectionModel.setSelection(textOffset, textOffset + normalizedContentPromptText.length)
             }
         }
     }
