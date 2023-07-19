@@ -20,13 +20,13 @@
   <img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build">
   <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg" alt="Version"></a>
   <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a
-
+<div>
   <h1>MoneyPenny AI Prompt - Refactor Your Codebase with Ease</h1>
 
   <p>
     MoneyPenny AI Prompt is a powerful IntelliJ IDEA plugin designed to supercharge your code refactoring process. With this plugin, you can easily refactor any codebase by simply dragging and dropping files into the tool window text area prompt. MoneyPenny AI Prompt leverages the capabilities of ChatGPT to parallelize all requests, ensuring fast and efficient code transformations.
   </p>
-
+</div>
 <h2>Features</h2>
 
   <ul>
