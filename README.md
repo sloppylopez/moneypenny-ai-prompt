@@ -13,7 +13,7 @@
     </p>
 </div>
 
-<h2>Refactor Your Codebase with Ease at Full Speed!</h2>
+<h2>Prompt Driven Development at it's finest</h2>
 
   <img src="src/main/resources/images/MoneyPenny_ToolWindow_Prompt.png" alt="Prompt">
 
