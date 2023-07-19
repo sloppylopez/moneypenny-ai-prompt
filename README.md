@@ -55,7 +55,9 @@
       <li>In IntelliJ IDEA, go to <strong>Settings/Preferences</strong> &gt; <strong>Plugins</strong> &gt; ⚙️ &gt; <strong>Install plugin from disk...</strong>.</li>
       <li>Select the downloaded JAR file of MoneyPenny AI Prompt and click <strong>OK</strong>.</li>
     </ol>
+
   </ul>
+    <p><em>Obseve you need and enviroment var in your machine called OPENAI_API_KEY with the key to your ChatGpt Key, if not plugin won't work</em></p>
 
   <hr>
 
