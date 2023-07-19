@@ -188,7 +188,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
                     if (startOffset != endOffset) {
                         ApplicationManager.getApplication().runWriteAction {
                             WriteCommandAction.runWriteCommandAction(project) {
-                                document.replaceString(0, document.textLength, newText.content)
+                                document.replaceString(startOffset, endOffset, newText.content)
                             }
                         }
                     }
