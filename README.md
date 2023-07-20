@@ -101,28 +101,15 @@
 
 <h2>Idea Plugin Description</h2>
 <!-- Plugin description -->
-MoneyPenny AI Prompt - Prompt Driven Development
+Experience the future of Prompt Driven Development (PDD) coding with MoneyPenny AI Prompt, the ultimate IntelliJ IDEA plugin designed to elevate your coding experience to new heights. Standout features include:
 
-Experience the future of PDD coding with MoneyPenny AI Prompt, the ultimate IntelliJ IDEA plugin, designed to elevate
-your coding experience to new heights. Here's why MoneyPenny stands out from the competition:
+* Multi-File Refactoring: Save valuable time and effort by refactoring, adding, or modifying multiple files simultaneously - a capability lacking in Copilot X.
+* Faster Responses, No Typewriter Effect: Enjoy lightning-fast responses without the typewriter effect, ensuring a seamless coding flow. MoneyPenny AI Prompt prioritizes speed over web chat-based solutions.
+* 16000 Token Contextual Prompt: Tap into the extensive context of the ChatGPT model for smarter, contextually relevant coding suggestions, surpassing standard web chatbots' limitations.
+* Seamless Integration & Intelligence: Effortlessly integrate MoneyPenny AI Prompt into IntelliJ IDEA, enhancing your coding experience with intelligent code completions and predictive assistance.
+* Continuous Evolution: Expect continuous improvement as MoneyPenny AI Prompt evolves with the latest advancements in AI and coding practices.
 
-Multi-File Refactoring: Refactor, add, or modify multiple files simultaneously, saving valuable time and effort. Copilot
-X lacks this powerful capability.
-
-Faster Responses, No Typewriter Effect: Enjoy lightning-fast responses without the annoying typewriter effect, providing
-a seamless coding flow. Unlike web chat-based solutions, MoneyPenny AI Prompt prioritizes speed.
-
-16000k Contextual Prompt: Our plugin taps into the extensive context of the ChatGPT model, delivering smarter,
-contextually relevant coding suggestions, surpassing the limitations of standard web chatbots.
-
-Seamless Integration & Intelligence: MoneyPenny AI Prompt effortlessly integrates into IntelliJ IDEA, enhancing your
-coding experience with intelligent code completions and predictive assistance.
-
-Continuous Evolution: We're committed to continuous improvement, ensuring MoneyPenny AI Prompt evolves with the latest
-advancements in AI and coding practices.
-
-Download MoneyPenny AI Prompt now and unlock the power of AI in your coding workflow, leaving other plugins and
-competitors in the dust. Elevate your coding efficiency and create brilliance with ease.
+Download MoneyPenny AI Prompt now to unlock the power of AI in your coding workflow, surpassing other plugins and competitors. Elevate your coding efficiency and create brilliance with ease.
 <!-- Plugin description end -->
 </body>
 </html>

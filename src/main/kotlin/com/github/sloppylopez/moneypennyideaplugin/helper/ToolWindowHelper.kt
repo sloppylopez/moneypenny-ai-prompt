@@ -127,7 +127,7 @@ class ToolWindowHelper {
 
         private fun getDisplayName(expandedFileList: List<File>): String {
             val prefix = if (expandedFileList.isEmpty()) "Prompt" else
-                "${expandedFileList.size} Arch"
+                "${expandedFileList.size} Archive${if (expandedFileList.size > 1) "s" else ""}"
             return "${getNextTabName()}) $prefix"
         }
 

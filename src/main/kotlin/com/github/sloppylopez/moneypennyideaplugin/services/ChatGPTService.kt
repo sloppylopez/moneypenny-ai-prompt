@@ -2,15 +2,12 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.google.gson.Gson
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import net.minidev.json.JSONObject
-import java.io.File
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -31,7 +28,6 @@ class ChatGPTService(project: Project) {
 
     fun sendChatPrompt(
         prompt: String,
-        tabName: String,
         callback: ChatGptChoiceCallback
     ): CompletableFuture<ChatGptCompletion> {
         val requestBody = getRequestBodyJson(prompt)
@@ -42,14 +38,14 @@ class ChatGPTService(project: Project) {
                 gson.fromJson(responseBody, ChatGptCompletion::class.java)
             }
             .whenComplete { choice: ChatGptCompletion?, throwable: Throwable? ->
-                handleCompletion(choice, throwable, callback, tabName)
+                handleCompletion(choice, throwable, callback)
             }
     }
 
     private fun createHttpRequest(requestBody: String): HttpRequest =
         HttpRequest.newBuilder()
             .uri(URI.create("https://api.openai.com/v1/chat/completions"))
-            .timeout(Duration.ofSeconds(60))
+            .timeout(Duration.ofSeconds(30))
             .header("Authorization", "Bearer $apiKey")
             .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
@@ -62,8 +58,7 @@ class ChatGPTService(project: Project) {
     private fun handleCompletion(
         choice: ChatGptCompletion?,
         throwable: Throwable?,
-        callback: ChatGptChoiceCallback,
-        tabName: String
+        callback: ChatGptChoiceCallback
     ) {
         if (throwable != null) {
             service.showNotification("Error", throwable.message!!)

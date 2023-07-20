@@ -88,10 +88,10 @@ class ButtonPanelFactory(project: Project) {
             progressBarFactory.addProgressBar(innerPanel, jProgressBar)
             val prompts = getPrompts()
             val promptList = service.getPromptListByKey(prompts!!, tabName)
-            if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
+            if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {//TODO here we can wrap promptList[1] with this symbol ``` to improve chatGpt returning code in the proper format always
                 chatGPTService.sendChatPrompt(
                     promptList.joinToString("\n"),
-                    tabName, createCallback(tabName)
+                    createCallback(tabName)
                 ).whenComplete { _, _ ->
                     progressBarFactory.removeProgressBar(panel, jProgressBar)
                 }
@@ -106,10 +106,10 @@ class ButtonPanelFactory(project: Project) {
             val prompts = getPrompts()
             prompts?.forEach { (_, promptMap) ->
                 promptMap.forEach { (tabName, promptList) ->
-                    if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
+                    if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {//TODO here we can wrap promptList[1] with this symbol ``` to improve chatGpt returning code in the proper format always
                         chatGPTService.sendChatPrompt(
                             promptList.joinToString("\n"),
-                            tabName, createCallback(tabName)
+                            createCallback(tabName)
                         ).whenComplete { _, _ ->
                             progressBarFactory.removeProgressBar(panel, jProgressBar)
                         }
