@@ -10,7 +10,7 @@
     <change-notes><![CDATA[
         <p>Initial release of MoneyPenny AI plugin for IntelliJ IDEA</p>
     ]]></change-notes>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <idea-version since-build="2023.*" />
 
     <depends>com.intellij.modules.platform</depends>

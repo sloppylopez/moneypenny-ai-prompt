@@ -47,9 +47,8 @@ import javax.swing.*
 import kotlin.collections.ArrayList
 
 @Service(Service.Level.PROJECT)
-class ProjectService(project: Project? = ProjectManager.getInstance().openProjects[0]) {
+class ProjectService {
     private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
-    private val gitService = project?.service<GitService>()
     private val pluginId = "MoneyPenny AI"
 
     fun getFileContents(filePath: String?) = filePath?.let {
@@ -358,72 +357,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
         content.getUserData(key)
     }
 
-    fun getPrompts(): MutableMap<String, Map<String, List<String>>>? {
-        prompts.clear()
-        val contentManager = getToolWindow()?.contentManager
-        val contentCount = contentManager?.contentCount
-        val textAreas = mutableListOf<String>()
-
-        for (i in 0 until contentCount!!) {
-            val content = contentManager.getContent(i)
-            val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
-            if (simpleToolWindowPanel != null) {
-                val jBTabbedPanes = mutableListOf<JBTabbedPane>()
-                simpleToolWindowPanel.components.forEach { component ->
-                    jBTabbedPanes.addAll(findJBTabbedPanes(component as Container))
-                }
-
-                // Find nested JBTabbedPane instances within each JBTabbedPane
-                val nestedJBTabbedPanes = mutableListOf<JBTabbedPane>()
-                jBTabbedPanes.forEach { tabbedPane ->
-                    nestedJBTabbedPanes.addAll(findNestedJBTabbedPanes(tabbedPane))
-                }
-
-                // Use the found JBTabbedPane instances (including nested ones)
-                for (tabbedPane in nestedJBTabbedPanes) {
-                    // Perform operations on each JBTabbedPane
-                    for (e in 0 until tabbedPane.tabCount) {
-                        val tabComponents = (tabbedPane.getComponentAt(e) as Container).components[1] as Container
-                        tabComponents.components.forEach { tabComponent ->
-                            if (tabComponent is JScrollPane) {
-                                val textArea = tabComponent.viewport.view as? JTextArea
-                                textArea?.let {
-                                    textAreas.add(it.text)
-                                    val tabName = tabbedPane.getTitleAt(e)
-                                    extractPromptInfo(tabName, textAreas, e, it.text)
-                                }
-                            }
-
-                        }
-                    }
-                }
-                val promptsAsJson = getPromptsAsJson(prompts)
-                saveDataToExtensionFolder(promptsAsJson)
-                return prompts
-            }
-        }
-        return null
-    }
-
-    private fun extractPromptInfo(
-        tabName: String,
-        textAreas: MutableList<String>,
-        index: Int,
-        text: String
-    ) {
-        try {
-            val shortSha = gitService?.getShortSha(tabNameToFilePathMap[tabName]) ?: index.toString()
-            val promptMap = prompts.getOrDefault(shortSha, mutableMapOf())
-            val promptList = promptMap.getOrDefault(tabName, listOf())
-            prompts[shortSha] = promptMap + (tabName to promptList.plus(text))
-            textAreas.add(text)
-        } catch (e: Exception) {
-            thisLogger().error(e.stackTraceToString())
-
-        }
-    }
-
-    private fun findNestedJBTabbedPanes(tabbedPane: JBTabbedPane): List<JBTabbedPane> {
+    fun findNestedJBTabbedPanes(tabbedPane: JBTabbedPane): List<JBTabbedPane> {
         val nestedTabbedPanes = mutableListOf<JBTabbedPane>()
 
         fun findNestedTabbedPanesRecursive(container: Container) {
@@ -442,7 +376,7 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
     }
 
 
-    private fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
+    fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
         val tabbedPanes = mutableListOf<JBTabbedPane>()
 
         fun findTabbedPanesRecursive(component: Component) {
@@ -460,11 +394,11 @@ class ProjectService(project: Project? = ProjectManager.getInstance().openProjec
     }
 
 
-    private fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
+    fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
         return Gson().toJson(prompts)
     }
 
-    private fun saveDataToExtensionFolder(data: String) {
+    fun saveDataToExtensionFolder(data: String) {
         val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
         if (!extensionFolder.exists()) {
             extensionFolder.mkdir()
