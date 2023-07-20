@@ -17,7 +17,7 @@
   <img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build">
   <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg" alt="Version"></a>
   <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a
-
+<div>
 <h2>Unrivaled Features</h2>
 
 <ul>
@@ -28,7 +28,7 @@
   <li>Seamless Integration: Effortlessly integrates into IntelliJ IDEA.</li>
   <li>Wide Range of Operations: Choose files and apply various operations.</li>
 </ul>
-
+</div>
 <p>Download MoneyPenny AI Prompt now and become a 10x developer with AI-powered coding efficiency.</p>
 
 <p>Experience unparalleled advantages today, leaving competitors behind. Unlock the true power of AI in your coding workflow and create brilliance effortlessly. Elevate your coding prowess with intelligent completions and achieve more in less time. Get started on your transformative coding journey with MoneyPenny AI Prompt - the ultimate IntelliJ IDEA plugin for 10x developers.</p>
