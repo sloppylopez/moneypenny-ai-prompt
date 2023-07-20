@@ -54,31 +54,31 @@ class RadioButtonFactory {
     ) {
         when (option) {
             "Refactor" -> {
-                prePromptTextArea.text = "Refactor Code:\n"
+                prePromptTextArea.text = "Refactor Code:"
             }
 
             "Fix" -> {
-                prePromptTextArea.text = "Fix Code:\n"
+                prePromptTextArea.text = "Fix Code:"
             }
 
             "Unit" -> {
-                prePromptTextArea.text = "Write Unit Test for Code:\n"
+                prePromptTextArea.text = "Write Unit Test for Code:"
             }
 
             "E2E" -> {
-                prePromptTextArea.text = "Write E2E for Code:\n"
+                prePromptTextArea.text = "Write E2E for Code:"
             }
 
             "As Reference" -> {
-                prePromptTextArea.text = "Using this code as reference:\n"
+                prePromptTextArea.text = "Using this code as reference:"
             }
 
             "Explain" -> {
-                prePromptTextArea.text = "Explain Code:\n"
+                prePromptTextArea.text = "Explain Code:"
             }
 
             "Find Bugs" -> {
-                prePromptTextArea.text = "Code:\n"
+                prePromptTextArea.text = "Code:"
             }
 
             "FreeStyle" -> {

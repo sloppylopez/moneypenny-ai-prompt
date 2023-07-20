@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
@@ -17,14 +18,15 @@ class ButtonPanelFactory(project: Project) {
     private val service = project.service<ProjectService>()
     private val chatGPTService = project.service<ChatGPTService>()
     private val progressBarFactory = project.service<ProgressBarFactory>()
+    private val isChatGptActive = apiKey?.isNotEmpty() ?: false
 
     fun buttonPanel(panel: JPanel, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
         addButtonRun(panel, "Run", innerPanel, tabbedPane)
         addButtonRunAll(panel, "Run All", innerPanel)
-        addButtonCopyPrompt(panel, "Copy Prompt", innerPanel, tabbedPane)
+        addButtonCopyPrompt(panel, "Copy Prompt", tabbedPane)
     }
 
-    private fun addButtonCopyPrompt(panel: JPanel, text: String, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
+    private fun addButtonCopyPrompt(panel: JPanel, text: String, tabbedPane: JBTabbedPane) {
         try {
             val button = JButton(text)
             panel.add(button)
@@ -51,6 +53,10 @@ class ButtonPanelFactory(project: Project) {
         try {
             val button = JButton(text)
             panel.add(button)
+            // Assuming isChatGptActive is a boolean variable indicating the active state of ChatGPT
+            if (!isChatGptActive) {
+                button.isEnabled = false
+            }
             addListener(button, panel, innerPanel, tabbedPane)
         } catch (e: Exception) {
             thisLogger().error(e)
@@ -61,6 +67,10 @@ class ButtonPanelFactory(project: Project) {
         try {
             val button = JButton(text)
             panel.add(button)
+            // Assuming isChatGptActive is a boolean variable indicating the active state of ChatGPT
+            if (!isChatGptActive) {
+                button.isEnabled = false
+            }
             addListenerRunAll(button, panel, innerPanel)
         } catch (e: Exception) {
             thisLogger().error(e)

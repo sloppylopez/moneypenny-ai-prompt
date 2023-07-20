@@ -2,6 +2,8 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.google.gson.Gson
 import com.intellij.openapi.components.Service
@@ -20,13 +22,11 @@ import java.util.concurrent.CompletableFuture
 @Service(Service.Level.PROJECT)
 class ChatGPTService(project: Project) {
     private val service: ProjectService
-    private val apiKey = System.getenv("OPENAI_API_KEY")
     private val client = HttpClient.newBuilder().build()
     private val gson = Gson()
 
     init {
         service = project.service<ProjectService>()
-        requireNotNull(apiKey) { "API key not found in environment variables." }
     }
 
     fun sendChatPrompt(
