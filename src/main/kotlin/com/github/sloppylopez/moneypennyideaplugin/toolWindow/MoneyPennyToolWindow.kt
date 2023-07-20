@@ -89,17 +89,17 @@ class MoneyPennyToolWindow(
         if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
-            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
+            1 -> {
+                val buttonPanelFactory = ButtonPanelFactory(service.getProject()!!)
+                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel, tabbedPane)
+            }
 
             2 -> {
                 promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
                 service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
             }
 
-            1 -> {
-                val buttonPanelFactory = ButtonPanelFactory(service.getProject()!!)
-                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel, tabbedPane)
-            }
+            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
         }
         return innerPanel
     }

@@ -21,15 +21,19 @@ class TextAreaFactory {
         }
     }
 
-    fun createDefaultTextArea(
-        text: String,
-        rows: Int,
-        columns: Int,
-        imageBackground: String? = null,
-        textArea: JTextArea? = this.createTextArea(text, rows, columns, imageBackground)
-    ): JTextArea {
-        val padding = JBUI.insets(5) // Adjust the padding values as needed
-        textArea?.border = BorderFactory.createEmptyBorder(padding.top, padding.left, padding.bottom, padding.right)
-        return textArea!!
-    }
+fun createDefaultTextArea(
+    text: String,
+    rows: Int,
+    columns: Int,
+    imageBackground: String? = null,
+    textArea: JTextArea? = this.createTextArea(text, rows, columns, imageBackground)
+): JTextArea {
+    val padding = JBUI.insets(5) // Adjust the padding values as needed
+    val border = BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(JBColor.GRAY, 1, true),
+        BorderFactory.createEmptyBorder(padding.top, padding.left, padding.bottom, padding.right)
+    )
+    textArea?.border = border
+    return textArea!!
+}
 }

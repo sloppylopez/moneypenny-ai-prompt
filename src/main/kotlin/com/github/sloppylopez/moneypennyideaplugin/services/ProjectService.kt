@@ -1,9 +1,9 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.prompts
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
@@ -15,7 +15,6 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -24,7 +23,6 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -129,16 +127,24 @@ class ProjectService {
 
     fun showNotification(
         @NlsSafe title: String,
-        @NlsSafe message: String
+        @NlsSafe message: String,
+        notificationType: NotificationType?,
+        customIcon: Icon? = null,
+        imageName: String? = null
     ) {
         val notification = Notification(
             "MoneyPenny",
             title,
             message,
-            NotificationType.INFORMATION
+            notificationType ?: NotificationType.INFORMATION
         )
-
+        notification.setIcon(customIcon ?: createRandomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13.jpg"))
         Notifications.Bus.notify(notification, this.getProject()!!)
+    }
+
+    private fun createRandomIcon(imageName: String): Icon {
+        // Code to generate a random image and create an icon from it
+        return ImageIcon(SendToPromptFileFolderTreeAction::class.java.getResource(imageName))
     }
 
     fun showMessage(

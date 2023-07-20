@@ -6,6 +6,7 @@ import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.GitService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -23,6 +24,7 @@ class ButtonPanelFactory(project: Project) {
     private val chatGPTService = project.service<ChatGPTService>()
     private val progressBarFactory = project.service<ProgressBarFactory>()
     private val isChatGptActive = apiKey?.isNotEmpty() ?: false
+    private val copiedMessage = "MoneyPenny AI: Response copied to clipboard: "
 
     fun buttonPanel(panel: JPanel, innerPanel: JPanel, tabbedPane: JBTabbedPane) {
         addButtonRun(panel, "Run", innerPanel, tabbedPane)
@@ -48,7 +50,11 @@ class ButtonPanelFactory(project: Project) {
             if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
                 val promptsText = promptList.joinToString("\n")
                 service.copyToClipboard(promptsText)
-                service.showNotification("ChatGPT Response copied to clipboard: ", promptsText)
+                service.showNotification(
+                    copiedMessage,
+                    promptsText,
+                    NotificationType.INFORMATION
+                )
             }
         }
     }
@@ -123,7 +129,11 @@ class ButtonPanelFactory(project: Project) {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 service.copyToClipboard(choice.content)
-                service.showNotification("ChatGPT Response copied to clipboard: ", choice.content)
+                service.showNotification(
+                    copiedMessage,
+                    choice.content,
+                    NotificationType.INFORMATION
+                )
                 val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
                 service.modifySelectedTextInEditorByFile(
                     choice,

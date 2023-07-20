@@ -41,7 +41,11 @@ class CheckBoxFactory {
 
     private fun updatePostPromptText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
         if (selectedCheckBox.isSelected && !selectedCheckBox.text.isNullOrBlank()) {
-            postPromptTextArea.append("${selectedCheckBox.text} \n")
+            if(selectedCheckBox.text.equals("With")) {
+                postPromptTextArea.append("Answer with an explanation \n")//This to allow to ask freeStyle questions to ChatGpt, if no it will answer "My role is to answer always with code blablabla"
+            } else {
+                postPromptTextArea.append("${selectedCheckBox.text} \n")
+            }
         } else {
             removeLineFromPrompt(selectedCheckBox, postPromptTextArea)
         }

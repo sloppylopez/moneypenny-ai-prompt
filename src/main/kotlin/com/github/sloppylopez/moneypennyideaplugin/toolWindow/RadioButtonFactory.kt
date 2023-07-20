@@ -74,7 +74,7 @@ class RadioButtonFactory {
             }
 
             "Explain" -> {
-                prePromptTextArea.text = "Explain Code:"
+                prePromptTextArea.text = "Explain this:"
             }
 
             "Find Bugs" -> {
@@ -82,7 +82,7 @@ class RadioButtonFactory {
             }
 
             "FreeStyle" -> {
-                prePromptTextArea.text = ""
+                prePromptTextArea.text = "Answer this:"
             }
 
             else -> {

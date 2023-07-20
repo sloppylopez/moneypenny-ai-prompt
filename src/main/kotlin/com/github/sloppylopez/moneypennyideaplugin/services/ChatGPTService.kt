@@ -4,6 +4,7 @@ import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
 import com.google.gson.Gson
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -61,7 +62,7 @@ class ChatGPTService(project: Project) {
         callback: ChatGptChoiceCallback
     ) {
         if (throwable != null) {
-            service.showNotification("Error", throwable.message!!)
+            service.showNotification("Error", throwable.message!!, NotificationType.INFORMATION)
             callback.onCompletion(ChatGptMessage("system", "Error: ${throwable.message}"))
         } else {
             val message = getMessage(choice)
@@ -80,7 +81,7 @@ class ChatGPTService(project: Project) {
             put("role", "system")
             put(
                 "content",
-                "You are a code refactor assistant. Always answer without explanations, return only code if possible, respect imports and class names"
+                "You are a code refactor assistant. Always answer without explanations unless explicitly told so, return only code if possible, respect imports and class names"
             )
         }
 
