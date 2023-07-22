@@ -28,7 +28,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
     override fun actionPerformed(e: AnActionEvent) {
         editor?.let { editor ->
             file?.let { file: VirtualFile ->
-                    service?.sendFileToContentPrompt(
+                service?.sendFileToContentPrompt(
                     editor,
                     service.virtualFileToFile(file)
                 )
@@ -42,7 +42,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
         val fileEditorManager = FileEditorManager.getInstance(project!!)
         editor = fileEditorManager.selectedTextEditor
         file = fileEditorManager.selectedFiles.firstOrNull()//With this we get the selected file from the file editor
-        e.presentation.isEnabled = editor != null && file != null
+        e.presentation.isEnabled = true
     }
 
     fun registerFileEditorAction() {
@@ -60,5 +60,9 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
         val defaultActionGroup = popupMenu as? DefaultActionGroup
         defaultActionGroup?.addSeparator()
         defaultActionGroup?.add(sendToPromptTextEditorAction, Constraints.FIRST)
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.EDT
     }
 }
