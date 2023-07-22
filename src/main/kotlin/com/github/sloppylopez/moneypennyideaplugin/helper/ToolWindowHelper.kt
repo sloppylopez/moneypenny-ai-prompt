@@ -6,6 +6,9 @@ import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabCounter
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -18,6 +21,7 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManager
 import java.io.File
 import javax.swing.ImageIcon
+import javax.swing.JComponent
 
 class ToolWindowHelper {
     companion object {
@@ -45,7 +49,6 @@ class ToolWindowHelper {
                     service,
                     selectedText
                 )
-//                service.putUserDataInComponent(fileList!!, contentTab)
                 //Add content tab to tabbed pane
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
                 tabbedPane.selectedIndex = tabCounter - 1
@@ -55,6 +58,16 @@ class ToolWindowHelper {
                     tabbedPane.setTabComponentAt(i, tabComponent)
                 }
                 toolWindowContent.setContent(tabbedPane)
+                val actionGroup = DefaultActionGroup()
+                actionGroup.add(SendToPromptFileFolderTreeAction(service.getProject()!!))
+                actionGroup.addSeparator()
+                val toolBar = ActionManager.getInstance().createActionToolbar(
+                    "MoneyPennyAI.MainPanel",
+                    actionGroup,
+                    true
+                )
+//                toolBar.targetComponent = toolWindow.component
+                toolWindowContent.toolbar = toolBar.component
                 // Add a change listener to handle tab close events
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
             } catch (e: Exception) {
@@ -94,7 +107,6 @@ class ToolWindowHelper {
                         true
                     )
             }
-//            service.putUserDataInComponent(fileList, contentTab)
             return contentTab
         }
 
