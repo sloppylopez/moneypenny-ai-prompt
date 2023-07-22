@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.intellij.notification.*
 import com.intellij.openapi.components.Service
 import java.awt.event.ActionEvent
@@ -16,7 +17,7 @@ class RadioButtonFactory {
         prePromptTextArea: JTextArea
     ) {
         val radioButtonPanel = JPanel()
-        val buttonLabels = arrayOf("Refactor", "Fix", "Unit", "E2E", "As Reference", "Explain", "FreeStyle")
+        val buttonLabels = arrayOf("Refactor", "Modify", "Fix", "Unit", "E2E", "As Reference", "Explain", "FreeStyle")
 
         val actionListener = ActionListener { event ->
             val selectedRadioButton = event.source as? JRadioButton
@@ -25,6 +26,9 @@ class RadioButtonFactory {
                     selectedRadioButton.text,
                     prePromptTextArea
                 )
+                if (selectedRadioButton.text.equals("FreeStyle")) {
+                    GlobalData.explanationButton?.isSelected = true
+                }
             }
         }
         val radioGroup = ButtonGroup()
@@ -55,6 +59,10 @@ class RadioButtonFactory {
         when (option) {
             "Refactor" -> {
                 prePromptTextArea.text = "Refactor Code:"
+            }
+
+            "Modify" -> {
+                prePromptTextArea.text = "Modify Code:"
             }
 
             "Fix" -> {
