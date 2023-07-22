@@ -22,8 +22,8 @@ class CheckBoxFactory {
             if (label == "DRY") {
                 updatePostPromptText(checkBox, postPromptTextArea)
             }
-            if(label == "Explanation"){
-               GlobalData.explanationButton = checkBox
+            if (label == "Explanation") {
+                GlobalData.explanationButton = checkBox
             }
         }
 
@@ -34,7 +34,7 @@ class CheckBoxFactory {
         val checkBox = JCheckBox(text, selected)
 
         checkBox.addActionListener { event ->
-            val selectedCheckBox = event.source as? JCheckBox
+            val selectedCheckBox = event.source as? JCheckBox ?: GlobalData.explanationButton
             selectedCheckBox?.let {
                 updatePostPromptText(selectedCheckBox, postPromptTextArea)
             }

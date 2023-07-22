@@ -42,7 +42,7 @@ import java.io.File
 import java.io.FileReader
 import java.util.*
 import javax.swing.*
-import kotlin.collections.ArrayList
+
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
@@ -428,4 +428,19 @@ class ProjectService {
         val dataFile = File(extensionFolder, "prompt_history.txt")
         return dataFile.readText()
     }
+
+//    fun createToolBar(toolWindow: JComponent?): JComponent {
+//        val actionGroup = DefaultActionGroup()
+//        actionGroup.add(SendToPromptFileFolderTreeAction(this.getProject()!!))
+//        actionGroup.addSeparator()
+//        val actionManager: ActionManager = ActionManager.getInstance()
+//        val toolbar: ActionToolbar = actionManager.createActionToolbar("MoneyPennyAI.MainPanel", actionGroup, true)
+//        toolbar.targetComponent = toolWindow
+//        return toolbar.component
+//    }
+
+//    JOptionPane.showMessageDialog(
+//    this@SQLPluginPanel, "Can't read file '$file'", "Error",
+//    JOptionPane.ERROR_MESSAGE
+//    )
 }

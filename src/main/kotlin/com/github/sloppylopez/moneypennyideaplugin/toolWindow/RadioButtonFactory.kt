@@ -28,6 +28,9 @@ class RadioButtonFactory {
                 )
                 if (selectedRadioButton.text.equals("FreeStyle")) {
                     GlobalData.explanationButton?.isSelected = true
+                    GlobalData.explanationButton?.let { explanationButton ->
+                        explanationButton.actionListeners.forEach { it.actionPerformed(event) }
+                    }
                 }
             }
         }
@@ -50,7 +53,6 @@ class RadioButtonFactory {
 
         panel.add(radioButtonPanel)
     }
-
 
     private fun radioButtonPressed(
         option: String,

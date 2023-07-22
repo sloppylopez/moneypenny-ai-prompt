@@ -15,8 +15,8 @@
 
   <img src="src/main/resources/images/img.png" alt="Prompt">
   <img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build">
-  <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg" alt="Version"></a>
-  <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a
+  <a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg" alt="Version"></a>
+  <a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a
 <div>
 <h2>Unrivaled Features</h2>
 
