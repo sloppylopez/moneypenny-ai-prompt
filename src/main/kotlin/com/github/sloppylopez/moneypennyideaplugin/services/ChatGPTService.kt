@@ -46,7 +46,7 @@ class ChatGPTService(project: Project) {
     private fun createHttpRequest(requestBody: String): HttpRequest =
         HttpRequest.newBuilder()
             .uri(URI.create("https://api.openai.com/v1/chat/completions"))
-            .timeout(Duration.ofSeconds(30))
+            .timeout(Duration.ofSeconds(60))
             .header("Authorization", "Bearer $apiKey")
             .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
@@ -97,6 +97,18 @@ class ChatGPTService(project: Project) {
         }
 
         return jsonObject.toString()
+    }
+
+    fun getAvailableModels(): CompletableFuture<String> {
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.openai.com/v1/engines"))
+            .timeout(Duration.ofSeconds(30))
+            .header("Authorization", "Bearer $apiKey")
+            .GET()
+            .build()
+
+        return sendAsyncRequest(request)
+            .thenApply { obj: HttpResponse<String>? -> obj?.body() }
     }
 
     interface ChatGptChoiceCallback {
