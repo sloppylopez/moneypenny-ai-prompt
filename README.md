@@ -89,6 +89,7 @@
     <li><a href="https://plugins.jetbrains.com/docs/intellij/psi-files.html#how-do-i-get-a-psi-file">Psi files</a></li>
     <li><a href="https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html?from=jetbrains.org#bundled-and-other-plugins">Plugins Support</a></li>
     <li><a href="https://mediamodifier.com/svg-editor#">Svg Editor</a></li>
+    <li><a href="https://jetbrains.design/intellij/controls/toolbar/">Idea ToolBar Component</a></li>
   </ul>
 
 <h2>Contributing</h2>

@@ -1,15 +1,22 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
+import com.github.sloppylopez.moneypennyideaplugin.actions.CopyPromptAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.RunAllPromptAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.RunPromptAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.google.gson.Gson
 import com.intellij.icons.AllIcons
+import com.intellij.ide.CommonActionsManager
 import com.intellij.notification.*
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
@@ -20,9 +27,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
+import com.intellij.openapi.keymap.impl.ui.ActionsTree
+import com.intellij.openapi.keymap.impl.ui.KeymapPanel.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -33,9 +43,8 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
-import java.awt.Component
-import java.awt.Container
-import java.awt.Toolkit
+import com.intellij.util.ui.components.BorderLayoutPanel
+import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 import java.io.File
@@ -133,16 +142,16 @@ class ProjectService {
         imageName: String? = null
     ) {
         val notification = Notification(
-            "MoneyPenny",
+            "MoneyPennyAI",
             title,
             message,
             notificationType ?: NotificationType.INFORMATION
         )
-        notification.setIcon(customIcon ?: createRandomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13.jpg"))
+        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13.jpg"))
         Notifications.Bus.notify(notification, this.getProject()!!)
     }
 
-    private fun createRandomIcon(imageName: String): Icon {
+    private fun createCustomIcon(imageName: String): Icon {
         // Code to generate a random image and create an icon from it
         return ImageIcon(SendToPromptFileFolderTreeAction::class.java.getResource(imageName))
     }
@@ -423,6 +432,102 @@ class ProjectService {
         return emptyList()
     }
 
+    fun addToolBar(toolWindowContent: SimpleToolWindowPanel) {
+        val actionGroup = DefaultActionGroup()
+        val project = this.getProject()!!
+        actionGroup.add(SendToPromptFileFolderTreeAction(project))
+        actionGroup.add(RunPromptAction(project))
+        actionGroup.add(RunAllPromptAction(project))
+        actionGroup.add(CopyPromptAction(project))
+        actionGroup.addSeparator()
+
+        val toolBar = ActionManager.getInstance().createActionToolbar(
+            "MoneyPennyAI.MainPanel",
+            actionGroup,
+            true // Specify that the toolbar should be vertical
+        )
+        toolWindowContent.toolbar = toolBar.component
+    }
+
+    fun createToolbarPanel(toolWindowContent: SimpleToolWindowPanel) {
+        val myActionsTree = ActionsTree()
+        var group = DefaultActionGroup()
+        val toolbar = ActionManager.getInstance().createActionToolbar("MoneyPennyAI.MainPanel", group, true)
+        toolbar.targetComponent = myActionsTree.tree
+        val commonActionsManager = CommonActionsManager.getInstance()
+        val treeExpander = createTreeExpander(myActionsTree)
+        group.add(commonActionsManager.createExpandAllAction(treeExpander, myActionsTree.tree))
+        group.add(commonActionsManager.createCollapseAllAction(treeExpander, myActionsTree.tree))
+//        group.add(EditShortcutAction())
+//        myShowOnlyConflictsButton = object : ToggleActionButton(
+//            KeyMapBundle.messagePointer("keymap.show.system.conflicts"),
+//            AllIcons.General.ShowWarning
+//        ) {
+//            override fun isSelected(e: AnActionEvent): Boolean {
+//                return myShowOnlyConflicts
+//            }
+//
+//            override fun setSelected(e: AnActionEvent, state: Boolean) {
+//                myShowOnlyConflicts = state
+//                myActionsTree.setBaseFilter(
+//                    if (myShowOnlyConflicts) SystemShortcuts.getInstance().createKeymapConflictsActionFilter() else null
+//                )
+//                myActionsTree.filter(null, myQuickLists)
+//                val tree: JTree = myActionsTree.getTree()
+//                if (myShowOnlyConflicts) {
+//                    TreeUtil.expandAll(tree)
+//                } else {
+//                    TreeUtil.collapseAll(tree, 0)
+//                }
+//            }
+//        }
+//        group.add(myShowOnlyConflictsButton)
+        group = DefaultActionGroup()
+        val actionToolbar = ActionManager.getInstance().createActionToolbar("Keymap", group, true)
+        actionToolbar.targetComponent = myActionsTree.tree
+        actionToolbar.setReservePlaceAutoPopupIcon(false)
+        val searchToolbar = actionToolbar.component
+        //TODO use alarms to cancel requests to chatGPT as
+//        val alarm = Alarm()
+//        myFilterComponent = object : FilterComponent("KEYMAP", 5) {
+//            override fun filter() {
+//                alarm.cancelAllRequests()
+//                alarm.addRequest({
+//                    if (!myFilterComponent.isShowing()) return@addRequest
+//                    myTreeExpansionMonitor.freeze()
+//                    myFilteringPanel.setShortcut(null)
+//                    val filter = filter
+//                    myActionsTree.filter(filter, myQuickLists)
+//                    val tree: JTree = myActionsTree.getTree()
+//                    TreeUtil.expandAll(tree)
+//                    if (filter == null || filter.length == 0) {
+//                        TreeUtil.collapseAll(tree, 0)
+//                        myTreeExpansionMonitor.restore()
+//                    } else {
+//                        myTreeExpansionMonitor.unfreeze()
+//                    }
+//                }, 300)
+//            }
+//        }
+//        myFilterComponent.reset()
+//        group.add(FindByShortcutAction(searchToolbar))
+//        group.add(ClearFilteringAction())
+        val panel = JPanel(GridLayout(1, 2))
+        panel.add(toolbar.component)
+        panel.add(BorderLayoutPanel().addToRight(searchToolbar))
+        toolWindowContent.toolbar = panel
+    }
+
+    fun addPanelsToGlobalData(
+        nestedPanel: JPanel,
+        innerPanel: JPanel,
+        tabbedPane: JBTabbedPane
+    ) {
+        GlobalData.nestedPanel = nestedPanel
+        GlobalData.innerPanel = innerPanel
+        GlobalData.tabbedPane = tabbedPane
+    }
+
     fun loadDataFromExtensionFolder(): String {
         val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
         val dataFile = File(extensionFolder, "prompt_history.txt")
@@ -443,4 +548,7 @@ class ProjectService {
 //    this@SQLPluginPanel, "Can't read file '$file'", "Error",
 //    JOptionPane.ERROR_MESSAGE
 //    )
+
+
+    ////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
 }

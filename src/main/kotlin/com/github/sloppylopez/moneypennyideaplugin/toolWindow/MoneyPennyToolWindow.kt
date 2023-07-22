@@ -14,7 +14,10 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
-import javax.swing.*
+import javax.swing.BoxLayout
+import javax.swing.JComponent
+import javax.swing.JPanel
+import javax.swing.JTabbedPane
 import javax.swing.event.ChangeListener
 
 class MoneyPennyToolWindow(
@@ -90,8 +93,7 @@ class MoneyPennyToolWindow(
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
             1 -> {
-                val buttonPanelFactory = ButtonPanelFactory(service.getProject()!!)
-                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel, tabbedPane)
+                service.addPanelsToGlobalData(nestedPanel, innerPanel, tabbedPane)
             }
 
             2 -> {

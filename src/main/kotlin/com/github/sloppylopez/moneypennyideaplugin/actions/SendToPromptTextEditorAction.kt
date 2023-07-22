@@ -11,8 +11,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
 @Service(Service.Level.PROJECT)
-class SendToPromptTextEditorAction(private var project: Project? = null) : AnAction("Send To MoneyPenny") {
-    private val service = project?.service<ProjectService>()
+class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
+    private val service = project.service<ProjectService>()
     private var editor: Editor? = null
     private var file: VirtualFile? = null
 
@@ -28,7 +28,7 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
     override fun actionPerformed(e: AnActionEvent) {
         editor?.let { editor ->
             file?.let { file: VirtualFile ->
-                service?.sendFileToContentPrompt(
+                service.sendFileToContentPrompt(
                     editor,
                     service.virtualFileToFile(file)
                 )
@@ -47,15 +47,12 @@ class SendToPromptTextEditorAction(private var project: Project? = null) : AnAct
 
     fun registerFileEditorAction() {
         val actionManager = ActionManager.getInstance()
-        // Check if the action with the given ID already exists
         val existingAction = actionManager.getAction(ACTION_ID)
         if (existingAction != null) {
             actionManager.unregisterAction(ACTION_ID)
         }
         val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-        // Register the SendToPromptFileEditorAction
         actionManager.registerAction(ACTION_ID, sendToPromptTextEditorAction)
-        // Add the SendToPromptFileEditorAction to the right-click menu
         val popupMenu = actionManager.getAction("EditorPopupMenu")
         val defaultActionGroup = popupMenu as? DefaultActionGroup
         defaultActionGroup?.addSeparator()
