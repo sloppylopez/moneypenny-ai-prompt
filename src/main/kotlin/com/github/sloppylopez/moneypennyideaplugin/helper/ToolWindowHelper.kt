@@ -21,7 +21,7 @@ import javax.swing.ImageIcon
 
 class ToolWindowHelper {
     companion object {
-        private val toolWindowContent = SimpleToolWindowPanel(false)
+        private val toolWindowContent = SimpleToolWindowPanel(true)
         private var moneyPennyToolWindow: MoneyPennyToolWindow? = null
         private var tabbedPane = JBTabbedPane()
 
