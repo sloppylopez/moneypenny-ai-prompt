@@ -12,7 +12,7 @@ class CheckBoxFactory {
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
         val checkboxPanel = JPanel()
         val checkboxLabels = arrayOf(
-            "DRY", "Add", "Create", "Remove", "Replace", "Explanation", "Gives", "With"
+            "DRY", "Add", "Create", "Remove", "Explanation", "Gives", "With", "Method", "Class"
         )
 
         checkboxLabels.forEach { label ->
@@ -56,6 +56,10 @@ class CheckBoxFactory {
             postPromptTextArea.append("Answer with an explanation \n")//This to allow to ask freeStyle questions to ChatGpt, if no it will answer "My role is to answer always with code blablabla"
         } else if (selectedCheckBox.text.equals("Explanation")) {
             postPromptTextArea.append("Give me an explanation \n")
+        } else if (selectedCheckBox.text.equals("Method")) {
+            postPromptTextArea.append("Write a method that \n")
+        } else if (selectedCheckBox.text.equals("Class")) {
+            postPromptTextArea.append("Write a class that \n")
         } else {
             postPromptTextArea.append("${selectedCheckBox.text} \n")
         }
