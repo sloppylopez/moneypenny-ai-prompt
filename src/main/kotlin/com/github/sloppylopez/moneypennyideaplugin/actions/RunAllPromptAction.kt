@@ -8,6 +8,7 @@ import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
@@ -67,5 +68,9 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
 
     override fun update(e: AnActionEvent) {
         e.presentation.isEnabled = GlobalData.apiKey?.isNotEmpty()!!
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.EDT
     }
 }

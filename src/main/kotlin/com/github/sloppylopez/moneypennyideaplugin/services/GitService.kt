@@ -23,7 +23,7 @@ class GitService {
 
             val process = processBuilder.start()
             val reader = BufferedReader(InputStreamReader(process.inputStream))
-            shortSHA = reader.readLine().trim()
+            shortSHA = reader.readLine()?.trim()
 
             process.waitFor()
         } catch (e: Exception) {

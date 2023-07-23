@@ -433,19 +433,25 @@ class ProjectService {
     fun addToolBar(toolWindowContent: SimpleToolWindowPanel) {
         val actionGroup = DefaultActionGroup()
         val project = this.getProject()!!
-        actionGroup.add(SendToPromptFileFolderTreeAction(project))
-        actionGroup.addSeparator()
-        actionGroup.add(RunPromptAction(project))
-        actionGroup.isPopup = true
-        actionGroup.add(RunAllPromptAction(project))
-        actionGroup.add(CopyPromptAction(project))
-        actionGroup.addSeparator("-")
-        actionGroup.add(MyDropDownAction(project))
         val toolBar = ActionManager.getInstance().createActionToolbar(
             "MoneyPennyAI.MainPanel",
             actionGroup,
-            true // Specify that the toolbar should be vertical
+            false // Specify that the toolbar should be vertical
         )
+        actionGroup.add(SendToPromptFileFolderTreeAction(project))
+        actionGroup.addSeparator()
+        actionGroup.add(RunPromptAction(project))
+//        actionGroup.isPopup = true
+        actionGroup.add(RunAllPromptAction(project))
+        actionGroup.add(CopyPromptAction(project))
+        actionGroup.addSeparator("-")
+        actionGroup.add(PopUpAction(project, actionGroup, AllIcons.Icons.Ide.NextStep, "Engine Selection"))
+//        val toolBar2 = ActionManager.getInstance().createActionPopupMenu(
+//            "MoneyPennyAI.MainPanel",
+//            actionGroup,
+//        )
+//        actionGroup.add(MyDropDownAction(project))
+//        actionGroup.add(PopUpAction(project, toolBar.component))
 //        val toolBar2 = ActionManager.getInstance().createActionPopupMenu(
 //            "MoneyPennyAI.MainPanel",
 //            actionGroup,
