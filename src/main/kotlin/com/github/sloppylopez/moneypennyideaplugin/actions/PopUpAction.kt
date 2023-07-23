@@ -1,9 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.intellij.icons.AllIcons
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
@@ -39,9 +37,18 @@ class PopUpAction(
 
         panel.add(iconLabel, BorderLayout.WEST)
 
-        val modelStrings = arrayOf("Davinci", "Curie", "Babbage", "Ada")
+        val modelStrings = arrayOf(
+            "gpt-4-32k",
+            "gpt-4",
+            "gpt-3.5-turbo-16k",
+            "gpt-3.5-turbo",
+            "text-davinci-003",
+            "text-curie-001",
+            "text-babbage-001",
+            "text-ada-001"
+        )
         val models = ComboBox(modelStrings)
-        val selectedIndex = 0
+        val selectedIndex = 2
         models.selectedIndex = selectedIndex
         models.addActionListener {
             val selectedOption = models.selectedItem?.toString()
@@ -56,13 +63,14 @@ class PopUpAction(
     }
 
     private fun showAnnotation(selectedOption: String) {
-        val notification = Notification(
-            "MoneyPenny",
-            "Selected Option",
-            selectedOption,
-            NotificationType.INFORMATION
-        )
-        Notifications.Bus.notify(notification)
+//        val notification = Notification(
+//            "MoneyPenny",
+//            "Selected Option",
+//            selectedOption,
+//            NotificationType.INFORMATION
+//        )
+//        Notifications.Bus.notify(notification)
+        GlobalData.engine = selectedOption
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {

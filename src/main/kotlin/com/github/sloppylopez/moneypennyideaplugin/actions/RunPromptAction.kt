@@ -34,7 +34,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
         val jProgressBar = progressBarFactory.getProgressBar()
         progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
         val prompts = promptService.getPrompts()
-        val promptList = service.getPromptListByKey(prompts!!, tabName!!)
+        val promptList = service.getPromptListByKey(prompts, tabName!!)
         if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
             chatGPTService.sendChatPrompt(
                 promptList.joinToString("\n"),
@@ -62,6 +62,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
             }
         }
     }
+
     override fun update(e: AnActionEvent) {
         e.presentation.isEnabled = GlobalData.apiKey?.isNotEmpty()!!
     }

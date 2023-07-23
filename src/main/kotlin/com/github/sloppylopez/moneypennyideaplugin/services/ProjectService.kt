@@ -371,12 +371,12 @@ class ProjectService {
         val nestedTabbedPanes = mutableListOf<JBTabbedPane>()
 
         fun findNestedTabbedPanesRecursive(container: Container) {
-            for (component in container.components) {
-                if (component is JBTabbedPane) {
-                    nestedTabbedPanes.add(component)
-                    findNestedTabbedPanesRecursive(component)
-                } else if (component is Container) {
-                    findNestedTabbedPanesRecursive(component)
+            for (currentTabbedPane in container.components) {
+                if (currentTabbedPane is JBTabbedPane) {
+                    nestedTabbedPanes.add(currentTabbedPane)
+                    findNestedTabbedPanesRecursive(currentTabbedPane)
+                } else if (currentTabbedPane is Container) {
+                    findNestedTabbedPanesRecursive(currentTabbedPane)
                 }
             }
         }

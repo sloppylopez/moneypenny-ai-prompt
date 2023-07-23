@@ -24,7 +24,6 @@ class MoneyPennyToolWindow(
     project: Project
 ) {
 
-    private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val ancestorListener = project.service<AncestorListener>()
     private val fileEditorManager = project.service<FileEditorManager>()

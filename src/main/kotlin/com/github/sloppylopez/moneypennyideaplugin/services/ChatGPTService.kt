@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
 import com.google.gson.Gson
 import com.intellij.notification.NotificationType
@@ -91,7 +92,7 @@ class ChatGPTService(project: Project) {
         }
 
         val jsonObject = JSONObject().apply {
-            put("model", "gpt-3.5-turbo-16k")
+            put("model", GlobalData.engine)
             put("messages", listOf(systemMessage, userMessage))
             put("max_tokens", maxTokenCount)
         }
