@@ -6,6 +6,7 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
+import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -18,7 +19,12 @@ class RunPromptAction(private var project: Project) : AnAction() {
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
     private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
-    private val copiedMessage = "MoneyPenny AI: Response copied to clipboard: "
+    private val copiedMessage = "Copied to clipboard: "
+
+    init {
+        templatePresentation.icon = AllIcons.Actions.Execute
+        templatePresentation.text = "Run prompt"
+    }
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
@@ -54,5 +60,8 @@ class RunPromptAction(private var project: Project) : AnAction() {
                 )
             }
         }
+    }
+    override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = GlobalData.apiKey?.isNotEmpty()!!
     }
 }

@@ -1,23 +1,25 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
-class CopyPromptAction(private var project: Project) : AnAction() {
+class ChoseEngineAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val copiedMessage = "Copied to clipboard: "
 
     init {
         templatePresentation.icon = AllIcons.Actions.Copy
-        templatePresentation.text = "Copy prompt"
+        templatePresentation.text = "Choose engine"
     }
 
     override fun actionPerformed(e: AnActionEvent) {

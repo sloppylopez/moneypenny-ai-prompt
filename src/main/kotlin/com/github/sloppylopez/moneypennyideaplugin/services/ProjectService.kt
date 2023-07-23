@@ -1,10 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
-import com.github.sloppylopez.moneypennyideaplugin.actions.CopyPromptAction
-import com.github.sloppylopez.moneypennyideaplugin.actions.RunAllPromptAction
-import com.github.sloppylopez.moneypennyideaplugin.actions.RunPromptAction
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.*
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
@@ -15,8 +12,7 @@ import com.google.gson.Gson
 import com.intellij.icons.AllIcons
 import com.intellij.ide.CommonActionsManager
 import com.intellij.notification.*
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
@@ -40,7 +36,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.SmartPointerManager
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
 import com.intellij.util.ui.components.BorderLayoutPanel
@@ -436,16 +434,33 @@ class ProjectService {
         val actionGroup = DefaultActionGroup()
         val project = this.getProject()!!
         actionGroup.add(SendToPromptFileFolderTreeAction(project))
+        actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))
+        actionGroup.isPopup = true
         actionGroup.add(RunAllPromptAction(project))
         actionGroup.add(CopyPromptAction(project))
-        actionGroup.addSeparator()
-
+        actionGroup.addSeparator("-")
+        actionGroup.add(MyDropDownAction(project))
         val toolBar = ActionManager.getInstance().createActionToolbar(
             "MoneyPennyAI.MainPanel",
             actionGroup,
             true // Specify that the toolbar should be vertical
         )
+//        val toolBar2 = ActionManager.getInstance().createActionPopupMenu(
+//            "MoneyPennyAI.MainPanel",
+//            actionGroup,
+//        )
+//        val dataContext = SimpleDataContext.builder()
+//            .add<Project>(CommonDataKeys.PROJECT, this.getProject())
+//            .add<JPanel>(PlatformCoreDataKeys.CONTEXT_COMPONENT, JPanel())
+//            .build()
+//        val popup = JBPopupFactory.getInstance().createActionGroupPopup(
+//            ExecutionBundle.message("add.new.before.run.task.name"), actionGroup,
+//            dataContext, false, false, false, null,
+//            -1, Conditions.alwaysTrue<AnAction>()
+//        )
+//        popup.show(RelativePoint(toolBar.component, Point(0, toolBar.component.height)))
+//        toolBar2.add(popup.component)
         toolWindowContent.toolbar = toolBar.component
     }
 
@@ -534,6 +549,10 @@ class ProjectService {
         return dataFile.readText()
     }
 
+    fun createPointer(element: PsiElement) {
+        SmartPointerManager.createPointer<PsiElement?>(element)
+    }
+
 //    fun createToolBar(toolWindow: JComponent?): JComponent {
 //        val actionGroup = DefaultActionGroup()
 //        actionGroup.add(SendToPromptFileFolderTreeAction(this.getProject()!!))
@@ -548,7 +567,17 @@ class ProjectService {
 //    this@SQLPluginPanel, "Can't read file '$file'", "Error",
 //    JOptionPane.ERROR_MESSAGE
 //    )
-
-
     ////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
+
+    //    fun hola(){
+    //        getProject().getModelAccess().executeCommand(object : DefaultCommand() {
+    //            fun run() {
+    //                createConsoleModel()
+    //                addBuiltInImports()
+    //                loadHistory(history)
+    //                createEditor()
+    //                myFileEditor = ConsoleFileEditor(myEditor)
+    //            }
+    //        })
+    //    }
 }
