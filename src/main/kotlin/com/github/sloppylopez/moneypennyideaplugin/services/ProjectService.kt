@@ -10,7 +10,6 @@ import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFi
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.google.gson.Gson
 import com.intellij.icons.AllIcons
-import com.intellij.ide.CommonActionsManager
 import com.intellij.notification.*
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
@@ -23,7 +22,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.keymap.impl.ui.ActionsTree
 import com.intellij.openapi.keymap.impl.ui.KeymapPanel.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -41,7 +39,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.SmartPointerManager
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
-import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
@@ -53,7 +50,7 @@ import javax.swing.*
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
-    private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
+    private val currentProcessPrompt = Key.create<String>("Current Processed Prompt")
     private val pluginId = "MoneyPenny AI"
 
     fun getFileContents(filePath: String?) = filePath?.let {
@@ -363,7 +360,7 @@ class ProjectService {
     fun putUserDataInComponent(fileList: List<*>, content: Content) {
         val myfiles = ArrayList<String>()
         myfiles.add("hello")
-        content.putUserData(CURRENT_PROCESS_PROMPT, myfiles.toString())
+        content.putUserData(currentProcessPrompt, myfiles.toString())
     }
 
     fun getUserDataFromComponent(key: Key<List<*>>, content: Content) {
@@ -441,102 +438,11 @@ class ProjectService {
         actionGroup.add(SendToPromptFileFolderTreeAction(project))
         actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))
-//        actionGroup.isPopup = true
         actionGroup.add(RunAllPromptAction(project))
         actionGroup.add(CopyPromptAction(project))
         actionGroup.addSeparator()
-        actionGroup.add(PopUpAction(project, actionGroup, AllIcons.Icons.Ide.NextStep, "Engine Selection"))
-//        val toolBar2 = ActionManager.getInstance().createActionPopupMenu(
-//            "MoneyPennyAI.MainPanel",
-//            actionGroup,
-//        )
-//        actionGroup.add(MyDropDownAction(project))
-//        actionGroup.add(PopUpAction(project, toolBar.component))
-//        val toolBar2 = ActionManager.getInstance().createActionPopupMenu(
-//            "MoneyPennyAI.MainPanel",
-//            actionGroup,
-//        )
-//        val dataContext = SimpleDataContext.builder()
-//            .add<Project>(CommonDataKeys.PROJECT, this.getProject())
-//            .add<JPanel>(PlatformCoreDataKeys.CONTEXT_COMPONENT, JPanel())
-//            .build()
-//        val popup = JBPopupFactory.getInstance().createActionGroupPopup(
-//            ExecutionBundle.message("add.new.before.run.task.name"), actionGroup,
-//            dataContext, false, false, false, null,
-//            -1, Conditions.alwaysTrue<AnAction>()
-//        )
-//        popup.show(RelativePoint(toolBar.component, Point(0, toolBar.component.height)))
-//        toolBar2.add(popup.component)
+        actionGroup.add(PopUpAction(project, AllIcons.Icons.Ide.NextStep, "Engine Selection"))
         toolWindowContent.toolbar = toolBar.component
-    }
-
-    fun createToolbarPanel(toolWindowContent: SimpleToolWindowPanel) {
-        val myActionsTree = ActionsTree()
-        var group = DefaultActionGroup()
-        val toolbar = ActionManager.getInstance().createActionToolbar("MoneyPennyAI.MainPanel", group, true)
-        toolbar.targetComponent = myActionsTree.tree
-        val commonActionsManager = CommonActionsManager.getInstance()
-        val treeExpander = createTreeExpander(myActionsTree)
-        group.add(commonActionsManager.createExpandAllAction(treeExpander, myActionsTree.tree))
-        group.add(commonActionsManager.createCollapseAllAction(treeExpander, myActionsTree.tree))
-//        group.add(EditShortcutAction())
-//        myShowOnlyConflictsButton = object : ToggleActionButton(
-//            KeyMapBundle.messagePointer("keymap.show.system.conflicts"),
-//            AllIcons.General.ShowWarning
-//        ) {
-//            override fun isSelected(e: AnActionEvent): Boolean {
-//                return myShowOnlyConflicts
-//            }
-//
-//            override fun setSelected(e: AnActionEvent, state: Boolean) {
-//                myShowOnlyConflicts = state
-//                myActionsTree.setBaseFilter(
-//                    if (myShowOnlyConflicts) SystemShortcuts.getInstance().createKeymapConflictsActionFilter() else null
-//                )
-//                myActionsTree.filter(null, myQuickLists)
-//                val tree: JTree = myActionsTree.getTree()
-//                if (myShowOnlyConflicts) {
-//                    TreeUtil.expandAll(tree)
-//                } else {
-//                    TreeUtil.collapseAll(tree, 0)
-//                }
-//            }
-//        }
-//        group.add(myShowOnlyConflictsButton)
-        group = DefaultActionGroup()
-        val actionToolbar = ActionManager.getInstance().createActionToolbar("Keymap", group, true)
-        actionToolbar.targetComponent = myActionsTree.tree
-        actionToolbar.setReservePlaceAutoPopupIcon(false)
-        val searchToolbar = actionToolbar.component
-        //TODO use alarms to cancel requests to chatGPT as
-//        val alarm = Alarm()
-//        myFilterComponent = object : FilterComponent("KEYMAP", 5) {
-//            override fun filter() {
-//                alarm.cancelAllRequests()
-//                alarm.addRequest({
-//                    if (!myFilterComponent.isShowing()) return@addRequest
-//                    myTreeExpansionMonitor.freeze()
-//                    myFilteringPanel.setShortcut(null)
-//                    val filter = filter
-//                    myActionsTree.filter(filter, myQuickLists)
-//                    val tree: JTree = myActionsTree.getTree()
-//                    TreeUtil.expandAll(tree)
-//                    if (filter == null || filter.length == 0) {
-//                        TreeUtil.collapseAll(tree, 0)
-//                        myTreeExpansionMonitor.restore()
-//                    } else {
-//                        myTreeExpansionMonitor.unfreeze()
-//                    }
-//                }, 300)
-//            }
-//        }
-//        myFilterComponent.reset()
-//        group.add(FindByShortcutAction(searchToolbar))
-//        group.add(ClearFilteringAction())
-        val panel = JPanel(GridLayout(1, 2))
-        panel.add(toolbar.component)
-        panel.add(BorderLayoutPanel().addToRight(searchToolbar))
-        toolWindowContent.toolbar = panel
     }
 
     fun addPanelsToGlobalData(
@@ -558,7 +464,7 @@ class ProjectService {
     fun createPointer(element: PsiElement) {
         SmartPointerManager.createPointer<PsiElement?>(element)
     }
-
+//TODO use alarms to be able to cancel requests supposedly
 //    fun createToolBar(toolWindow: JComponent?): JComponent {
 //        val actionGroup = DefaultActionGroup()
 //        actionGroup.add(SendToPromptFileFolderTreeAction(this.getProject()!!))
