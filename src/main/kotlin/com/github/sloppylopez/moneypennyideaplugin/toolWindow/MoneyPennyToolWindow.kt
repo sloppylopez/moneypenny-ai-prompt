@@ -101,7 +101,7 @@ class MoneyPennyToolWindow(
                 service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
             }
 
-            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
+//            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
         }
         return innerPanel
     }

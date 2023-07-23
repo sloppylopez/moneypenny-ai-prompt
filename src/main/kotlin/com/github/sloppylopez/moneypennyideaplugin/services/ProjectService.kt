@@ -436,7 +436,7 @@ class ProjectService {
         val toolBar = ActionManager.getInstance().createActionToolbar(
             "MoneyPennyAI.MainPanel",
             actionGroup,
-            false // Specify that the toolbar should be vertical
+            true // Specify that the toolbar should be vertical
         )
         actionGroup.add(SendToPromptFileFolderTreeAction(project))
         actionGroup.addSeparator()
@@ -444,7 +444,7 @@ class ProjectService {
 //        actionGroup.isPopup = true
         actionGroup.add(RunAllPromptAction(project))
         actionGroup.add(CopyPromptAction(project))
-        actionGroup.addSeparator("-")
+        actionGroup.addSeparator()
         actionGroup.add(PopUpAction(project, actionGroup, AllIcons.Icons.Ide.NextStep, "Engine Selection"))
 //        val toolBar2 = ActionManager.getInstance().createActionPopupMenu(
 //            "MoneyPennyAI.MainPanel",
