@@ -433,7 +433,7 @@ class ProjectService {
         val toolBar = ActionManager.getInstance().createActionToolbar(
             "MoneyPennyAI.MainPanel",
             actionGroup,
-            true // Specify that the toolbar should be vertical
+            true
         )
         actionGroup.add(SendToPromptFileFolderTreeAction(project))
         actionGroup.addSeparator()
@@ -441,7 +441,26 @@ class ProjectService {
         actionGroup.add(RunAllPromptAction(project))
         actionGroup.add(CopyPromptAction(project))
         actionGroup.addSeparator()
-        actionGroup.add(PopUpAction(project, AllIcons.Icons.Ide.NextStep, "Engine Selection"))
+        actionGroup.add(
+            ComboBoxEnginesAction(
+                project,
+                AllIcons.General.Gear,
+                "Engine Selection",
+                GlobalData.engineModelStrings,
+                "ChatGPT Engines"
+            )
+        )
+        actionGroup.addSeparator()
+        actionGroup.add(
+            ComboBoxRolesAction(
+                project,
+                AllIcons.CodeWithMe.Users,
+                "Role Selection",
+                GlobalData.roleModelStrings,
+                "ChatGPT Roles"
+            )
+        )
+        actionGroup.addSeparator()
         toolWindowContent.toolbar = toolBar.component
     }
 

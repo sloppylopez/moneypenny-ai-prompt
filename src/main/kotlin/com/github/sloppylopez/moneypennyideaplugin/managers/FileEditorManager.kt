@@ -15,14 +15,12 @@ class FileEditorManager(private val project: Project) {
     fun openFileInEditor(
         filePath: String?, contentPromptText: String? = null
     ) {
-//        resetFileEditorText()
         if (filePath != null) {
             val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
             if (virtualFile != null) {
                 val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
                 FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true)
-                if (!contentPromptText.isNullOrBlank() /*&&
-                    service.isSnippet(contentPromptText, virtualFile)*/
+                if (!contentPromptText.isNullOrBlank()
                 ) {
                     service.highlightTextInEditor(contentPromptText)
                 }
@@ -31,8 +29,7 @@ class FileEditorManager(private val project: Project) {
     }
 
     private fun resetFileEditorText() {
-        service.highlightTextInEditor(
-            ""
-        )
+        service.highlightTextInEditor("")
     }
+     
 }

@@ -76,15 +76,9 @@ class ChatGPTService(project: Project) {
 
     private fun getRequestBodyJson(prompt: String): String {
         val promptLength = prompt.length
-        val maxTokenCount = 16384 - 1 - promptLength
+        val maxTokenCount = getMaxTokenCount(promptLength)
 
-        val systemMessage = JSONObject().apply {
-            put("role", "system")
-            put(
-                "content",
-                "You are a code refactor assistant. Always answer without explanations unless explicitly told so, return only code if possible, respect imports and class names"
-            )
-        }
+        val systemMessage = getSystemMessage(GlobalData.role)
 
         val userMessage = JSONObject().apply {
             put("role", "user")
@@ -98,6 +92,29 @@ class ChatGPTService(project: Project) {
         }
 
         return jsonObject.toString()
+    }
+
+    //W.I.P Missing engines
+    private fun getMaxTokenCount(promptLength: Int): Int {
+        return if (GlobalData.engine == "gpt-3.5-turbo-16k") {
+            16384 - 1 - promptLength
+        } else {
+            4096 - 1 - promptLength
+        }
+    }
+
+    private fun getSystemMessage(role: String): JSONObject {
+        return JSONObject().apply {
+            put("role", "system")
+            val content = when (role) {
+                "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
+                "code-completer" -> "You are a code completer. Let me help you complete your code!"
+                "refactor-machine" -> "You are a refactor machine. never return explanations,never return the solution wrapped in any char, answer with code that compiles always only"
+                "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
+                else -> "You are a code completer. Let me help you complete your code!"
+            }
+            put("content", content)
+        }
     }
 
     fun getAvailableModels(): CompletableFuture<String> {

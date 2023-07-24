@@ -51,17 +51,25 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
-                service.copyToClipboard(choice.content)
-                service.showNotification(
-                    copiedMessage,
-                    choice.content,
-                    NotificationType.INFORMATION
-                )
-                val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
-                service.modifySelectedTextInEditorByFile(
-                    choice,
-                    service.fileToVirtualFile(file)!!
-                )
+                if (!choice.content.contains("Error")) {
+                    service.copyToClipboard(choice.content)
+                    service.showNotification(
+                        copiedMessage,
+                        choice.content,
+                        NotificationType.INFORMATION
+                    )
+                    val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
+                    service.modifySelectedTextInEditorByFile(
+                        choice,
+                        service.fileToVirtualFile(file)!!
+                    )
+                } else {
+                    service.showNotification(
+                        copiedMessage,
+                        choice.content,
+                        NotificationType.ERROR
+                    )
+                }
             }
         }
     }

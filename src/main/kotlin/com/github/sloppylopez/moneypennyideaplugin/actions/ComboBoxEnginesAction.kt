@@ -1,7 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
@@ -15,10 +14,12 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 
-class PopUpAction(
+class ComboBoxEnginesAction(
     private var project: Project,
-    icon: Icon,
-    text: String
+    private val icon: Icon,
+    text: String,
+    private val modelStrings: Array<String>,
+    private val tooltipText: String?
 ) : AnActionButton(), CustomComponentAction {
 
     init {
@@ -28,31 +29,17 @@ class PopUpAction(
 
     override fun createCustomComponent(presentation: Presentation, place: String): JComponent {
         val panel = JPanel(BorderLayout())
-
-        val icon = AllIcons.General.Settings
         val iconLabel = JLabel(icon)
-
-        val tooltipText = "ChatGPT Engines"
         iconLabel.toolTipText = tooltipText // Set tooltip text for the label
 
         panel.add(iconLabel, BorderLayout.WEST)
 
-        val modelStrings = arrayOf(
-            "gpt-4-32k",
-            "gpt-4",
-            "gpt-3.5-turbo-16k",
-            "gpt-3.5-turbo",
-            "text-davinci-003",
-            "text-curie-001",
-            "text-babbage-001",
-            "text-ada-001"
-        )
         val models = ComboBox(modelStrings)
-        val selectedIndex = 2
+        val selectedIndex = 0
         models.selectedIndex = selectedIndex
         models.addActionListener {
             val selectedOption = models.selectedItem?.toString()
-            showAnnotation(selectedOption!!)
+            addEngineToGlobalData(selectedOption!!)
         }
         panel.add(models, BorderLayout.CENTER)
         return panel
@@ -62,7 +49,7 @@ class PopUpAction(
         project = e.project!!
     }
 
-    private fun showAnnotation(selectedOption: String) {
+    private fun addEngineToGlobalData(selectedOption: String) {
 //        val notification = Notification(
 //            "MoneyPenny",
 //            "Selected Option",
