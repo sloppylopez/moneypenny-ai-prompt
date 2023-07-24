@@ -57,7 +57,11 @@ class RunPromptAction(private var project: Project) : AnAction() {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
-                    val content = service.extractCode(choice.content)
+                    var content = choice.content
+                    if(GlobalData.role == "refactor-machine" &&
+                        service.isCodeCommented(content)){
+                        content = service.extractCommentsFromCode(content)
+                    }
                     if (!content.contains("Error: No response from GPT")) {
                         service.copyToClipboard(content)
                         service.showNotification(

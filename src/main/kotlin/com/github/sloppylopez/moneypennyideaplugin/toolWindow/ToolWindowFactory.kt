@@ -30,7 +30,7 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
             sendToPromptFileFolderTreeAction.registerFolderTreeAction()
 //            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
 //            sendToPromptTextEditorAction.registerFileEditorAction()
-            val popUpHooverAction = PopUpHooverAction(project)
+            val popUpHooverAction = PopUpHooverAction()
             popUpHooverAction.addActionsToEditor()
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
             SwingUtilities.invokeLater {

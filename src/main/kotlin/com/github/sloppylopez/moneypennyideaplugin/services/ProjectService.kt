@@ -38,6 +38,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.SmartPointerManager
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
+import io.ktor.util.*
 import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
@@ -60,10 +61,16 @@ class ProjectService {
         }
     } as String
 
-    fun extractCode(input: String): String {
+    fun extractCommentsFromCode(input: String): String {
         val regex = Regex("```\\w*\\n(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
         val matchResult = regex.find(input)
         return matchResult?.groups?.get(1)?.value?.trim() ?: ""
+    }
+
+    fun isCodeCommented(input: String): Boolean {
+        val regex = Regex("```\\w*\\n(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
+        val matchResult = regex.find(input)
+        return matchResult != null
     }
 
     fun getRandomNumber() = (1..100).random()
@@ -144,7 +151,7 @@ class ProjectService {
         val notification = Notification(
             "MoneyPennyAI",
             title,
-            message,
+            message.escapeHTML(),
             notificationType ?: NotificationType.INFORMATION
         )
         notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13.jpg"))

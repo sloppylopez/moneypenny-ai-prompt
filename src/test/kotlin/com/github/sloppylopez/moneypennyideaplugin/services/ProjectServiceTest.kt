@@ -20,7 +20,7 @@ class ProjectServiceTest : BasePlatformTestCase() {
                 "}\n" +
                 "```\n" +
                 "I have added the `isString` method that takes an `Any` parameter and returns `true` if the parameter is a string, and `false` otherwise."
-        val result = projectService.extractCode(response)
+        val result = projectService.extractCommentsFromCode(response)
         assertEquals(
             result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
                     "\n" +
@@ -44,7 +44,7 @@ class ProjectServiceTest : BasePlatformTestCase() {
                 "}\n" +
                 "```\n" +
                 "I have added the `isString` method that takes an `Any` parameter and returns `true` if the parameter is a string, and `false` otherwise."
-        val result = projectService.extractCode(response)
+        val result = projectService.extractCommentsFromCode(response)
         assertEquals(
             result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
                     "\n" +
@@ -67,7 +67,7 @@ class ProjectServiceTest : BasePlatformTestCase() {
                 "}\n" +
                 "```\n" +
                 "I have added the `isString` method that takes an `Any` parameter and returns `true` if the parameter is a string, and `false` otherwise."
-        val result = projectService.extractCode(response)
+        val result = projectService.extractCommentsFromCode(response)
         assertEquals(
             result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
                     "\n" +
@@ -89,7 +89,7 @@ class ProjectServiceTest : BasePlatformTestCase() {
                 "    }\n" +
                 "}\n" +
                 "```\n"
-        val result = projectService.extractCode(response)
+        val result = projectService.extractCommentsFromCode(response)
         assertEquals(
             result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
                     "\n" +

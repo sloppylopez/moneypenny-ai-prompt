@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -19,7 +20,7 @@ class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
     }
 
     init {
-        templatePresentation.icon = ToolWindowHelper.getIcon("/images/MoneyPenny-Icon_13x13.jpg")
+        templatePresentation.icon = AllIcons.Duplicates.SendToTheRight
         templatePresentation.text = "Send to Prompt"
     }
 

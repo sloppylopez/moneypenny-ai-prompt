@@ -1,34 +1,32 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
+import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.getIcon
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 
 @Service(Service.Level.PROJECT)
-class PopUpHooverAction(private val project: Project) : ActionGroup() {
-
+class PopUpHooverAction : ActionGroup() {
 
     companion object {
         private const val ACTION_ID = "com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"
     }
 
     init {
-        templatePresentation.icon = ToolWindowHelper.getIcon("/images/MoneyPenny-Icon_13x13.jpg")
-        templatePresentation.text = "MoneyPenny AI Prompt"
+        templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13.jpg")
+        templatePresentation.text = "MoneyPenny AI Actions"
+        templatePresentation.isPopupGroup = true
     }
-
-    // Return true because this action has a submenu
-    override fun isPopup(): Boolean = true
 
     // Return the actions for the submenu
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-        return arrayOf(SendToPromptTextEditorAction(project))
+        val project = getProjectFromEvent(e)
+        return arrayOf(SendToPromptTextEditorAction(project!!))//TODO Add more actions here
     }
 
-    // Handle the action if it's clicked directly (optional)
-    override fun actionPerformed(e: AnActionEvent) {
-        // Handle the action if needed
+    // Helper method to get the Project from AnActionEvent
+    private fun getProjectFromEvent(e: AnActionEvent?): Project? {
+        return e?.project
     }
 
     fun addActionsToEditor() {
@@ -37,7 +35,7 @@ class PopUpHooverAction(private val project: Project) : ActionGroup() {
         existingAction?.let {
             actionManager.unregisterAction(ACTION_ID)
         }
-        actionManager.registerAction(ACTION_ID, PopUpHooverAction(project))
+        actionManager.registerAction(ACTION_ID, this)
         val popupMenu = actionManager.getAction("EditorPopupMenu") as? DefaultActionGroup
         popupMenu?.addSeparator()
         popupMenu?.add(actionManager.getAction(ACTION_ID), Constraints.FIRST)

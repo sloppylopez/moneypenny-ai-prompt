@@ -53,7 +53,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
-                    val content = service.extractCode(choice.content)
+                    val content = service.extractCommentsFromCode(choice.content)
                     if (!content.contains("Error")) {
                         service.copyToClipboard(content)
                         service.showNotification(

@@ -34,6 +34,16 @@
                     id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
     </extensions>
 
+<!--    <actions>-->
+<!--        <action id="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
+<!--                class="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
+<!--                text="MoneyPenny AI Prompt"-->
+<!--                description="Open MoneyPenny AI Prompt"-->
+<!--                icon="/images/MoneyPenny-Icon_13x13.jpg">-->
+<!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
+<!--        </action>-->
+<!--    </actions>-->
+
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
