@@ -1,5 +1,3 @@
-# MoneyPenny AI Prompt: Empowering Code Refactoring with ChatGPT-4 Compatibility
-
 <div>
   <div style="margin: 10px;">
     <img style="margin: 10px;" src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px" align="left">
@@ -10,12 +8,6 @@
     </p>
 </div>
 
-## Release 1.1.0-SNAPSHOT – Enhancements and Bug Fixes
-
-We are pleased to announce the release of version 1.1.0-SNAPSHOT, which introduces significant bug fixes and improves
-the overall performance and stability of the plugin. This release solidifies our commitment to providing the best
-possible experience for our users.
-
 ## Embark on a Prompt Driven Development Journey!
 
 <img src="src/main/resources/images/img.png" alt="Prompt" align="center">
@@ -24,30 +16,37 @@ possible experience for our users.
 <a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/v/22252-moneypenny-ai.svg" alt="Version"></a>
 <a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/d/22252-moneypenny-ai.svg" alt="Downloads"></a>
 
-## Exceptional Features of MoneyPenny AI Prompt
+## Exceptional Performance with MoneyPenny AI Prompt
 
 - **Multi-File Refactoring**: Revamp, supplement, or modify multiple files at once.
-- **Swift Response Time**: Bid farewell to lag, maintain your coding flow.
+- **Swift Response Time**: Bid farewell to changing apps, maintain your coding flow inside Intellij IDEA.
 - **Up to 32,000 Token Contextual Prompt**: Get smart, context-aware coding suggestions using our extended contextual
   prompt.
-- **Optimized Performance & Speed**: Say goodbye to the Typewriter effect and enjoy speed with parallelized requests.
-- **Smooth Integration**: Merge effortlessly with IntelliJ IDEA.
-- **Extensive Range of Operations**: Select and manipulate files with ease.
+- **Optimized Performance & Speed**: No Typewriter effect, enjoy speed with parallelized requests.
+- **Smooth Integration**: Use all features of IntelliJ IDEA effortlessly.
+- **Buzzwords**: To avoid typing the most common buzzwords, "refactor", "fix", "add" and such.
 
-Jump into the future of code refactoring with MoneyPenny AI Prompt! Transform into a 10x developer with the aid of
-AI-powered coding efficiency. Now compatible with the latest ChatGPT-4 technology for even more accurate and
-context-aware suggestions.
+Watch the *Code Frequency* graf below to see how MoneyPenny AI Prompt has helped achieve 
+10x productivity. This chart represents the code frequency over the last 1 year of development of the template
+for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a month with no precious
+experience of Kotlin or IntelliJ IDEA SDK.
+Watch productivity skyrocket with MoneyPenny AI Prompt!
+
+<img src="src/main/resources/images/productivity_chart.png" alt="Code Frequency" align="center">
+
+https://github.com/JetBrains/intellij-platform-plugin-template/graphs/code-frequency
+
+VS
+
+https://github.com/sloppylopez/moneypenny-ai-prompt/graphs/code-frequency
 
 Stay ahead of your peers by experiencing the unmatched benefits of MoneyPenny AI Prompt today. Unleash the power of AI
-into your coding workflow, create innovative solutions with ease, and achieve more in less time. Begin your journey with
-MoneyPenny AI Prompt - the ultimate IntelliJ IDEA plugin for developers who dare to achieve more.
-into your coding workflow, create innovative solutions with ease, and achieve more in less time. Begin your journey with
-MoneyPenny AI Prompt - the ultimate IntelliJ IDEA plugin for developers who dare to achieve more.
+into your coding workflow, create innovative solutions with ease, and achieve more in less time.
 
 ## The Origin Story
 
 MoneyPenny AI Prompt is a testament to the extraordinary capabilities of ChatGPT. Developed in just a month, with no
-prior knowledge of Kotlin or IntelliJ IDEA SDK, this project breaks all barriers.
+prior knowledge of Kotlin or IntelliJ IDEA SDK.
 
 ChatGPT, with its advanced language understanding and coding skills, is the primary author of this plugin, contributing
 a staggering 98% of the code. It was pivotal in creating a tool that has become a developer's best friend, aiding in
@@ -72,12 +71,16 @@ To install MoneyPenny AI Prompt, you have two straightforward options:
     - In IntelliJ IDEA, navigate to `Settings/Preferences > Plugins > ⚙️ > Install plugin from disk...`.
     - Select the JAR file of MoneyPenny AI Prompt and click `OK`.
 
-> Note: Until the plugin gets published, you can fork the GitHub repository, create a JAR file locally, and manually
-> install it using the second option. Remember, you need an environment variable called `OPENAI_API_KEY` in your machine
-> containing your ChatGPT API Key for the plugin to work correctly.
+> You need your ChatGPT API Key named OPENAI_API_KEY for the plugin to work correctly.
 
 Plugin based on
 the [IntelliJ Platform Plugin Template](https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg).
+
+## Release 1.1.0-SNAPSHOT – Enhancements and Bug Fixes
+
+We are pleased to announce the release of version 1.1.0-SNAPSHOT, which introduces significant bug fixes and improves
+the overall performance and stability of the plugin. This release solidifies our commitment to providing the best
+possible experience for our users.
 
 ## Useful Resources
 
@@ -105,7 +108,6 @@ designed to skyrocket your coding productivity. Here are the standout features t
   suggestions, going beyond the limitations of standard web chatbots.
 - **Effortless Integration & Enhanced Intelligence**: Integrate MoneyPenny AI Prompt into IntelliJ IDEA effortlessly,
   boosting your coding experience with intelligent code completions and predictive assistance.
-- **Continuous Evolution**: As the field of AI and coding practices evolve, so does MoneyPenny AI Prompt.
 
 Download MoneyPenny AI Prompt today to unlock the potential of AI in your coding workflow, leaving other plugins and
 competitors far behind. Boost your coding efficiency and create wonders with ease.
