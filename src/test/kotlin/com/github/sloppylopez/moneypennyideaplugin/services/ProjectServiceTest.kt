@@ -8,6 +8,12 @@ import java.io.File
 class ProjectServiceTest : BasePlatformTestCase() {
     private val projectService = ProjectService()
 
+    fun test_trim_code_single() {
+        val response = "```kotlin\nfun myFunc(){\n}```"
+        val codeSymbol = "```"
+        val result = response.replaceFirst("""```[a-zA-Z0-9]+\n""".toRegex(), "").removeSurrounding(codeSymbol).trim()
+        assertEquals(result, "fun myFunc(){")
+    }
 
     fun testExpandFoldersWithEmptyList() {
         val fileList = emptyList<Any>()

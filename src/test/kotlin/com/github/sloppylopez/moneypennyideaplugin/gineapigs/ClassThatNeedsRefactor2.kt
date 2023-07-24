@@ -8,8 +8,15 @@ class ClassThatNeedsRefactor2 {
         for (number in numbers) {
             var isPrime = true
 
-            if (number < 2 || isDivisibleBy(number)) {
+            if (number < 2) {
                 isPrime = false
+            } else {
+                for (i in 2..number / 2) {
+                    if (number % i == 0) {
+                        isPrime = false
+                        break
+                    }
+                }
             }
 
             if (isPrime) {
@@ -18,14 +25,5 @@ class ClassThatNeedsRefactor2 {
         }
 
         return primeNumbers
-    }
-
-    private fun isDivisibleBy(number: Int): Boolean {
-        for (i in 2..number / 2) {
-            if (number % i == 0) {
-                return true
-            }
-        }
-        return false
     }
 }

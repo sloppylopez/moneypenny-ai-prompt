@@ -474,6 +474,13 @@ class ProjectService {
         GlobalData.tabbedPane = tabbedPane
     }
 
+    fun trimCode(response: String): String {
+        val codeSymbol = "```"
+        return response.trim()
+            .removeSurrounding(codeSymbol)
+            .trim()
+    }
+
     fun loadDataFromExtensionFolder(): String {
         val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
         val dataFile = File(extensionFolder, "prompt_history.txt")

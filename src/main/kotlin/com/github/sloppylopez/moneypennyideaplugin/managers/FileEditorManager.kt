@@ -12,16 +12,14 @@ import java.io.File
 @Service(Service.Level.PROJECT)
 class FileEditorManager(private val project: Project) {
     private val service = project.service<ProjectService>()
-    fun openFileInEditor(
-        filePath: String?, contentPromptText: String? = null
-    ) {
+
+    fun openFileInEditor(filePath: String?, contentPromptText: String? = null) {
         if (filePath != null) {
             val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(filePath))
-            if (virtualFile != null) {
+            virtualFile?.let {
                 val openFileDescriptor = OpenFileDescriptor(project, virtualFile)
                 FileEditorManager.getInstance(project).openEditor(openFileDescriptor, true)
-                if (!contentPromptText.isNullOrBlank()
-                ) {
+                contentPromptText?.let {
                     service.highlightTextInEditor(contentPromptText)
                 }
             }
@@ -31,5 +29,4 @@ class FileEditorManager(private val project: Project) {
     private fun resetFileEditorText() {
         service.highlightTextInEditor("")
     }
-     
 }

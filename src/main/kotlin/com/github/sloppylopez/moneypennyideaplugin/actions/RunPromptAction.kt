@@ -50,15 +50,8 @@ class RunPromptAction(private var project: Project) : AnAction() {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
-                    var content = choice.content
+                    val content = service.trimCode(choice.content)
                     if (!content.contains("Error: No response from GPT")) {
-                        if (content.contains("```")) {
-//                            val lineStartIndex = content.indexOf('\n')
-//                            val lineEndIndex = content.lastIndexOf('\n')
-//                            content = content.substring(0, lineStartIndex)
-//                            content = content.substring(lineEndIndex, content.length - 1)
-                            content = content.replace("```", "")
-                        }
                         service.copyToClipboard(content)
                         service.showNotification(
                             copiedMessage, content, NotificationType.INFORMATION
