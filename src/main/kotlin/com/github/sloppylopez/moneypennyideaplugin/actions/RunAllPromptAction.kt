@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
 
@@ -51,24 +52,24 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
-                if (!choice.content.contains("Error")) {
-                    service.copyToClipboard(choice.content)
-                    service.showNotification(
-                        copiedMessage,
-                        choice.content,
-                        NotificationType.INFORMATION
-                    )
-                    val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
-                    service.modifySelectedTextInEditorByFile(
-                        choice,
-                        service.fileToVirtualFile(file)!!
-                    )
-                } else {
-                    service.showNotification(
-                        copiedMessage,
-                        choice.content,
-                        NotificationType.ERROR
-                    )
+                try {
+                    val content = service.extractCode(choice.content)
+                    if (!content.contains("Error")) {
+                        service.copyToClipboard(content)
+                        service.showNotification(
+                            copiedMessage, content, NotificationType.INFORMATION
+                        )
+                        val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
+                        service.modifySelectedTextInEditorByFile(
+                            choice, service.fileToVirtualFile(file)!!
+                        )
+                    } else {
+                        service.showNotification(
+                            copiedMessage, content, NotificationType.ERROR
+                        )
+                    }
+                } catch (e: Exception) {
+                    thisLogger().error(e.stackTraceToString())
                 }
             }
         }

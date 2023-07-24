@@ -8,11 +8,26 @@ import java.io.File
 class ProjectServiceTest : BasePlatformTestCase() {
     private val projectService = ProjectService()
 
-    fun test_trim_code_single() {
-        val response = "```kotlin\nfun myFunc(){\n}```"
-        val codeSymbol = "```"
-        val result = response.replaceFirst("""```[a-zA-Z0-9]+\n""".toRegex(), "").removeSurrounding(codeSymbol).trim()
-        assertEquals(result, "fun myFunc(){")
+    fun test_trim_code_with_explanations_single() {
+        val response = "Here is the modified code with the added method:\n" +
+                "```\n" +
+                "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                "\n" +
+                "class ClassThatNeedsRefactor {\n" +
+                "    fun isString(value: Any): Boolean {\n" +
+                "        return value is String\n" +
+                "    }\n" +
+                "}\n" +
+                "```\n" +
+                "I have added the `isString` method that takes an `Any` parameter and returns `true` if the parameter is a string, and `false` otherwise."
+        val result = projectService.extractCode(response)
+        assertEquals(result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                "\n" +
+                "class ClassThatNeedsRefactor {\n" +
+                "    fun isString(value: Any): Boolean {\n" +
+                "        return value is String\n" +
+                "    }\n" +
+                "}")
     }
 
     fun testExpandFoldersWithEmptyList() {

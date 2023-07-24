@@ -30,16 +30,23 @@ class RunPromptAction(private var project: Project) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
-
+        val prompt: String
         val tabName = GlobalData.tabbedPane?.getTitleAt(GlobalData.tabbedPane!!.selectedIndex)
         val jProgressBar = progressBarFactory.getProgressBar()
         progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
         val prompts = promptService.getPrompts()
         val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
-        promptList[1] = "```\n" + promptList[1] + "\n```"
+        if (GlobalData.role == "refactor-machine") {
+            promptList[1] = "```\n" + promptList[1] + "\n```"
+        }
         if (promptList[1].isNotBlank()) {
+            prompt = if (GlobalData.role == "refactor-machine") {
+                promptList.joinToString("\n")
+            } else {
+                promptList.joinToString(" ")
+            }
             chatGPTService.sendChatPrompt(
-                promptList.joinToString("\n"), createCallback(tabName)
+                prompt, createCallback(tabName)
             ).whenComplete { _, _ ->
                 progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
             }
@@ -50,7 +57,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
-                    val content = service.trimCode(choice.content)
+                    val content = service.extractCode(choice.content)
                     if (!content.contains("Error: No response from GPT")) {
                         service.copyToClipboard(content)
                         service.showNotification(

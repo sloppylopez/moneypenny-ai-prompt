@@ -30,7 +30,7 @@ object GlobalData {
     )
     val roleModelStrings = arrayOf(
         "🤖 refactor-machine",
-        "🧠 helpful-assistant",
+        "🐶 helpful-assistant",
         "✨ code-completer",
         "🤓 code-reviewer",
     )

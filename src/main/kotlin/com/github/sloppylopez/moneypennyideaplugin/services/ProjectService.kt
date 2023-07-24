@@ -61,6 +61,12 @@ class ProjectService {
         }
     } as String
 
+    fun extractCode(input: String): String {
+        val regex = Regex("```(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
+        val matchResult = regex.find(input)
+        return matchResult?.groups?.get(1)?.value?.trim() ?: ""
+    }
+
     fun getRandomNumber() = (1..100).random()
 
     fun fileToVirtualFile(file: File?): VirtualFile? {
@@ -472,13 +478,6 @@ class ProjectService {
         GlobalData.nestedPanel = nestedPanel
         GlobalData.innerPanel = innerPanel
         GlobalData.tabbedPane = tabbedPane
-    }
-
-    fun trimCode(response: String): String {
-        val codeSymbol = "```"
-        return response.trim()
-            .removeSurrounding(codeSymbol)
-            .trim()
     }
 
     fun loadDataFromExtensionFolder(): String {
