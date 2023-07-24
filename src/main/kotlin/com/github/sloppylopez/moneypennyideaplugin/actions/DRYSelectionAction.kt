@@ -4,7 +4,6 @@ import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
@@ -13,53 +12,64 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import java.io.File
+import com.intellij.openapi.vfs.VirtualFile
 
-class RunPromptAction(private var project: Project) : AnAction() {
+class DRYSelectionAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
-    private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
-    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
     private val copiedMessage = "Copied to clipboard: "
+    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
 
     init {
-        templatePresentation.icon = AllIcons.Actions.Execute
-        templatePresentation.text = "Run prompt"
+        templatePresentation.icon = AllIcons.Diff.MagicResolve
+        templatePresentation.text = "DRY Selection"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        project = e.project!!
-        val prompt: String
-        val tabName = GlobalData.tabbedPane?.getTitleAt(GlobalData.tabbedPane!!.selectedIndex)
+        val file = getFile(e) ?: return
+        val editor = getEditor(e) ?: return
         val jProgressBar = progressBarFactory.getProgressBar()
-        progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
-        val prompts = promptService.getPrompts()
-        val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
-        if (GlobalData.role == "refactor-machine") {
-            promptList[1] = "```\n" + promptList[1] + "\n```"
-        }
-        if (promptList[1].isNotBlank()) {
-            prompt = if (GlobalData.role == "refactor-machine") {
-                promptList.joinToString("\n")
-            } else {
-                promptList.joinToString(" ")
-            }
-            chatGPTService.sendChatPrompt(
-                prompt, createCallback(tabName)
-            ).whenComplete { _, _ ->
-                progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
-            }
+        val selectedText = service.getSelectedTextFromEditor(
+            editor
+        )
+        chatGPTService.sendChatPrompt(
+            getPrompt(selectedText), createCallback(file)
+        ).whenComplete { _, _ ->
+            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
-    //TODO: needs DRYing
-    private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
+
+    private fun getPrompt(selectedText: String?): String {
+        val prePrompt = "Refactor code:\n"
+        val postPrompt = "\nDRY it"
+        return "$prePrompt```$selectedText```$postPrompt"
+    }
+
+    override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = getFile(e) != null && getEditor(e) != null
+    }
+
+    private fun getFile(event: AnActionEvent): VirtualFile? {
+        return FileEditorManager.getInstance(event.project ?: return null).selectedFiles.firstOrNull()
+    }
+
+    private fun getEditor(event: AnActionEvent): Editor? {
+        return FileEditorManager.getInstance(event.project ?: return null).selectedTextEditor
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.EDT
+    }
+
+    private fun createCallback(file: VirtualFile): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
                     var content = choice.content
-                    if(GlobalData.role == "refactor-machine" &&
-                        service.isCodeCommented(content)){
+                    if (GlobalData.role == "refactor-machine" && service.isCodeCommented(content)) {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {
@@ -67,9 +77,8 @@ class RunPromptAction(private var project: Project) : AnAction() {
                         service.showNotification(
                             copiedMessage, content, NotificationType.INFORMATION
                         )
-                        val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
                         service.modifySelectedTextInEditorByFile(
-                            content, service.fileToVirtualFile(file)!!
+                            content, file
                         )
                     } else {
                         service.showNotification(
@@ -81,13 +90,5 @@ class RunPromptAction(private var project: Project) : AnAction() {
                 }
             }
         }
-    }
-
-    override fun update(e: AnActionEvent) {
-        e.presentation.isEnabled = GlobalData.apiKey?.isNotEmpty()!!
-    }
-
-    override fun getActionUpdateThread(): ActionUpdateThread {
-        return ActionUpdateThread.EDT
     }
 }

@@ -323,23 +323,48 @@ class ProjectService {
         return ToolWindowManager.getInstance(getProject()!!).getToolWindow(pluginId)
     }
 
-    fun sendFileToContentPrompt(
-        editor: Editor?,
-        file: File?,
-    ) {
+//    fun sendFileToContentPrompt(
+//        editor: Editor?,
+//        file: File?,
+//    ) {
+//        try {
+//            editor?.let { selectedEditor ->
+//                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+//                if (selectedTextFromEditor.isNullOrEmpty()) {
+//                    selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
+//                }
+//                if (!selectedTextFromEditor.isNullOrEmpty()) {
+//                    addTabbedPaneToToolWindow(
+//                        this.getProject()!!,
+//                        listOf(file),
+//                        selectedTextFromEditor
+//                    )
+//                }
+//            }
+//        } catch (e: Exception) {
+//            thisLogger().error(e.stackTraceToString())
+//        }
+//    }
+
+    fun getSelectedTextFromEditor(editor: Editor?): String? {
+        return editor?.let { selectedEditor ->
+            var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+            if (selectedTextFromEditor.isNullOrEmpty()) {
+                selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
+            }
+            selectedTextFromEditor
+        }
+    }
+
+    fun addSelectedTextToTabbedPane(editor: Editor?, file: File?) {
         try {
-            editor?.let { selectedEditor ->
-                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
-                if (selectedTextFromEditor.isNullOrEmpty()) {
-                    selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
-                }
-                if (!selectedTextFromEditor.isNullOrEmpty()) {
-                    addTabbedPaneToToolWindow(
-                        this.getProject()!!,
-                        listOf(file),
-                        selectedTextFromEditor
-                    )
-                }
+            val selectedTextFromEditor = getSelectedTextFromEditor(editor)
+            if (!selectedTextFromEditor.isNullOrEmpty()) {
+                addTabbedPaneToToolWindow(
+                    this.getProject()!!,
+                    listOf(file),
+                    selectedTextFromEditor
+                )
             }
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())

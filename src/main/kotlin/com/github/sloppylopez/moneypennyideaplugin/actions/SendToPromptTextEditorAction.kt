@@ -1,6 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
@@ -27,7 +26,10 @@ class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val file = getFile(e) ?: return
         val editor = getEditor(e) ?: return
-        service.sendFileToContentPrompt(
+        service.getSelectedTextFromEditor(
+            editor
+        )
+        service.addSelectedTextToTabbedPane(
             editor,
             service.virtualFileToFile(file)
         )
@@ -43,20 +45,6 @@ class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
 
     private fun getEditor(event: AnActionEvent): Editor? {
         return FileEditorManager.getInstance(event.project ?: return null).selectedTextEditor
-    }
-
-    fun registerFileEditorAction() {
-        val actionManager = ActionManager.getInstance()
-        val existingAction = actionManager.getAction(ACTION_ID)
-        if (existingAction != null) {
-            actionManager.unregisterAction(ACTION_ID)
-        }
-        val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-        actionManager.registerAction(ACTION_ID, sendToPromptTextEditorAction)
-        val popupMenu = actionManager.getAction("EditorPopupMenu")
-        val defaultActionGroup = popupMenu as? DefaultActionGroup
-        defaultActionGroup?.addSeparator()
-        defaultActionGroup?.add(sendToPromptTextEditorAction, Constraints.FIRST)
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {

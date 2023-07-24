@@ -32,7 +32,13 @@ class RefactorIntentionFactory(private val project: Project) {
                 override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = true
 
                 override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
-                    service.sendFileToContentPrompt(editor, service.psiFileToFile(file!!))
+                    service.getSelectedTextFromEditor(
+                        editor
+                    )
+                    service.addSelectedTextToTabbedPane(
+                        editor,
+                        service.psiFileToFile(file!!)
+                    )
                 }
 
                 override fun startInWriteAction(): Boolean = false
