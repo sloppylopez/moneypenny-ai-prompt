@@ -39,22 +39,5 @@
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 
-    <actions>
-        <group id="MoneyPennyAIPluginGroup" text="MoneyPenny AI" popup="true">
-            <action id="CopySpecialAction"
-                    class="com.github.sloppylopez.moneypennyideaplugin.actions.CopySpecialPlugin"
-                    text="Copy Special"
-                    description="Copy with special options">
-            </action>
-            <action id="PasteSpecialAction"
-                    class="com.github.sloppylopez.moneypennyideaplugin.actions.PasteSpecialPlugin"
-                    text="Paste Special"
-                    description="Paste with special options">
-            </action>
-        </group>
-
-
-    </actions>
-
 
 </idea-plugin>

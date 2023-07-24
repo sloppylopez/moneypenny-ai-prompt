@@ -4,6 +4,7 @@
    To fix this we need to replace them with a space ' '.
 2) https://intellij-support.jetbrains.com/hc/en-us/community/posts/360008653100-How-to-add-a-multi-button-in-table-s-toolbar-\
 3) We can use this to ensure chat gpt will never answer with ```Kotlin ``` chars in the response https://platform.openai.com/docs/api-reference/chat/create
+4) https://plugins.jetbrains.com/docs/intellij/basic-action-system.html#building-ui-from-actions
 
 <section>
     <h2 class="notion-h notion-h1 notion-h-indent-0 notion-block-6859055bc61e48409065b74d478ba5c0"
