@@ -21,8 +21,8 @@ possible experience for our users.
 <img src="src/main/resources/images/img.png" alt="Prompt" align="center">
 <br>
 <img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build" align="center">
-<a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg" alt="Version"></a>
-<a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a>
+<a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/v/22252-moneypenny-ai.svg" alt="Version"></a>
+<a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/d/22252-moneypenny-ai.svg" alt="Downloads"></a>
 
 ## Exceptional Features of MoneyPenny AI Prompt
 
