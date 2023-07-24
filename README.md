@@ -20,7 +20,7 @@
 
 - **Multi-File Refactoring**: Revamp, supplement, or modify multiple files at once.
 - **Swift Response Time**: Bid farewell to changing apps, maintain your coding flow inside Intellij IDEA.
-- **Up to 32,000 Token Contextual Prompt**: Get smart, context-aware coding suggestions using our extended contextual
+- **Up to 32,000 Token Contextual Prompt**: Get smart, context-aware coding suggestions using extended contextual
   prompt.
 - **Optimized Performance & Speed**: No Typewriter effect, enjoy speed with parallelized requests.
 - **Smooth Integration**: Use all features of IntelliJ IDEA effortlessly.
