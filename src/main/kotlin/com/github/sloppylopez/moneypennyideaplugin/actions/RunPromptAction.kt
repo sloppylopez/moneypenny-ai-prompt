@@ -65,7 +65,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
                         )
                         val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
                         service.modifySelectedTextInEditorByFile(
-                            choice, service.fileToVirtualFile(file)!!
+                            content, service.fileToVirtualFile(file)!!
                         )
                     } else {
                         service.showNotification(

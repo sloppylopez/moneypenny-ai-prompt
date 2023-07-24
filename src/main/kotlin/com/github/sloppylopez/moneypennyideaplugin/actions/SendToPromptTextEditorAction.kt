@@ -13,8 +13,6 @@ import com.intellij.openapi.vfs.VirtualFile
 @Service(Service.Level.PROJECT)
 class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
-    private var editor: Editor? = null
-    private var file: VirtualFile? = null
 
     companion object {
         private const val ACTION_ID = "com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileEditorAction"
@@ -26,23 +24,24 @@ class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        editor?.let { editor ->
-            file?.let { file: VirtualFile ->
-                service.sendFileToContentPrompt(
-                    editor,
-                    service.virtualFileToFile(file)
-                )
-            }
-        }
+        val file = getFile(e) ?: return
+        val editor = getEditor(e) ?: return
+        service.sendFileToContentPrompt(
+            editor,
+            service.virtualFileToFile(file)
+        )
     }
 
-    // This executes just after you right clik on an open file in editor, we use it to get the opened file
     override fun update(e: AnActionEvent) {
-        val project = e.getData(CommonDataKeys.PROJECT)
-        val fileEditorManager = FileEditorManager.getInstance(project!!)
-        editor = fileEditorManager.selectedTextEditor
-        file = fileEditorManager.selectedFiles.firstOrNull()//With this we get the selected file from the file editor
-        e.presentation.isEnabled = true
+        e.presentation.isEnabled = getFile(e) != null && getEditor(e) != null
+    }
+
+    private fun getFile(event: AnActionEvent): VirtualFile? {
+        return FileEditorManager.getInstance(event.project ?: return null).selectedFiles.firstOrNull()
+    }
+
+    private fun getEditor(event: AnActionEvent): Editor? {
+        return FileEditorManager.getInstance(event.project ?: return null).selectedTextEditor
     }
 
     fun registerFileEditorAction() {

@@ -32,23 +32,29 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory"
                     id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
-
-        <!--        <intentionAction factoryClass="com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory">-->
-        <!--            <language name="JAVA"/>-->
-        <!--            <className/>-->
-        <!--        </intentionAction>-->
     </extensions>
-
-    <!--    <extensions defaultExtensionNs="com.intellij">-->
-    <!--        <codeInsight.lineMarkerProvider language="Markdown" implementationClass="ui.MarkdownLineMarkerProvider" />-->
-    <!--    </extensions>-->
 
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
 
-    <!--    <extensions defaultExtensionNs="com.intellij.intentionAction">-->
-    <!--        <intentionAction implementation="com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory$CustomIntention"/>-->
-    <!--    </extensions>-->
+    <actions>
+        <group id="MoneyPennyAIPluginGroup" text="MoneyPenny AI" popup="true">
+            <action id="CopySpecialAction"
+                    class="com.github.sloppylopez.moneypennyideaplugin.actions.CopySpecialPlugin"
+                    text="Copy Special"
+                    description="Copy with special options">
+            </action>
+            <action id="PasteSpecialAction"
+                    class="com.github.sloppylopez.moneypennyideaplugin.actions.PasteSpecialPlugin"
+                    text="Paste Special"
+                    description="Paste with special options">
+            </action>
+        </group>
+
+
+    </actions>
+
+
 </idea-plugin>

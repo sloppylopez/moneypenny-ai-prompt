@@ -2,7 +2,6 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
-import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
@@ -62,7 +61,7 @@ class ProjectService {
     } as String
 
     fun extractCode(input: String): String {
-        val regex = Regex("```(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
+        val regex = Regex("```\\w*\\n(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
         val matchResult = regex.find(input)
         return matchResult?.groups?.get(1)?.value?.trim() ?: ""
     }
@@ -185,7 +184,7 @@ class ProjectService {
     }
 
     fun modifySelectedTextInEditorByFile(
-        newText: ChatGptMessage,
+        newText: String,
         file: VirtualFile,
     ) {
         try {
@@ -203,7 +202,7 @@ class ProjectService {
                     if (startOffset != endOffset) {
                         ApplicationManager.getApplication().runWriteAction {
                             WriteCommandAction.runWriteCommandAction(project) {
-                                document.replaceString(startOffset, endOffset, newText.content)
+                                document.replaceString(startOffset, endOffset, newText)
                             }
                         }
                     }
