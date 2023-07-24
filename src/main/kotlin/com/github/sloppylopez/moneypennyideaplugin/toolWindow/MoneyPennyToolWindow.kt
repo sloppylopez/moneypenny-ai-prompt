@@ -14,14 +14,16 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
-import javax.swing.*
+import javax.swing.BoxLayout
+import javax.swing.JComponent
+import javax.swing.JPanel
+import javax.swing.JTabbedPane
 import javax.swing.event.ChangeListener
 
 class MoneyPennyToolWindow(
     project: Project
 ) {
 
-    private val comboBoxPanelFactory = project.service<ComboBoxPanelFactory>()
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val ancestorListener = project.service<AncestorListener>()
     private val fileEditorManager = project.service<FileEditorManager>()
@@ -89,17 +91,16 @@ class MoneyPennyToolWindow(
         if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
-            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
+            1 -> {
+                service.addPanelsToGlobalData(nestedPanel, innerPanel, tabbedPane)
+            }
 
             2 -> {
                 promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
                 service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
             }
 
-            1 -> {
-                val buttonPanelFactory = ButtonPanelFactory(service.getProject()!!)
-                buttonPanelFactory.buttonPanel(nestedPanel, innerPanel, tabbedPane)
-            }
+//            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
         }
         return innerPanel
     }

@@ -13,22 +13,20 @@ internal class MarkdownLineMarkerProvider : LineMarkerProvider {
 
         val node = element.node
         val tokenSet = TokenSet.create(MarkdownElementTypes.INLINE_LINK)
-        val classLoader = Thread.currentThread().contextClassLoader
-        val icon = IconLoader.getIcon(
-            "C:\\Users\\sergi\\PycharmProjects2\\moneypenny-idea-plugin\\src\\main\\resources\\icons\\ic_linemarkerprovider.svg",
-            classLoader
-        )
+        val icon = loadIcon("icons/ic_linemarkerprovider.svg")
 
         if (tokenSet.contains(node.elementType))
             return LineMarkerInfo(
                 element,
                 element.textRange,
                 icon,
-                null,   
+                null,
                 null,
                 GutterIconRenderer.Alignment.CENTER
             )
 
         return null
     }
+
+    private fun loadIcon(path: String) = IconLoader.getIcon(path, Thread.currentThread().contextClassLoader)
 }

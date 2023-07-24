@@ -1,26 +1,27 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
-import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.actions.*
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.prompts
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.google.gson.Gson
 import com.intellij.icons.AllIcons
 import com.intellij.notification.*
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
+import com.intellij.openapi.keymap.impl.ui.KeymapPanel.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
@@ -32,23 +33,24 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.SmartPointerManager
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
-import java.awt.Component
-import java.awt.Container
-import java.awt.Toolkit
+import io.ktor.util.*
+import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
 import javax.swing.*
-import kotlin.collections.ArrayList
+
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
-    private val CURRENT_PROCESS_PROMPT = Key.create<String>("Current Processed Prompt")
+    private val currentProcessPrompt = Key.create<String>("Current Processed Prompt")
     private val pluginId = "MoneyPenny AI"
 
     fun getFileContents(filePath: String?) = filePath?.let {
@@ -58,6 +60,18 @@ class ProjectService {
             thisLogger().error(e.stackTraceToString())
         }
     } as String
+
+    fun extractCommentsFromCode(input: String): String {
+        val regex = Regex("```\\w*\\n(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
+        val matchResult = regex.find(input)
+        return matchResult?.groups?.get(1)?.value?.trim() ?: ""
+    }
+
+    fun isCodeCommented(input: String): Boolean {
+        val regex = Regex("```\\w*\\n(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
+        val matchResult = regex.find(input)
+        return matchResult != null
+    }
 
     fun getRandomNumber() = (1..100).random()
 
@@ -129,16 +143,24 @@ class ProjectService {
 
     fun showNotification(
         @NlsSafe title: String,
-        @NlsSafe message: String
+        @NlsSafe message: String,
+        notificationType: NotificationType?,
+        customIcon: Icon? = null,
+        imageName: String? = null
     ) {
         val notification = Notification(
-            "MoneyPenny",
+            "MoneyPennyAI",
             title,
-            message,
-            NotificationType.INFORMATION
+            message.escapeHTML(),
+            notificationType ?: NotificationType.INFORMATION
         )
-
+        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13.jpg"))
         Notifications.Bus.notify(notification, this.getProject()!!)
+    }
+
+    private fun createCustomIcon(imageName: String): Icon {
+        // Code to generate a random image and create an icon from it
+        return ImageIcon(SendToPromptFileFolderTreeAction::class.java.getResource(imageName))
     }
 
     fun showMessage(
@@ -169,7 +191,7 @@ class ProjectService {
     }
 
     fun modifySelectedTextInEditorByFile(
-        newText: ChatGptMessage,
+        newText: String,
         file: VirtualFile,
     ) {
         try {
@@ -187,7 +209,7 @@ class ProjectService {
                     if (startOffset != endOffset) {
                         ApplicationManager.getApplication().runWriteAction {
                             WriteCommandAction.runWriteCommandAction(project) {
-                                document.replaceString(startOffset, endOffset, newText.content)
+                                document.replaceString(startOffset, endOffset, newText)
                             }
                         }
                     }
@@ -301,23 +323,48 @@ class ProjectService {
         return ToolWindowManager.getInstance(getProject()!!).getToolWindow(pluginId)
     }
 
-    fun sendFileToContentPrompt(
-        editor: Editor?,
-        file: File?,
-    ) {
+//    fun sendFileToContentPrompt(
+//        editor: Editor?,
+//        file: File?,
+//    ) {
+//        try {
+//            editor?.let { selectedEditor ->
+//                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+//                if (selectedTextFromEditor.isNullOrEmpty()) {
+//                    selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
+//                }
+//                if (!selectedTextFromEditor.isNullOrEmpty()) {
+//                    addTabbedPaneToToolWindow(
+//                        this.getProject()!!,
+//                        listOf(file),
+//                        selectedTextFromEditor
+//                    )
+//                }
+//            }
+//        } catch (e: Exception) {
+//            thisLogger().error(e.stackTraceToString())
+//        }
+//    }
+
+    fun getSelectedTextFromEditor(editor: Editor?): String? {
+        return editor?.let { selectedEditor ->
+            var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
+            if (selectedTextFromEditor.isNullOrEmpty()) {
+                selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
+            }
+            selectedTextFromEditor
+        }
+    }
+
+    fun addSelectedTextToTabbedPane(editor: Editor?, file: File?) {
         try {
-            editor?.let { selectedEditor ->
-                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
-                if (selectedTextFromEditor.isNullOrEmpty()) {
-                    selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
-                }
-                if (!selectedTextFromEditor.isNullOrEmpty()) {
-                    addTabbedPaneToToolWindow(
-                        this.getProject()!!,
-                        listOf(file),
-                        selectedTextFromEditor
-                    )
-                }
+            val selectedTextFromEditor = getSelectedTextFromEditor(editor)
+            if (!selectedTextFromEditor.isNullOrEmpty()) {
+                addTabbedPaneToToolWindow(
+                    this.getProject()!!,
+                    listOf(file),
+                    selectedTextFromEditor
+                )
             }
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
@@ -350,7 +397,7 @@ class ProjectService {
     fun putUserDataInComponent(fileList: List<*>, content: Content) {
         val myfiles = ArrayList<String>()
         myfiles.add("hello")
-        content.putUserData(CURRENT_PROCESS_PROMPT, myfiles.toString())
+        content.putUserData(currentProcessPrompt, myfiles.toString())
     }
 
     fun getUserDataFromComponent(key: Key<List<*>>, content: Content) {
@@ -361,12 +408,12 @@ class ProjectService {
         val nestedTabbedPanes = mutableListOf<JBTabbedPane>()
 
         fun findNestedTabbedPanesRecursive(container: Container) {
-            for (component in container.components) {
-                if (component is JBTabbedPane) {
-                    nestedTabbedPanes.add(component)
-                    findNestedTabbedPanesRecursive(component)
-                } else if (component is Container) {
-                    findNestedTabbedPanesRecursive(component)
+            for (currentTabbedPane in container.components) {
+                if (currentTabbedPane is JBTabbedPane) {
+                    nestedTabbedPanes.add(currentTabbedPane)
+                    findNestedTabbedPanesRecursive(currentTabbedPane)
+                } else if (currentTabbedPane is Container) {
+                    findNestedTabbedPanesRecursive(currentTabbedPane)
                 }
             }
         }
@@ -417,9 +464,88 @@ class ProjectService {
         return emptyList()
     }
 
+    fun addToolBar(toolWindowContent: SimpleToolWindowPanel) {
+        val actionGroup = DefaultActionGroup()
+        val project = this.getProject()!!
+        val toolBar = ActionManager.getInstance().createActionToolbar(
+            "MoneyPennyAI.MainPanel",
+            actionGroup,
+            true
+        )
+        actionGroup.add(SendToPromptFileFolderTreeAction(project))
+        actionGroup.addSeparator()
+        actionGroup.add(RunPromptAction(project))
+        actionGroup.add(RunAllPromptAction(project))
+        actionGroup.add(CopyPromptAction(project))
+        actionGroup.addSeparator()
+        actionGroup.add(
+            ComboBoxEnginesAction(
+                project,
+                AllIcons.General.Gear,
+                "Engine Selection",
+                GlobalData.engineModelStrings,
+                "ChatGPT Engines"
+            )
+        )
+        actionGroup.addSeparator()
+        actionGroup.add(
+            ComboBoxRolesAction(
+                project,
+                AllIcons.CodeWithMe.Users,
+                "Role Selection",
+                GlobalData.roleModelStrings,
+                "ChatGPT Roles"
+            )
+        )
+        actionGroup.addSeparator()
+        toolWindowContent.toolbar = toolBar.component
+    }
+
+    fun addPanelsToGlobalData(
+        nestedPanel: JPanel,
+        innerPanel: JPanel,
+        tabbedPane: JBTabbedPane
+    ) {
+        GlobalData.nestedPanel = nestedPanel
+        GlobalData.innerPanel = innerPanel
+        GlobalData.tabbedPane = tabbedPane
+    }
+
     fun loadDataFromExtensionFolder(): String {
         val extensionFolder = File(PathManager.getPluginsPath(), pluginId)
         val dataFile = File(extensionFolder, "prompt_history.txt")
         return dataFile.readText()
     }
+
+    fun createPointer(element: PsiElement) {
+        SmartPointerManager.createPointer<PsiElement?>(element)
+    }
+//TODO use alarms to be able to cancel requests supposedly
+//    fun createToolBar(toolWindow: JComponent?): JComponent {
+//        val actionGroup = DefaultActionGroup()
+//        actionGroup.add(SendToPromptFileFolderTreeAction(this.getProject()!!))
+//        actionGroup.addSeparator()
+//        val actionManager: ActionManager = ActionManager.getInstance()
+//        val toolbar: ActionToolbar = actionManager.createActionToolbar("MoneyPennyAI.MainPanel", actionGroup, true)
+//        toolbar.targetComponent = toolWindow
+//        return toolbar.component
+//    }
+
+//    JOptionPane.showMessageDialog(
+//    this@SQLPluginPanel, "Can't read file '$file'", "Error",
+//    JOptionPane.ERROR_MESSAGE
+//    )
+    ////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
+
+    //    fun hola(){
+    //        getProject().getModelAccess().executeCommand(object : DefaultCommand() {
+    //            fun run() {
+    //                createConsoleModel()
+    //                addBuiltInImports()
+    //                loadHistory(history)
+    //                createEditor()
+    //                myFileEditor = ConsoleFileEditor(myEditor)
+    //            }
+    //        })
+    //    }
 }

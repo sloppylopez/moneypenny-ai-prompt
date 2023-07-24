@@ -5,11 +5,7 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBScrollPane
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -19,7 +15,6 @@ import java.awt.dnd.DropTargetAdapter
 import java.awt.dnd.DropTargetDropEvent
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Paths
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
@@ -43,7 +38,11 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             prePromptTextArea = textAreaFactory
                 .createDefaultTextArea("", 2, 79)
             contentPromptTextArea = textAreaFactory
-                .createDefaultTextArea("Paste text, drag a file, copy folder path, use Action, use Intention...", 10, 79)
+                .createDefaultTextArea(
+                    "Paste text, drag a file, copy folder path, use Action, use Intention...",
+                    10,
+                    79
+                )
             contentPromptTextArea?.name = "contentPromptTextArea"
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(

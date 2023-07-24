@@ -1,73 +1,110 @@
-<!DOCTYPE html>
-<html lang="html">
-<body>
 <div>
-  <div>
-    <img src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px" align="left">
-    <h1>&nbsp;&nbsp;MoneyPenny AI Prompt</h1>
+  <div style="margin: 10px;">
+    <img style="margin: 10px;" src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px" align="left">
+    <h1>MoneyPenny AI Prompt</h1>
   </div>
-    <p>
-        MoneyPenny AI Prompt, the cutting-edge IntelliJ IDEA plugin that revolutionizes code refactoring! Empower yourself to enhance, refactor, and test your codebase effortlessly with just a few clicks. Experience the seamless integration with IntelliJ IDEA, making code optimization a breeze!
+    <p style="margin: 10px;">
+        MoneyPenny AI Prompt, the cutting-edge IntelliJ IDEA plugin now compatible with ChatGPT-4! It revolutionizes code refactoring by allowing users to utilize a 16,000 or even 32,000 token contextual prompt. Empower yourself to enhance, refactor, and test your codebase effortlessly with just a few clicks. Experience the seamless integration with IntelliJ IDEA, making code optimization a breeze!
     </p>
 </div>
 
-<h2>Welcome to Prompt Driven Development!</h2>
+## Embark on a Prompt Driven Development Journey!
 
-  <img src="src/main/resources/images/img.png" alt="Prompt">
-  <img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build">
-  <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg" alt="Version"></a>
-  <a href="https://plugins.jetbrains.com/plugin/PLUGIN_ID"><img src="https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg" alt="Downloads"></a
+<img src="src/main/resources/images/img.png" alt="Prompt" align="center">
+<br>
+<img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build" align="center">
+<a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/v/22252-moneypenny-ai.svg" alt="Version"></a>
+<a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/d/22252-moneypenny-ai.svg" alt="Downloads"></a>
+
+## Exceptional Performance with MoneyPenny AI Prompt
+
+- **Multi-File Refactoring**: Revamp, supplement, or modify multiple files at once.
+- **Swift Response Time**: Bid farewell to changing apps, maintain your coding flow inside Intellij IDEA.
+- **Up to 32,000 Token Contextual Prompt**: Get smart, context-aware coding suggestions using extended contextual
+  prompt.
+- **Optimized Performance & Speed**: No Typewriter effect, enjoy speed with parallelized requests.
+- **Smooth Integration**: Use all features of IntelliJ IDEA effortlessly.
+- **Buzzwords**: To avoid typing the most common buzzwords, "refactor", "fix", "add" and such.
+
+Watch the *Code Frequency* graf below to see how MoneyPenny AI Prompt has helped achieve
+10x productivity. This chart represents the code frequency over the last 1 year of development of the template
+for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a month with no precious
+experience of Kotlin or IntelliJ IDEA SDK.
+Watch productivity skyrocket with MoneyPenny AI Prompt!
+
+<img src="src/main/resources/images/productivity_chart.png" alt="Code Frequency" align="center">
+
+https://github.com/JetBrains/intellij-platform-plugin-template/graphs/code-frequency
+
+VS
+
+https://github.com/sloppylopez/moneypenny-ai-prompt/graphs/code-frequency
+
+Stay ahead of your peers by experiencing the unmatched benefits of MoneyPenny AI Prompt today. Unleash the power of AI
+into your coding workflow, create innovative solutions with ease, and achieve more in less time.
+
+## The Origin Story
+
+MoneyPenny AI Prompt is a testament to the extraordinary capabilities of ChatGPT. Developed in just a month, with no
+prior knowledge of Kotlin or IntelliJ IDEA SDK.
+
+ChatGPT, with its advanced language understanding and coding skills, is the primary author of this plugin, contributing
+a staggering 98% of the code. It was pivotal in creating a tool that has become a developer's best friend, aiding in
+achieving 10x productivity. It assisted in implementing complex functionalities and ensuring a smooth integration into
+IntelliJ IDEA.
+
+Witness the magic of this collaboration by installing MoneyPenny AI Prompt and experience the fantastic synergy of human
+creativity and AI intelligence.
+
+## How to Install
+
+To install MoneyPenny AI Prompt, you have two straightforward options:
+
+1. **IDE built-in plugin system** (Once the plugin is published)
+    - Navigate to `Settings/Preferences > Plugins > Marketplace`.
+    - Search for "MoneyPenny AI Prompt".
+    - Click on `Install Plugin`.
+2. **Manual installation** (Until the plugin is published)
+    - Fork the GitHub repository of MoneyPenny AI Prompt.
+    - Clone the forked repository on your machine.
+    - Build the plugin to generate a JAR file.
+    - In IntelliJ IDEA, navigate to `Settings/Preferences > Plugins > ⚙️ > Install plugin from disk...`.
+    - Select the JAR file of MoneyPenny AI Prompt and click `OK`.
+
+> You need your ChatGPT API Key named OPENAI_API_KEY for the plugin to work correctly.
+
+Plugin based on
+the [IntelliJ Platform Plugin Template](https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg).
+
+## Release 1.1.0-SNAPSHOT – Enhancements and Bug Fixes
+
+We are pleased to announce the release of version 1.1.0-SNAPSHOT, which introduces significant bug fixes and improves
+the overall performance and stability of the plugin. This release solidifies our commitment to providing the best
+possible experience for our users.
+
+### Enhancements
+
+* Fix most bugs that was making refactoring tedious, still possibly more to go
+* Add comboBox to control engines, so we can test using the smaller engine
+* Add comboBox to control roles, so we can have a more diverse set of prompts
+* Change 90's buttons for proper toolBar inside toolWindow
+* Add automagic DRY action in right click menu
+* Add action with submenus in right click menu
+
+## Useful Resources
+
+To make the most of MoneyPenny AI Prompt and IntelliJ IDEA, check out these resources:
+
+[List of resource links as in the original README]
+
+## Contribute to the Future
+
+Your contributions are highly appreciated! If you have innovative ideas, suggestions, or encounter any bugs, feel free
+to raise an issue on
+the [MoneyPenny AI Prompt GitHub repository](https://github.com/sloppylopez/moneypenny-idea-plugin). Want to contribute
+code? Fork the repository and submit a pull request. We're excited to see your contributions!
+
 <div>
-<h2>Unrivaled Features</h2>
-
-<ul>
-  <li>Multi-File Refactoring: Refactor, add, or modify multiple files simultaneously.</li>
-  <li>Lightning-Fast Responses: Enjoy seamless coding flow without delays.</li>
-  <li>16000 Token Contextual Prompt: Smarter, contextually relevant coding suggestions.</li>
-  <li>Optimal Performance & Speed: No Typewriter effect and parallelized requests for lightning-fast results.</li>
-  <li>Seamless Integration: Effortlessly integrates into IntelliJ IDEA.</li>
-  <li>Wide Range of Operations: Choose files and apply various operations.</li>
-</ul>
-</div>
-<p>Download MoneyPenny AI Prompt now and become a 10x developer with AI-powered coding efficiency.</p>
-
-<p>Experience unparalleled advantages today, leaving competitors behind. Unlock the true power of AI in your coding workflow and create brilliance effortlessly. Elevate your coding prowess with intelligent completions and achieve more in less time. Get started on your transformative coding journey with MoneyPenny AI Prompt - the ultimate IntelliJ IDEA plugin for 10x developers.</p>
-
-<h2>History of the Project</h2>
-
-<p>The inception of MoneyPenny AI Prompt is a testament to the remarkable capabilities of ChatGPT. Created in a short span of just one month, this revolutionary project was developed without any prior experience in Kotlin or IntelliJ IDEA SDK.</p>
-
-<p>The driving force behind this remarkable achievement was the invaluable assistance provided by ChatGPT. With ChatGPT's unparalleled language understanding and coding capabilities, it became the author of a staggering 98% of the code that powers this plugin.</p>
-
-<p>ChatGPT's collaboration and intelligence played a pivotal role in crafting a tool that has now become the ultimate companion for developers seeking to achieve 10x productivity. It not only enabled the implementation of complex functionalities but also facilitated seamless integration into IntelliJ IDEA.</p>
-
-<p>Experience the tantamount outcome of this collaboration by downloading MoneyPenny AI Prompt and witness the incredible synergy of human imagination and AI intelligence.</p>
-
-
-<h2>Installation</h2>
-<p>To install MoneyPenny AI Prompt, you have two options:</p>
-<ul>
-  <li>Option 1: Using IDE built-in plugin system (when the plugin is published):</li>
-  <ol>
-    <li>Go to <strong>Settings/Preferences</strong> &gt; <strong>Plugins</strong> &gt; <strong>Marketplace</strong>.</li>
-    <li>Search for "MoneyPenny AI Prompt".</li>
-    <li>Click <strong>Install Plugin</strong>.</li>
-  </ol>
-  <li>Option 2: Manual installation (until the plugin gets published):</li>
-  <ol>
-    <li>Fork the repository of the MoneyPenny AI Prompt plugin from GitHub.</li>
-    <li>Clone the forked repository to your local machine.</li>
-    <li>Build the plugin to create a JAR file.</li>
-    <li>In IntelliJ IDEA, go to <strong>Settings/Preferences</strong> &gt; <strong>Plugins</strong> &gt; ⚙️ &gt; <strong>Install plugin from disk...</strong>.</li>
-    <li>Select the generated JAR file of MoneyPenny AI Prompt and click <strong>OK</strong>.</li>
-  </ol>
-</ul>
-<p><em>Note: Until the plugin gets published, you can fork the GitHub repository, create a JAR file locally, and manually install it using the second option above.</em></p>
-<p><em>Observe that you need an environment variable in your machine called OPENAI_API_KEY, containing the key to your ChatGPT API Key; otherwise, the plugin won't function correctly.</em></p>
-  <hr>
-
-  <p>Plugin based on the <a href="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg">IntelliJ Platform Plugin Template</a>.</p>
-
 <h2>Useful Links</h2>
 
   <p>Here are some useful links to help you make the most of MoneyPenny AI Prompt and IntelliJ IDEA:</p>
@@ -90,39 +127,22 @@
     <li><a href="https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html?from=jetbrains.org#bundled-and-other-plugins">Plugins Support</a></li>
     <li><a href="https://mediamodifier.com/svg-editor#">Svg Editor</a></li>
   </ul>
+</div>
 
-<h2>Contributing</h2>
+## MoneyPenny AI Prompt Plugin Description
 
-  <p>
-    Contributions are welcome! If you have any ideas, suggestions, or bug reports, please create an issue on the
-    <a href="https://github.com/sloppylopez/moneypenny-idea-plugin">MoneyPenny AI Prompt GitHub repository</a>.
-    If you would like to contribute code, please fork the repository and submit a pull request.
-  </p>
-
-<h2>Idea Plugin Description</h2>
 <!-- Plugin description -->
-MoneyPenny AI Prompt - Prompt Driven Development
+Unveil the future of Prompt Driven Development (PDD) with MoneyPenny AI Prompt, a top-notch IntelliJ IDEA plugin
+designed to skyrocket your coding productivity. Here are the standout features that set us apart from the rest:
 
-Experience the future of PDD coding with MoneyPenny AI Prompt, the ultimate IntelliJ IDEA plugin, designed to elevate
-your coding experience to new heights. Here's why MoneyPenny stands out from the competition:
+- **Multi-File Refactoring**: Tweak, add, or adjust multiple files all at once, unlike other platforms like Copilot X.
+- **Rapid Responses without Typewriter Effect**: Revel in lightning-fast responses without any disruptive typing effect,
+  making your coding experience smoother than ever. We prioritize speed over web chat-based solutions.
+- **16,000 Token Contextual Prompt**: Leverage the vast context of the ChatGPT model for smart, context-aware coding
+  suggestions, going beyond the limitations of standard web chatbots.
+- **Effortless Integration & Enhanced Intelligence**: Integrate MoneyPenny AI Prompt into IntelliJ IDEA effortlessly,
+  boosting your coding experience with intelligent code completions and predictive assistance.
 
-Multi-File Refactoring: Refactor, add, or modify multiple files simultaneously, saving valuable time and effort. Copilot
-X lacks this powerful capability.
-
-Faster Responses, No Typewriter Effect: Enjoy lightning-fast responses without the annoying typewriter effect, providing
-a seamless coding flow. Unlike web chat-based solutions, MoneyPenny AI Prompt prioritizes speed.
-
-16000k Contextual Prompt: Our plugin taps into the extensive context of the ChatGPT model, delivering smarter,
-contextually relevant coding suggestions, surpassing the limitations of standard web chatbots.
-
-Seamless Integration & Intelligence: MoneyPenny AI Prompt effortlessly integrates into IntelliJ IDEA, enhancing your
-coding experience with intelligent code completions and predictive assistance.
-
-Continuous Evolution: We're committed to continuous improvement, ensuring MoneyPenny AI Prompt evolves with the latest
-advancements in AI and coding practices.
-
-Download MoneyPenny AI Prompt now and unlock the power of AI in your coding workflow, leaving other plugins and
-competitors in the dust. Elevate your coding efficiency and create brilliance with ease.
+Download MoneyPenny AI Prompt today to unlock the potential of AI in your coding workflow, leaving other plugins and
+competitors far behind. Boost your coding efficiency and create wonders with ease.
 <!-- Plugin description end -->
-</body>
-</html>

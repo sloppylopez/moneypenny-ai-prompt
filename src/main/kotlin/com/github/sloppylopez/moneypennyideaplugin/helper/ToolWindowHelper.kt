@@ -45,7 +45,6 @@ class ToolWindowHelper {
                     service,
                     selectedText
                 )
-//                service.putUserDataInComponent(fileList!!, contentTab)
                 //Add content tab to tabbed pane
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
                 tabbedPane.selectedIndex = tabCounter - 1
@@ -55,6 +54,9 @@ class ToolWindowHelper {
                     tabbedPane.setTabComponentAt(i, tabComponent)
                 }
                 toolWindowContent.setContent(tabbedPane)
+                service.addToolBar(toolWindowContent)
+//                toolWindowContent.componentOrientation = ComponentOrientation.RIGHT_TO_LEFT
+//                service.createToolbarPanel(toolWindowContent)
                 // Add a change listener to handle tab close events
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
             } catch (e: Exception) {
@@ -94,7 +96,6 @@ class ToolWindowHelper {
                         true
                     )
             }
-//            service.putUserDataInComponent(fileList, contentTab)
             return contentTab
         }
 
@@ -127,7 +128,7 @@ class ToolWindowHelper {
 
         private fun getDisplayName(expandedFileList: List<File>): String {
             val prefix = if (expandedFileList.isEmpty()) "Prompt" else
-                "${expandedFileList.size} Arch"
+                "${expandedFileList.size} Archive${if (expandedFileList.size > 1) "s" else ""}"
             return "${getNextTabName()}) $prefix"
         }
 

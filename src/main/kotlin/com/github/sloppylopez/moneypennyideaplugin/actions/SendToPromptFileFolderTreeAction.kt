@@ -9,8 +9,8 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 
 @Service(Service.Level.PROJECT)
-class SendToPromptFileFolderTreeAction(private var project: Project? = null) : AnAction() {
-    private val promptPanelFactory = project?.service<PromptPanelFactory>()
+class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction() {
+    private val promptPanelFactory = project.service<PromptPanelFactory>()
 
     companion object {
         private const val ACTION_ID =
@@ -19,14 +19,14 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
 
     init {
         templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13.jpg")
-        templatePresentation.text = "Send To MoneyPenny"
+        templatePresentation.text = "Send to Prompt"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
         try {
             val selectedFiles = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY)?.toList() // Convert array to list
             if (!selectedFiles.isNullOrEmpty()) {
-                promptPanelFactory?.openFilesAndSendContentToPrompt(
+                promptPanelFactory.openFilesAndSendContentToPrompt(
                     selectedFiles
                 )
             }
@@ -52,5 +52,9 @@ class SendToPromptFileFolderTreeAction(private var project: Project? = null) : A
         val defaultActionGroup = popupMenu as? DefaultActionGroup
         defaultActionGroup?.addSeparator()
         defaultActionGroup?.add(sendToPromptFileFolderTreeAction, Constraints.FIRST)
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.EDT
     }
 }

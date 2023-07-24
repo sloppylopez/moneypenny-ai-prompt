@@ -8,6 +8,98 @@ import java.io.File
 class ProjectServiceTest : BasePlatformTestCase() {
     private val projectService = ProjectService()
 
+    fun test_trim_code_with_explanations_single() {
+        val response = "Here is the modified code with the added method:\n" +
+                "```\n" +
+                "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                "\n" +
+                "class ClassThatNeedsRefactor {\n" +
+                "    fun isString(value: Any): Boolean {\n" +
+                "        return value is String\n" +
+                "    }\n" +
+                "}\n" +
+                "```\n" +
+                "I have added the `isString` method that takes an `Any` parameter and returns `true` if the parameter is a string, and `false` otherwise."
+        val result = projectService.extractCommentsFromCode(response)
+        assertEquals(
+            result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                    "\n" +
+                    "class ClassThatNeedsRefactor {\n" +
+                    "    fun isString(value: Any): Boolean {\n" +
+                    "        return value is String\n" +
+                    "    }\n" +
+                    "}"
+        )
+    }
+
+    fun test_trim_code_with_explanations_single_and_language() {
+        val response = "Here is the modified code with the added method:\n" +
+                "```java\n" +
+                "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                "\n" +
+                "class ClassThatNeedsRefactor {\n" +
+                "    fun isString(value: Any): Boolean {\n" +
+                "        return value is String\n" +
+                "    }\n" +
+                "}\n" +
+                "```\n" +
+                "I have added the `isString` method that takes an `Any` parameter and returns `true` if the parameter is a string, and `false` otherwise."
+        val result = projectService.extractCommentsFromCode(response)
+        assertEquals(
+            result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                    "\n" +
+                    "class ClassThatNeedsRefactor {\n" +
+                    "    fun isString(value: Any): Boolean {\n" +
+                    "        return value is String\n" +
+                    "    }\n" +
+                    "}"
+        )
+    }
+
+    fun test_trim_code_with_explanations_single_and_language_without_previous_sentence() {
+        val response = "```kotlin\n" +
+                "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                "\n" +
+                "class ClassThatNeedsRefactor {\n" +
+                "    fun isString(value: Any): Boolean {\n" +
+                "        return value is String\n" +
+                "    }\n" +
+                "}\n" +
+                "```\n" +
+                "I have added the `isString` method that takes an `Any` parameter and returns `true` if the parameter is a string, and `false` otherwise."
+        val result = projectService.extractCommentsFromCode(response)
+        assertEquals(
+            result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                    "\n" +
+                    "class ClassThatNeedsRefactor {\n" +
+                    "    fun isString(value: Any): Boolean {\n" +
+                    "        return value is String\n" +
+                    "    }\n" +
+                    "}"
+        )
+    }
+
+    fun test_trim_code_with_explanations_single_and_language_without_sentences_or_language() {
+        val response = "```\n" +
+                "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                "\n" +
+                "class ClassThatNeedsRefactor {\n" +
+                "    fun isString(value: Any): Boolean {\n" +
+                "        return value is String\n" +
+                "    }\n" +
+                "}\n" +
+                "```\n"
+        val result = projectService.extractCommentsFromCode(response)
+        assertEquals(
+            result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                    "\n" +
+                    "class ClassThatNeedsRefactor {\n" +
+                    "    fun isString(value: Any): Boolean {\n" +
+                    "        return value is String\n" +
+                    "    }\n" +
+                    "}"
+        )
+    }
 
     fun testExpandFoldersWithEmptyList() {
         val fileList = emptyList<Any>()

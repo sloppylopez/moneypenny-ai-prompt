@@ -13,7 +13,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 
 private const val CUSTOM_INTENTIONS = "Custom Intentions"
-private const val SEND_TO_MONEY_PENNY = "Send to MoneyPenny"
+private const val SEND_TO_MONEY_PENNY = "Send to Prompt"
 
 @Service(Service.Level.PROJECT)
 class RefactorIntentionFactory(private val project: Project) {
@@ -32,7 +32,13 @@ class RefactorIntentionFactory(private val project: Project) {
                 override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = true
 
                 override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
-                    service.sendFileToContentPrompt(editor, service.psiFileToFile(file!!))
+                    service.getSelectedTextFromEditor(
+                        editor
+                    )
+                    service.addSelectedTextToTabbedPane(
+                        editor,
+                        service.psiFileToFile(file!!)
+                    )
                 }
 
                 override fun startInWriteAction(): Boolean = false

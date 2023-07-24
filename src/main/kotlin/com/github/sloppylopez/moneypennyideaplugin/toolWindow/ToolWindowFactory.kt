@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
@@ -27,8 +28,10 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
         try {
             val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
             sendToPromptFileFolderTreeAction.registerFolderTreeAction()
-            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-            sendToPromptTextEditorAction.registerFileEditorAction()
+//            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
+//            sendToPromptTextEditorAction.registerFileEditorAction()
+            val popUpHooverAction = PopUpHooverAction()
+            popUpHooverAction.addActionsToEditor()
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
             SwingUtilities.invokeLater {
                 ApplicationManager.getApplication().invokeLater(

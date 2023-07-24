@@ -4,13 +4,12 @@ import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.google.gson.Gson
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import net.minidev.json.JSONObject
-import java.io.File
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -31,7 +30,6 @@ class ChatGPTService(project: Project) {
 
     fun sendChatPrompt(
         prompt: String,
-        tabName: String,
         callback: ChatGptChoiceCallback
     ): CompletableFuture<ChatGptCompletion> {
         val requestBody = getRequestBodyJson(prompt)
@@ -42,7 +40,7 @@ class ChatGPTService(project: Project) {
                 gson.fromJson(responseBody, ChatGptCompletion::class.java)
             }
             .whenComplete { choice: ChatGptCompletion?, throwable: Throwable? ->
-                handleCompletion(choice, throwable, callback, tabName)
+                handleCompletion(choice, throwable, callback)
             }
     }
 
@@ -62,11 +60,10 @@ class ChatGPTService(project: Project) {
     private fun handleCompletion(
         choice: ChatGptCompletion?,
         throwable: Throwable?,
-        callback: ChatGptChoiceCallback,
-        tabName: String
+        callback: ChatGptChoiceCallback
     ) {
         if (throwable != null) {
-            service.showNotification("Error", throwable.message!!)
+            service.showNotification("Error", throwable.message!!, NotificationType.INFORMATION)
             callback.onCompletion(ChatGptMessage("system", "Error: ${throwable.message}"))
         } else {
             val message = getMessage(choice)
@@ -79,15 +76,9 @@ class ChatGPTService(project: Project) {
 
     private fun getRequestBodyJson(prompt: String): String {
         val promptLength = prompt.length
-        val maxTokenCount = 16384 - 1 - promptLength
+        val maxTokenCount = getMaxTokenCount(promptLength)
 
-        val systemMessage = JSONObject().apply {
-            put("role", "system")
-            put(
-                "content",
-                "You are a code refactor assistant. Always answer without explanations, return only code if possible, respect imports and class names"
-            )
-        }
+        val systemMessage = getSystemMessage(GlobalData.role)
 
         val userMessage = JSONObject().apply {
             put("role", "user")
@@ -95,12 +86,47 @@ class ChatGPTService(project: Project) {
         }
 
         val jsonObject = JSONObject().apply {
-            put("model", "gpt-3.5-turbo-16k")
+            put("model", GlobalData.engine)
             put("messages", listOf(systemMessage, userMessage))
             put("max_tokens", maxTokenCount)
         }
 
         return jsonObject.toString()
+    }
+
+    //W.I.P Missing engines
+    private fun getMaxTokenCount(promptLength: Int): Int {
+        return if (GlobalData.engine == "gpt-3.5-turbo-16k") {
+            16384 - 1 - promptLength
+        } else {
+            4096 - 1 - promptLength
+        }
+    }
+
+    private fun getSystemMessage(role: String): JSONObject {
+        return JSONObject().apply {
+            put("role", "system")
+            val content = when (role) {
+                "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
+                "code-completer" -> "You are a code completer. Let me help you complete your code!"
+                "refactor-machine" -> "You are a code refactor assistant. Always answer without explanations, return only code if possible, maintain given imports and class names"
+                "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
+                else -> "You are a code completer. Let me help you complete your code!"
+            }
+            put("content", content)
+        }
+    }
+
+    fun getAvailableModels(): CompletableFuture<String> {
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.openai.com/v1/engines"))
+            .timeout(Duration.ofSeconds(30))
+            .header("Authorization", "Bearer $apiKey")
+            .GET()
+            .build()
+
+        return sendAsyncRequest(request)
+            .thenApply { obj: HttpResponse<String>? -> obj?.body() }
     }
 
     interface ChatGptChoiceCallback {

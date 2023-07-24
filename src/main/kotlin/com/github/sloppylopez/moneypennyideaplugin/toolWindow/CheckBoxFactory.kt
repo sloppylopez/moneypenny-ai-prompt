@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.intellij.openapi.components.Service
 import javax.swing.JCheckBox
 import javax.swing.JPanel
@@ -11,7 +12,7 @@ class CheckBoxFactory {
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
         val checkboxPanel = JPanel()
         val checkboxLabels = arrayOf(
-            "DRY", "Add", "Create", "Modify", "Remove", "Replace", "Update", "Gives", "With"
+            "DRY", "Add", "Create", "Remove", "Explanation", "Gives", "With", "Method", "Class"
         )
 
         checkboxLabels.forEach { label ->
@@ -20,6 +21,9 @@ class CheckBoxFactory {
 
             if (label == "DRY") {
                 updatePostPromptText(checkBox, postPromptTextArea)
+            }
+            if (label == "Explanation") {
+                GlobalData.explanationButton = checkBox
             }
         }
 
@@ -30,7 +34,7 @@ class CheckBoxFactory {
         val checkBox = JCheckBox(text, selected)
 
         checkBox.addActionListener { event ->
-            val selectedCheckBox = event.source as? JCheckBox
+            val selectedCheckBox = event.source as? JCheckBox ?: GlobalData.explanationButton
             selectedCheckBox?.let {
                 updatePostPromptText(selectedCheckBox, postPromptTextArea)
             }
@@ -41,9 +45,23 @@ class CheckBoxFactory {
 
     private fun updatePostPromptText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
         if (selectedCheckBox.isSelected && !selectedCheckBox.text.isNullOrBlank()) {
-            postPromptTextArea.append("${selectedCheckBox.text} \n")
+            appendText(selectedCheckBox, postPromptTextArea)
         } else {
             removeLineFromPrompt(selectedCheckBox, postPromptTextArea)
+        }
+    }
+
+    private fun appendText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
+        if (selectedCheckBox.text.equals("With")) {
+            postPromptTextArea.append("Answer with an explanation \n")//This to allow to ask freeStyle questions to ChatGpt, if no it will answer "My role is to answer always with code blablabla"
+        } else if (selectedCheckBox.text.equals("Explanation")) {
+            postPromptTextArea.append("Give me an explanation \n")
+        } else if (selectedCheckBox.text.equals("Method")) {
+            postPromptTextArea.append("Write a method that \n")
+        } else if (selectedCheckBox.text.equals("Class")) {
+            postPromptTextArea.append("Write a class that \n")
+        } else {
+            postPromptTextArea.append("${selectedCheckBox.text} \n")
         }
     }
 
