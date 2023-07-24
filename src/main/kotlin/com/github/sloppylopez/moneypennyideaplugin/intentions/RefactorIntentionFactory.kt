@@ -13,7 +13,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 
 private const val CUSTOM_INTENTIONS = "Custom Intentions"
-private const val SEND_TO_MONEY_PENNY = "Send to MoneyPenny"
+private const val SEND_TO_MONEY_PENNY = "Send to Prompt"
 
 @Service(Service.Level.PROJECT)
 class RefactorIntentionFactory(private val project: Project) {

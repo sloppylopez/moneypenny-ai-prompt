@@ -19,7 +19,7 @@ class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction(
 
     init {
         templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13.jpg")
-        templatePresentation.text = "Send To MoneyPenny"
+        templatePresentation.text = "Send to Prompt"
     }
 
     override fun actionPerformed(e: AnActionEvent) {

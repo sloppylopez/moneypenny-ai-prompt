@@ -28,8 +28,8 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
         try {
             val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
             sendToPromptFileFolderTreeAction.registerFolderTreeAction()
-            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-            sendToPromptTextEditorAction.registerFileEditorAction()
+//            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
+//            sendToPromptTextEditorAction.registerFileEditorAction()
             val popUpHooverAction = PopUpHooverAction(project)
             popUpHooverAction.addActionsToEditor()
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()

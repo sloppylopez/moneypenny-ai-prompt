@@ -1,11 +1,9 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper
-import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.popup.JBPopupFactory
 
 @Service(Service.Level.PROJECT)
 class PopUpHooverAction(private val project: Project) : ActionGroup() {
@@ -17,7 +15,7 @@ class PopUpHooverAction(private val project: Project) : ActionGroup() {
 
     init {
         templatePresentation.icon = ToolWindowHelper.getIcon("/images/MoneyPenny-Icon_13x13.jpg")
-        templatePresentation.text = "MoneyPenny PopUp Hoover Menu555"
+        templatePresentation.text = "MoneyPenny AI Prompt"
     }
 
     // Return true because this action has a submenu
@@ -25,7 +23,7 @@ class PopUpHooverAction(private val project: Project) : ActionGroup() {
 
     // Return the actions for the submenu
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-        return arrayOf(FirstAction(project), SecondAction(project))
+        return arrayOf(SendToPromptTextEditorAction(project))
     }
 
     // Handle the action if it's clicked directly (optional)
