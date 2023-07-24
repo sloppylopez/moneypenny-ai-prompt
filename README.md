@@ -26,7 +26,7 @@
 - **Smooth Integration**: Use all features of IntelliJ IDEA effortlessly.
 - **Buzzwords**: To avoid typing the most common buzzwords, "refactor", "fix", "add" and such.
 
-Watch the *Code Frequency* graf below to see how MoneyPenny AI Prompt has helped achieve 
+Watch the *Code Frequency* graf below to see how MoneyPenny AI Prompt has helped achieve
 10x productivity. This chart represents the code frequency over the last 1 year of development of the template
 for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a month with no precious
 experience of Kotlin or IntelliJ IDEA SDK.
@@ -82,6 +82,15 @@ We are pleased to announce the release of version 1.1.0-SNAPSHOT, which introduc
 the overall performance and stability of the plugin. This release solidifies our commitment to providing the best
 possible experience for our users.
 
+### Enhancements
+
+* Fix most bugs that was making refactoring tedious, still possibly more to go
+* Add comboBox to control engines, so we can test using the smaller engine
+* Add comboBox to control roles, so we can have a more diverse set of prompts
+* Change 90's buttons for proper toolBar inside toolWindow
+* Add automagic DRY action in right click menu
+* Add action with submenus in right click menu
+
 ## Useful Resources
 
 To make the most of MoneyPenny AI Prompt and IntelliJ IDEA, check out these resources:
@@ -94,6 +103,31 @@ Your contributions are highly appreciated! If you have innovative ideas, suggest
 to raise an issue on
 the [MoneyPenny AI Prompt GitHub repository](https://github.com/sloppylopez/moneypenny-idea-plugin). Want to contribute
 code? Fork the repository and submit a pull request. We're excited to see your contributions!
+
+<div>
+<h2>Useful Links</h2>
+
+  <p>Here are some useful links to help you make the most of MoneyPenny AI Prompt and IntelliJ IDEA:</p>
+
+  <ul>
+    <li><a href="https://plugins.jetbrains.com/docs/intellij/syntax-highlighter-and-color-settings-page.html#define-a-color-settings-page">Syntax Highlighter and Color Settings Page</a></li>
+    <li><a href="https://plugins.jetbrains.com/docs/intellij/lexer-and-parser-definition.html#define-a-parser">Lexer and Parser Definition</a></li>
+    <li><a href="https://plugins.jetbrains.com/docs/intellij/controlling-highlighting.html">Controlling Highlighting</a></li>
+    <li><a href="https://web.mit.edu/6.005/www/sp14/psets/ps4/java-6-tutorial/components.html">Java Swing Components</a></li>
+    <li><a href="https://docs.oracle.com/javase/tutorial/uiswing/components/tabbedpane.html">Java Swing Tabbed Pane</a></li>
+    <li><a href="https://docs.oracle.com/javase/tutorial/uiswing/examples/components/index.html#TabbedPaneDemo">Java Swing Examples</a></li>
+    <li><a href="https://medium.com/agorapulse-stories/how-to-debug-your-own-intellij-idea-instance-7d7df185a48d">Debugging Your IntelliJ IDEA Instance</a></li>
+    <li><a href="https://docs.oracle.com/javase/8/javafx/layout-tutorial/index.html">JavaFX Layout Tutorial</a></li>
+    <li><a href="https://openjfx.io/javadoc/14/javafx.controls/javafx/scene/control/TabPane.html">JavaFX Tab Pane</a></li>
+    <li><a href="https://www.youtube.com/watch?v=WRE5VwsS1X4">Debug Intellij Idea Plugin</a></li>
+    <li><a href="https://developerlife.com/2021/03/13/ij-idea-plugin-advanced/">Idea Plugin Advanced Tutorial</a></li>
+    <li><a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/360002476840-How-to-auto-start-initialize-plugin-on-project-loaded-">Autostart</a></li>
+    <li><a href="https://developerlife.com/2021/03/13/ij-idea-plugin-advanced/#psi-access-and-mutation">Psi Access and Mutation</a></li>
+    <li><a href="https://plugins.jetbrains.com/docs/intellij/psi-files.html#how-do-i-get-a-psi-file">Psi files</a></li>
+    <li><a href="https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html?from=jetbrains.org#bundled-and-other-plugins">Plugins Support</a></li>
+    <li><a href="https://mediamodifier.com/svg-editor#">Svg Editor</a></li>
+  </ul>
+</div>
 
 ## MoneyPenny AI Prompt Plugin Description
 
