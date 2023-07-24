@@ -1,14 +1,20 @@
-# MoneyPenny AI Prompt: Empowering Code Refactoring
+# MoneyPenny AI Prompt: Empowering Code Refactoring with ChatGPT-4 Compatibility
 
 <div>
-  <div>
-    <img src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px" align="left">
-    <h1>&nbsp;&nbsp;MoneyPenny AI Prompt</h1>
+  <div style="margin: 10px;">
+    <img style="margin: 10px;" src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px" align="left">
+    <h1>MoneyPenny AI Prompt</h1>
   </div>
-    <p>
-        MoneyPenny AI Prompt, the cutting-edge IntelliJ IDEA plugin that revolutionizes code refactoring! Empower yourself to enhance, refactor, and test your codebase effortlessly with just a few clicks. Experience the seamless integration with IntelliJ IDEA, making code optimization a breeze!
+    <p style="margin: 10px;">
+        MoneyPenny AI Prompt, the cutting-edge IntelliJ IDEA plugin now compatible with ChatGPT-4! It revolutionizes code refactoring by allowing users to utilize a 16,000 or even 32,000 token contextual prompt. Empower yourself to enhance, refactor, and test your codebase effortlessly with just a few clicks. Experience the seamless integration with IntelliJ IDEA, making code optimization a breeze!
     </p>
 </div>
+
+## Release 1.1.0-SNAPSHOT – Enhancements and Bug Fixes
+
+We are pleased to announce the release of version 1.1.0-SNAPSHOT, which introduces significant bug fixes and improves
+the overall performance and stability of the plugin. This release solidifies our commitment to providing the best
+possible experience for our users.
 
 ## Embark on a Prompt Driven Development Journey!
 
@@ -22,15 +28,19 @@
 
 - **Multi-File Refactoring**: Revamp, supplement, or modify multiple files at once.
 - **Swift Response Time**: Bid farewell to lag, maintain your coding flow.
-- **16,000 Token Contextual Prompt**: Get smart, context-aware coding suggestions.
+- **Up to 32,000 Token Contextual Prompt**: Get smart, context-aware coding suggestions using our extended contextual
+  prompt.
 - **Optimized Performance & Speed**: Say goodbye to the Typewriter effect and enjoy speed with parallelized requests.
 - **Smooth Integration**: Merge effortlessly with IntelliJ IDEA.
 - **Extensive Range of Operations**: Select and manipulate files with ease.
 
 Jump into the future of code refactoring with MoneyPenny AI Prompt! Transform into a 10x developer with the aid of
-AI-powered coding efficiency.
+AI-powered coding efficiency. Now compatible with the latest ChatGPT-4 technology for even more accurate and
+context-aware suggestions.
 
 Stay ahead of your peers by experiencing the unmatched benefits of MoneyPenny AI Prompt today. Unleash the power of AI
+into your coding workflow, create innovative solutions with ease, and achieve more in less time. Begin your journey with
+MoneyPenny AI Prompt - the ultimate IntelliJ IDEA plugin for developers who dare to achieve more.
 into your coding workflow, create innovative solutions with ease, and achieve more in less time. Begin your journey with
 MoneyPenny AI Prompt - the ultimate IntelliJ IDEA plugin for developers who dare to achieve more.
 
