@@ -1,11 +1,11 @@
 package com.github.sloppylopez.moneypennyideaplugin.gineapigs
 
-class ClassThatNeedsRefactor2 {
+class StringsService {
 
     fun getPrimeNumbers(numbers: Array<Int>): List<Int> {
         val primeNumbers = mutableListOf<Int>()
 
-        for (number in numbers) {
+        numbers.forEach { number ->
             var isPrime = true
 
             if (number < 2) {
