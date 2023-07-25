@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.gineapigs
 
-class ClassThatNeedsRefactor {
+class NumbersCalculator {
 
     fun getPrimeNumbers(numbers: Array<Int>): List<Int> {
         val primeNumbers = mutableListOf<Int>()

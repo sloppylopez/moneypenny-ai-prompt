@@ -44,7 +44,7 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
 
     private fun getPrompt(selectedText: String?): String {
         val prePrompt = "Refactor code:\n"
-        val postPrompt = "\nDRY it"
+        val postPrompt = "\nDRY it following best practices and using one-liners if possible"
         return "$prePrompt```$selectedText```$postPrompt"
     }
 

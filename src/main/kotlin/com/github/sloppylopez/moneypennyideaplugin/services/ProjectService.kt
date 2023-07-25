@@ -64,7 +64,7 @@ class ProjectService {
     fun extractCommentsFromCode(input: String): String {
         val regex = Regex("```\\w*\\n(.*?)```", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE))
         val matchResult = regex.find(input)
-        return matchResult?.groups?.get(1)?.value?.trim() ?: ""
+        return matchResult?.groups?.get(1)?.value?.trim() ?: input
     }
 
     fun isCodeCommented(input: String): Boolean {
