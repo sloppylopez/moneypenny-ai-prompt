@@ -11,12 +11,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
 @Service(Service.Level.PROJECT)
-class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
+class SendToPromptTextEditorAction(project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
-
-    companion object {
-        private const val ACTION_ID = "com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileEditorAction"
-    }
 
     init {
         templatePresentation.icon = AllIcons.Duplicates.SendToTheRight
@@ -40,11 +36,11 @@ class SendToPromptTextEditorAction(private var project: Project) : AnAction() {
     }
 
     private fun getFile(event: AnActionEvent): VirtualFile? {
-        return FileEditorManager.getInstance(event.project ?: return null).selectedFiles.firstOrNull()
+        return FileEditorManager.getInstance(event.project!!).selectedFiles.firstOrNull()
     }
 
     private fun getEditor(event: AnActionEvent): Editor? {
-        return FileEditorManager.getInstance(event.project ?: return null).selectedTextEditor
+        return FileEditorManager.getInstance(event.project!!).selectedTextEditor
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {
