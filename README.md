@@ -10,7 +10,7 @@
 
 ## Embark on a Prompt Driven Development Journey!
 
-<img src="src/main/resources/images/img.png" alt="Prompt" align="center">
+<img src="src/main/resources/images/prompt-pic-1.png" alt="Prompt" align="center">
 <br>
 <img src="https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg" alt="Build" align="center">
 <a href="https://plugins.jetbrains.com/plugin/22252-moneypenny-ai"><img src="https://img.shields.io/jetbrains/plugin/v/22252-moneypenny-ai.svg" alt="Version"></a>
@@ -19,7 +19,6 @@
 ## Exceptional Performance with MoneyPenny AI Prompt
 
 - **Multi-File Refactoring**: Revamp, supplement, or modify multiple files at once.
-- **Swift Response Time**: Bid farewell to changing apps, maintain your coding flow inside Intellij IDEA.
 - **Up to 32,000 Token Contextual Prompt**: Get smart, context-aware coding suggestions using extended contextual
   prompt.
 - **Optimized Performance & Speed**: No Typewriter effect, enjoy speed with parallelized requests.
@@ -28,7 +27,7 @@
 
 Watch the *Code Frequency* graf below to see how MoneyPenny AI Prompt has helped achieve
 10x productivity. This chart represents the code frequency over the last 1 year of development of the template
-for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a month with no precious
+for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a month with no previous
 experience of Kotlin or IntelliJ IDEA SDK.
 Watch productivity skyrocket with MoneyPenny AI Prompt!
 

@@ -76,7 +76,7 @@ class ChatGPTService(project: Project) {
 
     private fun getRequestBodyJson(prompt: String): String {
         val promptLength = prompt.length
-        val maxTokenCount = getMaxTokenCount(promptLength)
+        val maxTokenCount = getMaxTokenCountPerEngine(promptLength)
 
         val systemMessage = getSystemMessage(GlobalData.role)
 
@@ -94,12 +94,12 @@ class ChatGPTService(project: Project) {
         return jsonObject.toString()
     }
 
-    //W.I.P Missing engines
-    private fun getMaxTokenCount(promptLength: Int): Int {
-        return if (GlobalData.engine == "gpt-3.5-turbo-16k") {
-            16384 - 1 - promptLength
-        } else {
-            4096 - 1 - promptLength
+    private fun getMaxTokenCountPerEngine(promptLength: Int): Int {
+        return when (GlobalData.engine) {
+            "gpt-3.5-turbo-16k" -> 16384 - 1 - promptLength
+            "gpt-4-32k" -> 32768 - 1 - promptLength
+            "gpt-4" -> 8192 - 1 - promptLength
+            else -> 4096 - 1 - promptLength
         }
     }
 
