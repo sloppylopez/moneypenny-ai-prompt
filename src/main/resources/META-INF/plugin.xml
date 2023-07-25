@@ -31,7 +31,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory"
-                    id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
+                    id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon_Verybig.svg"/>
     </extensions>
 
 <!--    <actions>-->
