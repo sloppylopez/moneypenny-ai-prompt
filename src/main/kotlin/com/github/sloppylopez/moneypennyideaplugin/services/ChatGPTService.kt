@@ -108,7 +108,7 @@ class ChatGPTService(project: Project) {
             put("role", "system")
             val content = when (role) {
                 "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
-                "code-completer" -> "You are a code completer. Let me help you complete your code!"
+//                "code-completer" -> "You are a code completer. Let me help you complete your code!"
                 "refactor-machine" -> "You are a code refactor assistant. Always answer without explanations, return only code if possible, maintain given imports and class names"
                 "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
                 else -> "You are a code completer. Let me help you complete your code!"

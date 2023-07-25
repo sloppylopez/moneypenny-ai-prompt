@@ -75,9 +75,9 @@ To install MoneyPenny AI Prompt, you have two straightforward options:
 Plugin based on
 the [IntelliJ Platform Plugin Template](https://github.com/sloppylopez/moneypenny-idea-plugin/workflows/Build/badge.svg).
 
-## Release 1.1.0-SNAPSHOT – Enhancements and Bug Fixes
+## Release 1.1.0 – Enhancements and Bug Fixes
 
-We are pleased to announce the release of version 1.1.0-SNAPSHOT, which introduces significant bug fixes and improves
+We are pleased to announce the release of version 1.1.0, which introduces significant bug fixes and improves
 the overall performance and stability of the plugin. This release solidifies our commitment to providing the best
 possible experience for our users.
 
