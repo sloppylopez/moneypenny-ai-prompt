@@ -31,7 +31,7 @@ for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a 
 experience of Kotlin or IntelliJ IDEA SDK.
 Watch productivity skyrocket with MoneyPenny AI Prompt!
 
-<img src="src/main/resources/images/productivity_chart.png" alt="Code Frequency" align="center">
+<img src="src/main/resources/images/productivity_charts.png" alt="Code Frequency" align="center">
 
 https://github.com/JetBrains/intellij-platform-plugin-template/graphs/code-frequency
 
