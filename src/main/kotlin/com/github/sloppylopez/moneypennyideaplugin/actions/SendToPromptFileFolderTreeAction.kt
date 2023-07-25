@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.getIcon
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -18,7 +18,7 @@ class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction(
     }
 
     init {
-        templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13-alpha.png")
+        templatePresentation.icon = AllIcons.Duplicates.SendToTheRight
         templatePresentation.text = "Send to Prompt"
     }
 
@@ -36,8 +36,7 @@ class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction(
     }
 
     override fun update(e: AnActionEvent) {
-        val selectedFile = e.getData(CommonDataKeys.VIRTUAL_FILE)
-        e.presentation.isEnabled = selectedFile != null
+        e.presentation.isEnabled = true
     }
 
     fun registerFolderTreeAction() {
@@ -51,7 +50,7 @@ class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction(
         val popupMenu = actionManager.getAction("ProjectViewPopupMenu")
         val defaultActionGroup = popupMenu as? DefaultActionGroup
         defaultActionGroup?.addSeparator()
-        defaultActionGroup?.add(sendToPromptFileFolderTreeAction, Constraints.FIRST)
+        defaultActionGroup?.add(sendToPromptFileFolderTreeAction, Constraints.LAST)
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {
