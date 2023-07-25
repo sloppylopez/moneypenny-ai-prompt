@@ -27,7 +27,7 @@
 
 Watch the *Code Frequency* graf below to see how MoneyPenny AI Prompt has helped achieve
 10x productivity. This chart represents the code frequency over the last 1 year of development of the template
-for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a month with no previous
+for Intellij which was used as a seed to create MoneyPenny AI Prompt. In just a month without previous
 experience of Kotlin or IntelliJ IDEA SDK.
 Watch productivity skyrocket with MoneyPenny AI Prompt!
 
