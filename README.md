@@ -131,7 +131,7 @@ designed to skyrocket your coding productivity. Here are the standout features t
 - **Multi-File Refactoring**: Tweak, add, or adjust multiple files all at once, unlike other platforms like Copilot X.
 - **Rapid Responses without Typewriter Effect**: Revel in lightning-fast responses without any disruptive typing effect,
   making your coding experience smoother than ever. We prioritize speed over web chat-based solutions.
-- **16,000 Token Contextual Prompt**: Leverage the vast context of the ChatGPT model for smart, context-aware coding
+- **32000 Token Contextual Prompt**: Leverage the vast context of the ChatGPT model for smart, context-aware coding
   suggestions, going beyond the limitations of standard web chatbots.
 - **Effortless Integration & Enhanced Intelligence**: Integrate MoneyPenny AI Prompt into IntelliJ IDEA effortlessly,
   boosting your coding experience with intelligent code completions and predictive assistance.
