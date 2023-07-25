@@ -15,7 +15,7 @@ class ProgressBarFactory {
     fun removeProgressBar(panel: JPanel, jProgressBar: JProgressBar) {
         jProgressBar.isVisible = false
         jProgressBar.isIndeterminate = false
-        jProgressBar.string = "Done!"
+        jProgressBar.string = "Release the Kraken!"
         panel.remove(jProgressBar)
         panel.revalidate()
         panel.repaint()
@@ -23,7 +23,7 @@ class ProgressBarFactory {
 
     fun getProgressBar(): JProgressBar {
         val jProgressBar = JProgressBar()
-//        jProgressBar.preferredSize = Dimension(250, 25)
+        jProgressBar.preferredSize = Dimension(250, 25)
         jProgressBar.isStringPainted = true
         jProgressBar.isIndeterminate = true
         jProgressBar.string = "Conjuring spells..."
