@@ -154,7 +154,7 @@ class ProjectService {
             message.escapeHTML(),
             notificationType ?: NotificationType.INFORMATION
         )
-        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13.jpg"))
+        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13-alpha.png"))
         Notifications.Bus.notify(notification, this.getProject()!!)
     }
 

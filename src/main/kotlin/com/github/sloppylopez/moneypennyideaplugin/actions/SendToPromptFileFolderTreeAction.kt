@@ -18,7 +18,7 @@ class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction(
     }
 
     init {
-        templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13.jpg")
+        templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13-alpha.png")
         templatePresentation.text = "Send to Prompt"
     }
 

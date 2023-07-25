@@ -13,7 +13,7 @@ class PopUpHooverAction : ActionGroup() {
     }
 
     init {
-        templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13.jpg")
+        templatePresentation.icon = getIcon("/images/MoneyPenny-Icon_13x13-alpha.png")
         templatePresentation.text = "MoneyPenny AI Actions"
         templatePresentation.isPopupGroup = true
     }

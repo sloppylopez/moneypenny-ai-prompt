@@ -37,7 +37,7 @@ class ToolWindowHelper {
                     initMoneyPennyToolWindow(project, toolWindow)
                 }
                 //Set tool window icon
-                toolWindow.setIcon(getIcon("/images/moneypenny-logo-main.jpg"))
+                toolWindow.setIcon(getIcon("/images/moneypenny-logo-main-alpha.png"))
                 //Get content tab
                 val contentTab: Content = getContentTab(
                     fileList,
