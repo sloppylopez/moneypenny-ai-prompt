@@ -46,9 +46,9 @@ class CheckBoxFactory {
     private fun updatePostPromptText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
         if (selectedCheckBox.isSelected && !selectedCheckBox.text.isNullOrBlank()) {
             appendText(selectedCheckBox, postPromptTextArea)
-        } else {
+        }/* else {
             removeLineFromPrompt(selectedCheckBox, postPromptTextArea)
-        }
+        }*/
     }
 
     private fun appendText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
@@ -58,7 +58,7 @@ class CheckBoxFactory {
             postPromptTextArea.append("Give me an explanation \n")
         } else if (selectedCheckBox.text.equals("Method")) {
             postPromptTextArea.append("Write a method that \n")
-        }  else if (selectedCheckBox.text.equals("DRY")) {
+        } else if (selectedCheckBox.text.equals("DRY")) {
             postPromptTextArea.append("DRY it following best practices and using one-liners if possible \n")
         } else if (selectedCheckBox.text.equals("Class")) {
             postPromptTextArea.append("Write a class that \n")
