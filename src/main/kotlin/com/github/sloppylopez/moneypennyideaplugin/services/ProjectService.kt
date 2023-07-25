@@ -472,7 +472,7 @@ class ProjectService {
             actionGroup,
             true
         )
-        actionGroup.add(SendToPromptFileFolderTreeAction(project))
+        actionGroup.add(SendToPromptTextEditorAction(project))
         actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))
         actionGroup.add(RunAllPromptAction(project))
