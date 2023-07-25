@@ -19,14 +19,10 @@ object GlobalData {
     var nestedPanel: JPanel? = null
     var tabbedPane: JBTabbedPane? = null
     val engineModelStrings = arrayOf(
-        "gpt-3.5-turbo-16k",
         "gpt-3.5-turbo",
+        "gpt-3.5-turbo-16k",
         "gpt-4-32k",
-        "gpt-4",
-        "text-davinci-003",
-        "text-curie-001",
-        "text-babbage-001",
-        "text-ada-001"
+        "gpt-4"
     )
     val roleModelStrings = arrayOf(
         "🤖 refactor-machine",

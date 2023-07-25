@@ -23,10 +23,10 @@ class ProgressBarFactory {
 
     fun getProgressBar(): JProgressBar {
         val jProgressBar = JProgressBar()
-        jProgressBar.preferredSize = Dimension(250, 25)
+//        jProgressBar.preferredSize = Dimension(250, 25)
         jProgressBar.isStringPainted = true
         jProgressBar.isIndeterminate = true
-        jProgressBar.string = "Waiting..."
+        jProgressBar.string = "Conjuring spells..."
         return jProgressBar
     }
 }

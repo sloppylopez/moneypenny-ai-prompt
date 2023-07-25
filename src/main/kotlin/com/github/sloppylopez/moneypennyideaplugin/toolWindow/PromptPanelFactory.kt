@@ -49,7 +49,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                     "",
                     5,
                     79,
-                    "images/pluginIcon_BIG.png"
+                    "images/moneypenny-ai-mid.png"
                 )
 
             if (contentPromptTextArea != null) {

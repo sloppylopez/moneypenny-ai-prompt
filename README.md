@@ -1,6 +1,6 @@
 <div>
   <div style="margin: 10px;">
-    <img style="margin: 10px;" src="src/main/resources/images/moneypenny4.jpg" alt="Prompt" height="206px" width="206px" align="left">
+    <img style="margin: 10px;" src="src/main/resources/images/moneypenny4-alpha.png" alt="Prompt" height="206px" width="206px" align="left">
     <h1>MoneyPenny AI Prompt</h1>
   </div>
     <p style="margin: 10px;">
