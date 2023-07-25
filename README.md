@@ -59,11 +59,11 @@ creativity and AI intelligence.
 
 To install MoneyPenny AI Prompt, you have two straightforward options:
 
-1. **IDE built-in plugin system** (Once the plugin is published)
+1. **IDE built-in plugin system**
     - Navigate to `Settings/Preferences > Plugins > Marketplace`.
     - Search for "MoneyPenny AI Prompt".
     - Click on `Install Plugin`.
-2. **Manual installation** (Until the plugin is published)
+2. **Manual installation** (Use this method to get cutting edge features)
     - Fork the GitHub repository of MoneyPenny AI Prompt.
     - Clone the forked repository on your machine.
     - Build the plugin to generate a JAR file.
@@ -90,12 +90,6 @@ possible experience for our users.
 * Add automagic DRY action in right click menu
 * Add action with submenus in right click menu
 
-## Useful Resources
-
-To make the most of MoneyPenny AI Prompt and IntelliJ IDEA, check out these resources:
-
-[List of resource links as in the original README]
-
 ## Contribute to the Future
 
 Your contributions are highly appreciated! If you have innovative ideas, suggestions, or encounter any bugs, feel free
@@ -104,7 +98,7 @@ the [MoneyPenny AI Prompt GitHub repository](https://github.com/sloppylopez/mone
 code? Fork the repository and submit a pull request. We're excited to see your contributions!
 
 <div>
-<h2>Useful Links</h2>
+<h2>Interest Links</h2>
 
   <p>Here are some useful links to help you make the most of MoneyPenny AI Prompt and IntelliJ IDEA:</p>
 
@@ -145,3 +139,7 @@ designed to skyrocket your coding productivity. Here are the standout features t
 Download MoneyPenny AI Prompt today to unlock the potential of AI in your coding workflow, leaving other plugins and
 competitors far behind. Boost your coding efficiency and create wonders with ease.
 <!-- Plugin description end -->
+
+## Pitfalls
+
+[PITFALLS.md](docs%2FPITFALLS.md)
