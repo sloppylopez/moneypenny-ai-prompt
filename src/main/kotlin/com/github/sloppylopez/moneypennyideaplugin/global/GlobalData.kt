@@ -8,6 +8,7 @@ import javax.swing.JPanel
 object GlobalData {
     var engine: String = "gpt-3.5-turbo-16k"
     var role: String = "🤖 refactor-machine"
+    var userRole: String = "🤓 user"
     var downerTabName: Int = 1
     var tabCounter: Int = 1
     var index: Int = 1
