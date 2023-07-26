@@ -46,6 +46,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
             } else {
                 promptList.joinToString(" ")
             }
+            promptService.setInChat(prompt, tabName, GlobalData.userRole)
             chatGPTService.sendChatPrompt(
                 prompt, createCallback(tabName)
             ).whenComplete { _, _ ->
@@ -86,7 +87,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
                             copiedMessage, content, NotificationType.ERROR
                         )
                     }
-                    promptService.setInChat(content, tabName)
+                    promptService.setInChat(content, tabName, GlobalData.role)
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())
                 }

@@ -488,6 +488,7 @@ class ProjectService {
             true
         )
         actionGroup.add(SendToPromptTextEditorAction(project))
+        actionGroup.add(AddTextAction(project))
         actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))
         actionGroup.add(RunAllPromptAction(project))

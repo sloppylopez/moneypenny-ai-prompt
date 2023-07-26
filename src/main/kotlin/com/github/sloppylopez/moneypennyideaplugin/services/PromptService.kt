@@ -51,7 +51,7 @@ class PromptService(project: Project) {
         return emptyMap<String, Map<String, List<String>>>().toMutableMap()
     }
 
-    fun setInChat(text: String, tabName: String): MutableMap<String, DefaultListModel<String>> {
+    fun setInChat(text: String, tabName: String, currentRole: String): MutableMap<String, DefaultListModel<String>> {
         val contentManager = service.getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
         for (i in 0 until contentCount!!) {
@@ -61,7 +61,7 @@ class PromptService(project: Project) {
                 simpleToolWindowPanel.components.forEach { component ->
                     service.addChatWindowContentListModelToGlobalData(component as Container)
                 }
-                GlobalData.tabNameToChatWindowContent[tabName]?.addElement(GlobalData.role + ": " + text)
+                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
                 return GlobalData.tabNameToChatWindowContent
             }
         }

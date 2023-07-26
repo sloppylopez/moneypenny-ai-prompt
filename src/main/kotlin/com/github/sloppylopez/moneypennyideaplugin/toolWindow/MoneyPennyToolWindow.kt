@@ -88,7 +88,7 @@ class MoneyPennyToolWindow(
         nestedPanel: JPanel,
         tabbedPane: JBTabbedPane
     ): JPanel {
-        val innerPanel = JPanel()
+        val innerPanel = JPanel(BorderLayout())
         if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
@@ -102,7 +102,6 @@ class MoneyPennyToolWindow(
             }
 
             3 -> {
-//                innerPanel.add(ChatWindowFactory().getChatWindowContent())
                 ChatWindowFactory().getChatWindowContent()?.let { innerPanel.add(it, BorderLayout.CENTER) }
             }
         }
