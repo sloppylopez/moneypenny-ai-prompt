@@ -4,7 +4,9 @@ import com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
+import com.github.sloppylopez.moneypennyideaplugin.intentions.ChatGptQuickFix
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
+import com.intellij.codeInsight.intention.IntentionManager
 import com.intellij.openapi.application.ApplicationActivationListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -14,6 +16,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.IdeFrame
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.psi.PsiManager
 import javax.swing.SwingUtilities
 
 class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
@@ -30,6 +33,13 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
             sendToPromptFileFolderTreeAction.registerFolderTreeAction()
 //            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
 //            sendToPromptTextEditorAction.registerFileEditorAction()
+//            val intentionManager = IntentionManager.getInstance()
+//            if (editor != null) {
+//                val psiFile = PsiManager.getInstance(project).findFile(editor)
+//                if (psiFile != null) {
+//                    intentionManager.addAction(ChatGptQuickFix())
+//                }
+//            }
             val popUpHooverAction = PopUpHooverAction()
             popUpHooverAction.addActionsToEditor()
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()

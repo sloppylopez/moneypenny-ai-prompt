@@ -69,7 +69,8 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
                     var content = choice.content
-                    if (GlobalData.role == "refactor-machine" && service.isCodeCommented(content)) {
+                    val role = GlobalData.role.split(" ")[1]
+                    if (role == "refactor-machine" && service.isCodeCommented(content)) {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {

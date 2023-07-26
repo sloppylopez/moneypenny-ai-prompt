@@ -36,11 +36,12 @@ class RunPromptAction(private var project: Project) : AnAction() {
         progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
         val prompts = promptService.getPrompts()
         val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
-        if (GlobalData.role == "refactor-machine") {
+        val role = GlobalData.role.split(" ")[1]
+        if (role == "refactor-machine") {
             promptList[1] = "```\n" + promptList[1] + "\n```"
         }
         if (promptList[1].isNotBlank()) {
-            prompt = if (GlobalData.role == "refactor-machine") {
+            prompt = if (role == "refactor-machine") {
                 promptList.joinToString("\n")
             } else {
                 promptList.joinToString(" ")
@@ -52,14 +53,17 @@ class RunPromptAction(private var project: Project) : AnAction() {
             }
         }
     }
+
     //TODO: needs DRYing
     private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
                     var content = choice.content
-                    if(GlobalData.role == "refactor-machine" &&
-                        service.isCodeCommented(content)){
+                    val role = GlobalData.role.split(" ")[1]
+                    if (role == "refactor-machine" &&
+                        service.isCodeCommented(content)
+                    ) {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {
@@ -67,15 +71,22 @@ class RunPromptAction(private var project: Project) : AnAction() {
                         service.showNotification(
                             copiedMessage, content, NotificationType.INFORMATION
                         )
-                        val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
-                        service.modifySelectedTextInEditorByFile(
-                            content, service.fileToVirtualFile(file)!!
-                        )
+                        if (tabName != "No File") {
+                            try {
+                                val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
+                                service.modifySelectedTextInEditorByFile(
+                                    content, service.fileToVirtualFile(file)!!
+                                )
+                            } catch (e: Exception) {
+                                thisLogger().error(e.stackTraceToString())
+                            }
+                        }
                     } else {
                         service.showNotification(
                             copiedMessage, content, NotificationType.ERROR
                         )
                     }
+                    promptService.setInChat(content, tabName)
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())
                 }

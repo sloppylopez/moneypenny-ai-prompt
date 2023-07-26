@@ -9,6 +9,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.Component
 import java.awt.Container
+import javax.swing.DefaultListModel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
@@ -48,6 +49,23 @@ class PromptService(project: Project) {
             }
         }
         return emptyMap<String, Map<String, List<String>>>().toMutableMap()
+    }
+
+    fun setInChat(text: String, tabName: String): MutableMap<String, DefaultListModel<String>> {
+        val contentManager = service.getToolWindow()?.contentManager
+        val contentCount = contentManager?.contentCount
+        for (i in 0 until contentCount!!) {
+            val content = contentManager.getContent(i)
+            val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
+            if (simpleToolWindowPanel != null) {
+                simpleToolWindowPanel.components.forEach { component ->
+                    service.addChatWindowContentListModelToGlobalData(component as Container)
+                }
+                GlobalData.tabNameToChatWindowContent[tabName]?.addElement(GlobalData.role + ": " + text)
+                return GlobalData.tabNameToChatWindowContent
+            }
+        }
+        return emptyMap<String, DefaultListModel<String>>().toMutableMap()
     }
 
     private fun getPromptInfo(

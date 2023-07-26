@@ -54,7 +54,7 @@ class ToolWindowHelper {
                     tabbedPane.setTabComponentAt(i, tabComponent)
                 }
                 toolWindowContent.setContent(tabbedPane)
-                service.addToolBar(toolWindowContent)
+                toolWindowContent.toolbar = service.getToolBar().component
 //                toolWindowContent.componentOrientation = ComponentOrientation.RIGHT_TO_LEFT
 //                service.createToolbarPanel(toolWindowContent)
                 // Add a change listener to handle tab close events

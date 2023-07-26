@@ -64,6 +64,7 @@ class MoneyPennyToolWindow(
             }
             service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
         }
+        tabbedPane.toolkit.createImage("images/moneypenny-ai-main.png")
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
         tabbedPane.addAncestorListener(ancestorListener.getAncestorListener(tabbedPane))
         val mainPanel = JPanel(BorderLayout())
@@ -100,7 +101,10 @@ class MoneyPennyToolWindow(
                 service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
             }
 
-//            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
+            3 -> {
+//                innerPanel.add(ChatWindowFactory().getChatWindowContent())
+                ChatWindowFactory().getChatWindowContent()?.let { innerPanel.add(it, BorderLayout.CENTER) }
+            }
         }
         return innerPanel
     }

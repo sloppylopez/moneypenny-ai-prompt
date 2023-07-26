@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
+import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
@@ -21,11 +22,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.keymap.impl.ui.KeymapPanel.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -154,7 +153,7 @@ class ProjectService {
             message.escapeHTML(),
             notificationType ?: NotificationType.INFORMATION
         )
-        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13-alpha.png"))
+        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/moneypenny-ai-notification.png"))
         Notifications.Bus.notify(notification, this.getProject()!!)
     }
 
@@ -423,6 +422,22 @@ class ProjectService {
     }
 
 
+    fun addChatWindowContentListModelToGlobalData(container: Container) {
+
+        fun findTabbedPanesRecursive(component: Component) {
+            if (component is ChatWindowContent) {
+                val parentTabName = (component.parent.parent.parent as JBTabbedPane).getTitleAt(0)
+                GlobalData.tabNameToChatWindowContent[parentTabName] = component.listModel
+            } else if (component is Container) {
+                for (child in component.components) {
+                    findTabbedPanesRecursive(child)
+                }
+            }
+        }
+
+        findTabbedPanesRecursive(container)
+    }
+
     fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
         val tabbedPanes = mutableListOf<JBTabbedPane>()
 
@@ -464,7 +479,7 @@ class ProjectService {
         return emptyList()
     }
 
-    fun addToolBar(toolWindowContent: SimpleToolWindowPanel) {
+    fun getToolBar(): ActionToolbar {
         val actionGroup = DefaultActionGroup()
         val project = this.getProject()!!
         val toolBar = ActionManager.getInstance().createActionToolbar(
@@ -498,7 +513,7 @@ class ProjectService {
             )
         )
         actionGroup.addSeparator()
-        toolWindowContent.toolbar = toolBar.component
+        return toolBar
     }
 
     fun addPanelsToGlobalData(

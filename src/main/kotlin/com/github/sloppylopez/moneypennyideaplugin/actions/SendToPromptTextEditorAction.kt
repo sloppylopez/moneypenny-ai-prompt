@@ -20,7 +20,7 @@ class SendToPromptTextEditorAction(project: Project) : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        val file = getFile(e) ?: return
+         val file = getFile(e) ?: return
         val editor = getEditor(e) ?: return
         service.getSelectedTextFromEditor(
             editor

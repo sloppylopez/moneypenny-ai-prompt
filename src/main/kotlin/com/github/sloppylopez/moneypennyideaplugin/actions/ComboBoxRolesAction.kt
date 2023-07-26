@@ -50,7 +50,7 @@ class ComboBoxRolesAction(
     }
 
     private fun addEngineToGlobalData(selectedOption: String) {
-        GlobalData.role = selectedOption.split(" ")[1]
+        GlobalData.role = selectedOption
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {
