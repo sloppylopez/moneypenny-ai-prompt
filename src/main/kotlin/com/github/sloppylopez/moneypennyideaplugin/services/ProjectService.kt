@@ -422,10 +422,11 @@ class ProjectService {
     }
 
 
-    fun addChatWindowContentListModelToGlobalData(container: Container) {
+    fun addChatWindowContentListModelToGlobalData(container: Container, text: String, currentRole: String) {
 
         fun findTabbedPanesRecursive(component: Component) {
             if (component is ChatWindowContent) {
+                component.addElement("$currentRole:\n$text")
                 val parentTabName = (component.parent.parent.parent as JBTabbedPane).getTitleAt(0)
                 GlobalData.tabNameToChatWindowContent[parentTabName] = component.listModel
             } else if (component is Container) {
