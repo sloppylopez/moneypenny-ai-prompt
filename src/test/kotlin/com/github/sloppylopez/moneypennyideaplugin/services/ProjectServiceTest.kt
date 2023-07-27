@@ -101,6 +101,34 @@ class ProjectServiceTest : BasePlatformTestCase() {
         )
     }
 
+    fun test_trim_code_with_explanations_single_and_language_with_sentences() {
+        val response = "Topic: Code refactoring\n" +
+                "Context: Refactoring code in the `NumbersCalculator` class to improve its efficiency and readability.\n" +
+                "Intent: To dry the code and use best practices, including using one-liners if possible.\n" +
+                "Named Entities: None\n" +
+                "Keywords: `package`, `class`, `fun`, `Array`, `List`, `getPrimeNumbers`, `val`, `mutableListOf`, `for`, `if`, `else`, `in`, `..`, `%`, `break`, `add`\n" +
+                "\n" +
+                "Sentiment: The sentiment is neutral as the prompt is requesting a code refactoring.\n" +
+                "\n" +
+                "Refactoring code in the `NumbersCalculator` class to improve its efficiency and readability. DRY it following best practices and using one-liners if possible.\n" +
+                "\n" +
+                "```kotlin\n" +
+                "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n" +
+                "\n" +
+                "class NumbersCalculator {\n" +
+                "    fun getPrimeNumbers(numbers: Array<Int>): List<Int> = numbers.filter { number ->\n" +
+                "        (number >= 2) && (2..number / 2).none { number % it == 0 }\n" +
+                "    }\n" +
+                "}\n" +
+                "```\n" +
+                "\n" +
+                "Follow Up: What are the changes made to the code?"
+        val result = projectService.extractCommentsFromCode(response)
+        assertEquals(
+            result, "package com.github.sloppylopez.moneypennyideaplugin.gineapigs\n\nclass NumbersCalculator {\n    fun getPrimeNumbers(numbers: Array\u003cInt\u003e): List\u003cInt\u003e \u003d numbers.filter { number -\u003e\n        (number \u003e\u003d 2) \u0026\u0026 (2..number / 2).none { number % it \u003d\u003d 0 }\n    }\n}"
+        )
+    }
+
     fun testExpandFoldersWithEmptyList() {
         val fileList = emptyList<Any>()
         val expandedFileList = projectService.expandFolders(fileList)
