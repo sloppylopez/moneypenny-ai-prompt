@@ -41,7 +41,7 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
             progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
-
+    //This is for right click action only
     private fun getPrompt(selectedText: String?): String {
         val prePrompt = "Refactor code:\n"
         val postPrompt = "\nDRY it following best practices and using one-liners if possible"
