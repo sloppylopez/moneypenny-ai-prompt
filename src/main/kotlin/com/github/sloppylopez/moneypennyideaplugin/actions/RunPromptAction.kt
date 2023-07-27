@@ -30,7 +30,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
-        val prompt: String
+        var prompt: String
         val tabName = GlobalData.tabbedPane?.getTitleAt(GlobalData.tabbedPane!!.selectedIndex)
         val jProgressBar = progressBarFactory.getProgressBar()
         progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
@@ -46,6 +46,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
             } else {
                 promptList.joinToString(" ")
             }
+            prompt = prompt.replace("\r\n", "\n")
             promptService.setInChat(prompt, tabName, GlobalData.userRole)
             chatGPTService.sendChatPrompt(
                 prompt, createCallback(tabName)

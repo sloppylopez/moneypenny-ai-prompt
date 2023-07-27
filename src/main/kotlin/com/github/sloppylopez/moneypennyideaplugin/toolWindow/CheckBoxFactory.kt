@@ -17,6 +17,7 @@ class CheckBoxFactory {
 
         checkboxLabels.forEach { label ->
             val checkBox = createCheckBox(label, label == "DRY", postPromptTextArea)
+            checkBox.font = checkBox.font.deriveFont(12f) // Change font size to 13
             checkboxPanel.add(checkBox)
 
             if (label == "DRY") {

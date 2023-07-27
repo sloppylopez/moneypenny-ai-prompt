@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
@@ -7,6 +8,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
+import java.awt.BorderLayout
+import java.awt.Font
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -30,42 +33,47 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private var postPromptTextArea: JTextArea? = JTextArea()
 
     fun promptPanel(
-        panel: JPanel,
+        innerPanel: JPanel,
         file: File?,
         contentPromptText: String?
     ) {
         try {
             prePromptTextArea = textAreaFactory
-                .createDefaultTextArea("", 2, 79)
+                .createDefaultTextArea("", 2, 49)
+            prePromptTextArea!!.font = Font("Arial", Font.PLAIN, 12) // Set font size 12
             contentPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "Paste text, drag a file, copy folder path, use Action, use Intention...",
-                    10,
-                    79
+                    12,
+                    49
                 )
             contentPromptTextArea?.name = "contentPromptTextArea"
+            contentPromptTextArea!!.font = Font("Arial", Font.PLAIN, 12) // Set font size 12
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "",
-                    5,
-                    79,
+                    4,
+                    49,
                     "images/moneypenny-ai-mid.png"
                 )
+            postPromptTextArea!!.font = Font("Arial", Font.PLAIN, 12) // Set font size 12
 
             if (contentPromptTextArea != null) {
+                //Add chat window
+                innerPanel.add(ChatWindowContent(), BorderLayout.SOUTH)
                 //Add radio buttons
-                radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
+                radioButtonFactory.radioButtonsPanel(innerPanel, prePromptTextArea!!)
                 val prePromptScrollPane = JBScrollPane(prePromptTextArea)
-                panel.add(prePromptScrollPane)
+                innerPanel.add(prePromptScrollPane, BorderLayout.SOUTH)
                 //Set text in content prompt text area, then add drop target
                 val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
                 contentPromptTextArea?.text = service.getText(file, contentPromptText)
-                panel.add(contentPromptScrollPane)
+                innerPanel.add(contentPromptScrollPane, BorderLayout.SOUTH)
                 contentPromptTextArea?.dropTarget = DropTarget(contentPromptTextArea, this)
                 //Add checkboxes
                 val postPromptScrollPane = JBScrollPane(postPromptTextArea)
-                panel.add(postPromptScrollPane)
-                checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
+                innerPanel.add(postPromptScrollPane, BorderLayout.SOUTH)
+                checkBoxFactory.checkboxesPanel(innerPanel, postPromptTextArea!!)
             }
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())

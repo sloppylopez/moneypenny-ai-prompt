@@ -9,10 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.util.ui.JBUI
-import java.awt.BorderLayout
-import java.awt.FlowLayout
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
+import java.awt.*
 import java.io.File
 import javax.swing.BoxLayout
 import javax.swing.JComponent
@@ -68,7 +65,12 @@ class MoneyPennyToolWindow(
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
         tabbedPane.addAncestorListener(ancestorListener.getAncestorListener(tabbedPane))
         val mainPanel = JPanel(BorderLayout())
-        mainPanel.add(tabbedPane, BorderLayout.CENTER)
+//        val mainPanel2 = JPanel(BorderLayout())
+        tabbedPane.preferredSize = null
+        mainPanel.add(tabbedPane, BorderLayout.NORTH)
+//        mainPanel.add(tabbedPane, BorderLayout.NORTH)
+//        ChatWindowFactory().getChatWindowContent()?.let { mainPanel2.add(it, BorderLayout.CENTER) }
+//        mainPanel.add(mainPanel2, BorderLayout.SOUTH)
         return mainPanel
     }
 
@@ -102,7 +104,7 @@ class MoneyPennyToolWindow(
             }
 
             3 -> {
-                ChatWindowFactory().getChatWindowContent()?.let { innerPanel.add(it, BorderLayout.CENTER) }
+//                ChatWindowFactory().getChatWindowContent()?.let { innerPanel.add(it, BorderLayout.CENTER) }
             }
         }
         return innerPanel

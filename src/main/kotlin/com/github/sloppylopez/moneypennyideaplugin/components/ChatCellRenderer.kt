@@ -1,4 +1,5 @@
 package com.github.sloppylopez.moneypennyideaplugin.components
+
 import java.awt.Component
 import javax.swing.JList
 import javax.swing.JTextArea
@@ -13,6 +14,7 @@ class ChatCellRenderer : JTextArea(), ListCellRenderer<String?> {
         border = UIManager.getBorder("List.cellNoFocusBorder")
         columns = 79
         rows = 1
+        font = UIManager.getFont("List.font")
     }
 
     override fun getListCellRendererComponent(

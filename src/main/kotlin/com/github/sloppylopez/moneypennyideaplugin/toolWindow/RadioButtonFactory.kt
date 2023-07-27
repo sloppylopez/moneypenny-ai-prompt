@@ -1,8 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.intellij.notification.*
 import com.intellij.openapi.components.Service
+import java.awt.Font
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.ButtonGroup
@@ -12,12 +12,17 @@ import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class RadioButtonFactory {
+    private val labelFontSize = 12
+
     fun radioButtonsPanel(
         panel: JPanel,
         prePromptTextArea: JTextArea
     ) {
         val radioButtonPanel = JPanel()
-        val buttonLabels = arrayOf("Refactor", "Example", "Modify", "Fix", "Unit", "E2E", "As Reference", "Explain", "FreeStyle")
+        val buttonLabels = arrayOf(
+            "Refactor", "Example", "Modify", "Fix", "Unit", "E2E",
+            "As Reference", "Explain", "FreeStyle"
+        )
 
         val actionListener = ActionListener { event ->
             val selectedRadioButton = event.source as? JRadioButton
@@ -39,7 +44,9 @@ class RadioButtonFactory {
             val radioButton = createRadioButton(label, actionListener)
             radioButton.isSelected = label == "Refactor"
             radioGroup.add(radioButton)
+            radioButton.font = Font(radioButton.font.name, radioButton.font.style, labelFontSize)
             radioButtonPanel.add(radioButton)
+
             // If the radio button is initially selected, simulate a click event
             if (radioButton.isSelected) {
                 val event = ActionEvent(
@@ -107,6 +114,7 @@ class RadioButtonFactory {
 
     private fun createRadioButton(text: String, actionListener: ActionListener): JRadioButton {
         return JRadioButton(text).apply {
+            this.font = Font(this.font.name, this.font.style, labelFontSize)
             addActionListener(actionListener)
         }
     }
