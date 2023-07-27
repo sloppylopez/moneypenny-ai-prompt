@@ -59,9 +59,9 @@ class PromptService(project: Project) {
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
                 simpleToolWindowPanel.components.forEach { component ->
-                    service.addChatWindowContentListModelToGlobalData(component as Container)
+                    service.addChatWindowContentListModelToGlobalData(component as Container, text, currentRole)
                 }
-                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
+//                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
                 return GlobalData.tabNameToChatWindowContent
             }
         }
@@ -100,4 +100,12 @@ class PromptService(project: Project) {
             thisLogger().error(e.stackTraceToString())
         }
     }
+
+//    fun setAllCheckboxesNotSelected(toolwindow: ToolWindow) {
+//        toolwindow.content.forEach { content ->
+//            if (content is Checkbox) {
+//                content.isSelected = false
+//            }
+//        }
+//    }
 }
