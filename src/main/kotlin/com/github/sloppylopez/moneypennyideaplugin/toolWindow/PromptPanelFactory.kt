@@ -20,6 +20,7 @@ import java.io.File
 import java.nio.file.Files
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import javax.swing.UIManager
 
 
 @Service(Service.Level.PROJECT)
@@ -39,24 +40,24 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     ) {
         try {
             prePromptTextArea = textAreaFactory
-                .createDefaultTextArea("", 2, 49)
-            prePromptTextArea!!.font = Font("Arial", Font.PLAIN, 12) // Set font size 12
+                .createDefaultTextArea("", 2, 40)
+            prePromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
             contentPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "Paste text, drag a file, copy folder path, use Action, use Intention...",
-                    12,
-                    49
+                    8,
+                    40
                 )
             contentPromptTextArea?.name = "contentPromptTextArea"
-            contentPromptTextArea!!.font = Font("Arial", Font.PLAIN, 12) // Set font size 12
+            contentPromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "",
                     4,
-                    49,
+                    40,
                     "images/moneypenny-ai-mid.png"
                 )
-            postPromptTextArea!!.font = Font("Arial", Font.PLAIN, 12) // Set font size 12
+            postPromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
 
             if (contentPromptTextArea != null) {
                 //Add chat window
