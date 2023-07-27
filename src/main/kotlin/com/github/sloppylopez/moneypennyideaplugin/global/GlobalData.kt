@@ -17,7 +17,7 @@ object GlobalData {
     val tabNameToChatWindowContent = mutableMapOf<String, DefaultListModel<String>>()
     val prompts = mutableMapOf<String, Map<String, List<String>>>()
     val apiKey: String? = System.getenv("OPENAI_API_KEY")
-    var explanationButton: JCheckBox? = null
+    var emptyCheckBoxButton: JCheckBox? = null
     var innerPanel: JPanel? = null
     var nestedPanel: JPanel? = null
     var tabbedPane: JBTabbedPane? = null
