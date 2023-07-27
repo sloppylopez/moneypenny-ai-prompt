@@ -12,19 +12,19 @@ class CheckBoxFactory {
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
         val checkboxPanel = JPanel()
         val checkboxLabels = arrayOf(
-            "DRY", "Add", "Create", "Remove", "Explanation", "Gives", "With", "Method", "Class"
+            "DRY", "Add", "Create", "Remove", "Gives", "With", "Method", "Class", "Empty"
         )
 
         checkboxLabels.forEach { label ->
             val checkBox = createCheckBox(label, label == "DRY", postPromptTextArea)
-            checkBox.font = checkBox.font.deriveFont(12f) // Change font size to 13
+            checkBox.font = checkBox.font.deriveFont(13f) // Change font size to 13
             checkboxPanel.add(checkBox)
 
             if (label == "DRY") {
                 updatePostPromptText(checkBox, postPromptTextArea)
             }
-            if (label == "Explanation") {
-                GlobalData.explanationButton = checkBox
+            if (label == "Empty") {
+                GlobalData.emptyCheckBoxButton = checkBox
             }
         }
 
@@ -35,7 +35,7 @@ class CheckBoxFactory {
         val checkBox = JCheckBox(text, selected)
 
         checkBox.addActionListener { event ->
-            val selectedCheckBox = event.source as? JCheckBox ?: GlobalData.explanationButton
+            val selectedCheckBox = event.source as? JCheckBox ?: GlobalData.emptyCheckBoxButton
             selectedCheckBox?.let {
                 updatePostPromptText(selectedCheckBox, postPromptTextArea)
             }
@@ -47,36 +47,17 @@ class CheckBoxFactory {
     private fun updatePostPromptText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
         if (selectedCheckBox.isSelected && !selectedCheckBox.text.isNullOrBlank()) {
             appendText(selectedCheckBox, postPromptTextArea)
-        }/* else {
-            removeLineFromPrompt(selectedCheckBox, postPromptTextArea)
-        }*/
-    }
-
-    private fun appendText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
-        if (selectedCheckBox.text.equals("With")) {
-            postPromptTextArea.append("Answer with an explanation \n")//This to allow to ask freeStyle questions to ChatGpt, if no it will answer "My role is to answer always with code blablabla"
-        } else if (selectedCheckBox.text.equals("Explanation")) {
-            postPromptTextArea.append("Give me an explanation \n")
-        } else if (selectedCheckBox.text.equals("Method")) {
-            postPromptTextArea.append("Write a method that \n")
-        } else if (selectedCheckBox.text.equals("DRY")) {
-            postPromptTextArea.append("DRY it following best practices and using one-liners if possible \n")
-        } else if (selectedCheckBox.text.equals("Class")) {
-            postPromptTextArea.append("Write a class that \n")
-        } else {
-            postPromptTextArea.append("${selectedCheckBox.text} \n")
         }
     }
 
-    private fun removeLineFromPrompt(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
-        val checkBoxText = selectedCheckBox.text
-        val postPromptText = postPromptTextArea.text
-        val lineStartIndex = postPromptText.indexOf(checkBoxText)
-        if (lineStartIndex != -1) {
-            val lineEndIndex = postPromptText.indexOf('\n', lineStartIndex)
-            val updatedText =
-                postPromptText.substring(0, lineStartIndex) + postPromptText.substring(lineEndIndex + 1)
-            postPromptTextArea.text = updatedText
+    private fun appendText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
+        when (selectedCheckBox.text) {
+            "With" -> postPromptTextArea.append("Answer with an explanation \n")
+            "Method" -> postPromptTextArea.append("Write a method that \n")
+            "DRY" -> postPromptTextArea.append("DRY it following best practices and using one-liners if possible \n")
+            "Class" -> postPromptTextArea.append("Write a class that \n")
+            "Empty" -> postPromptTextArea.text = ""
+            else -> postPromptTextArea.append("${selectedCheckBox.text} \n")
         }
     }
 }
