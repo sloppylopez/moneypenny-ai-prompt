@@ -21,7 +21,7 @@ class RadioButtonFactory {
         val radioButtonPanel = JPanel()
         val buttonLabels = arrayOf(
             "Refactor", "Example", "Modify", "Fix", "Unit", "E2E",
-            "As Reference", "Explain", "FreeStyle"
+            "Context", "Explain", "Empty"
         )
 
         val actionListener = ActionListener { event ->
@@ -31,10 +31,10 @@ class RadioButtonFactory {
                     selectedRadioButton.text,
                     prePromptTextArea
                 )
-                if (selectedRadioButton.text.equals("FreeStyle")) {
-                    GlobalData.explanationButton?.isSelected = true
-                    GlobalData.explanationButton?.let { explanationButton ->
-                        explanationButton.actionListeners.forEach { it.actionPerformed(event) }
+                if (selectedRadioButton.text.equals("Empty")) {
+                    GlobalData.emptyCheckBoxButton?.isSelected = true
+                    GlobalData.emptyCheckBoxButton?.let { emptyCheckBoxButton ->
+                        emptyCheckBoxButton.actionListeners.forEach { it.actionPerformed(event) }
                     }
                 }
             }
@@ -90,8 +90,8 @@ class RadioButtonFactory {
                 prePromptTextArea.text = "Write E2E for Code:"
             }
 
-            "As Reference" -> {
-                prePromptTextArea.text = "Using this code as reference:"
+            "Context" -> {
+                prePromptTextArea.text = "Using this code as context:"
             }
 
             "Explain" -> {
@@ -102,8 +102,8 @@ class RadioButtonFactory {
                 prePromptTextArea.text = "Code:"
             }
 
-            "FreeStyle" -> {
-                prePromptTextArea.text = "Answer this:"
+            "Empty" -> {
+                prePromptTextArea.text = ""
             }
 
             else -> {
