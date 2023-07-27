@@ -62,10 +62,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
                     var content = choice.content
-                    val role = GlobalData.role.split(" ")[1]
-                    if (role == "refactor-machine" &&
-                        service.isCodeCommented(content)
-                    ) {
+                    if (service.isCodeCommented(content)) {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {
@@ -88,7 +85,11 @@ class RunPromptAction(private var project: Project) : AnAction() {
                             copiedMessage, content, NotificationType.ERROR
                         )
                     }
-                    promptService.setInChat(content, tabName, GlobalData.role)
+                    promptService.setInChat(
+                        choice.content,
+                        tabName,
+                        GlobalData.role
+                    )//In the chat window we want to display the NPL analysis as well
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())
                 }
