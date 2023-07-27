@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.role
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -25,7 +26,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
 
     init {
         templatePresentation.icon = AllIcons.Actions.Execute
-        templatePresentation.text = "Run prompt"
+        templatePresentation.text = "Run Prompt"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -36,11 +37,11 @@ class RunPromptAction(private var project: Project) : AnAction() {
         progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
         val prompts = promptService.getPrompts()
         val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
-        val role = GlobalData.role.split(" ")[1]
+        val role = role.split(" ")[1]
         if (role == "refactor-machine") {
             promptList[1] = "```\n" + promptList[1] + "\n```"
         }
-        if (promptList[1].isNotBlank()) {
+        if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
             prompt = if (role == "refactor-machine") {
                 promptList.joinToString("\n")
             } else {
@@ -88,7 +89,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
                     promptService.setInChat(
                         choice.content,
                         tabName,
-                        GlobalData.role
+                        role
                     )//In the chat window we want to display the NPL analysis as well
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())

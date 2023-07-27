@@ -1,0 +1,21 @@
+Topic: Code refactoring
+Context: Refactoring code in the `NumbersCalculator` class to improve its efficiency and readability.
+Intent: To dry the code and use best practices, including using one-liners if possible.
+Named Entities: None
+Keywords: `package`, `class`, `fun`, `Array`, `List`, `getPrimeNumbers`, `val`, `mutableListOf`, `for`, `if`, `else`, `in`, `..`, `%`, `break`, `add`
+
+Sentiment: The sentiment is neutral as the prompt is requesting a code refactoring.
+
+Refactoring code in the `NumbersCalculator` class to improve its efficiency and readability. DRY it following best practices and using one-liners if possible.
+
+```kotlin
+package com.github.sloppylopez.moneypennyideaplugin.gineapigs
+
+class NumbersCalculator {
+    fun getPrimeNumbers(numbers: Array<Int>): List<Int> = numbers.filter { number ->
+        (number >= 2) && (2..number / 2).none { number % it == 0 }
+    }
+}
+```
+
+Follow Up: What are the changes made to the code?

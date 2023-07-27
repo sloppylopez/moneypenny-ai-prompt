@@ -214,3 +214,5 @@
 It results in useful NLP analysis of the Response and creates a virtuous circle with the next Prompt. An example of such an analysis was: Topic: Heinrich Schliemann and Homer’s Iliad and Odyssey: Context: Excavation at Hissarlik: Intent: To search for and verify the historical accuracy of Homer’s descriptions of the cities: Named Entities: Heinrich Schliemann, Hissarlik, Homer’s Iliad and Odyssey: Keywords: Excavate, verify, historical accuracy, Homer’s descriptions, cities: Sentiment: Neutral
 
 The period symbol ‘.’ helps separate discreet elements of the response. It is also good practise to terminate prompts with characters such as ‘?.!’ which helps GPT recognise questions, sentences and exclamations.
+
+![img.png](img.png)

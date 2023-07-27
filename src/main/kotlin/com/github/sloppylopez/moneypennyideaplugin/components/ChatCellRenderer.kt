@@ -7,7 +7,6 @@ import javax.swing.ListCellRenderer
 import javax.swing.UIManager
 
 class ChatCellRenderer : JTextArea(), ListCellRenderer<String?> {
-
     init {
         isOpaque = true
         lineWrap = true

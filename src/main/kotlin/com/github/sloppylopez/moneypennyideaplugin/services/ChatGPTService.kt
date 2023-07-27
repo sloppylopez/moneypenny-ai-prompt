@@ -47,7 +47,7 @@ class ChatGPTService(project: Project) {
     private fun createHttpRequest(requestBody: String): HttpRequest =
         HttpRequest.newBuilder()
             .uri(URI.create("https://api.openai.com/v1/chat/completions"))
-            .timeout(Duration.ofSeconds(60))
+            .timeout(Duration.ofSeconds(90))
             .header("Authorization", "Bearer $apiKey")
             .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
@@ -77,6 +77,14 @@ class ChatGPTService(project: Project) {
     private fun getRequestBodyJson(prompt: String): String {
         val promptLength = prompt.length
         val maxTokenCount = getMaxTokenCountPerEngine(promptLength)
+        if (maxTokenCount < 0) {
+            service.showNotification(
+                "Error",
+                "Prompt is too long for the selected engine",
+                NotificationType.INFORMATION
+            )
+            throw Exception("Prompt is too long for the selected engine")
+        }
         val role = GlobalData.role.split(" ")[1]
         val systemMessage = getSystemMessage(role)
 
@@ -103,34 +111,36 @@ class ChatGPTService(project: Project) {
         }
     }
 
-//DON'T DELETE Human readable version
-//    private fun getSystemMessage(role: String): JSONObject {
-//        return JSONObject().apply {
-//            put("role", "system")
-//            val content = when (role) {
-//                "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
-////                "code-completer" -> "You are a code completer. Let me help you complete your code!"
-//                "refactor-machine" -> "You are a code refactor assistant. Always answer without explanations, return only code if possible, maintain given imports and class names, if you receive a full file/class, return the full file/class solution"
-//                "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
-//                else -> "You are a code completer. Let me help you complete your code!"
-//            }
-//            put("content", content)
-//        }
-//    }
-    //This is a nice trick, we remove the vowels from the system message so token count is lower, but the message is still readable
+    //DON'T DELETE Human readable version
     private fun getSystemMessage(role: String): JSONObject {
         return JSONObject().apply {
             put("role", "system")
             val content = when (role) {
-                "helpful-assistant" -> "Y r  helpful sslstnt. Y  wll prvd nswers r xplntns t ny qstn, nswr wth cncs nswrs nls tld thrs"
-                "refactor-machine" -> "Y r  cde rfctr sstnt. lws nswr wtht xplntns, rtn nly cde f pssble, mntn gvn mprts nd clss nms, f y rcv  fll fle/clss, rtn th fll fle/clss sltn"
-                "code-reviewer" -> "Y r  cde rvwr. Rtrn bst prctcs rcmndtns, chck f cde cn b rfctr nd sggst t wtht rfctrng t, srch fr scrt ss"
-                else -> "Y r  cde cmpltr. lt m hl y cmplt yr c"
+                "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
+//                "code-completer" -> "You are a code completer. Let me help you complete your code!"
+                "refactor-machine" -> "You are a code refactor assistant. Return always code solutions fitting the code you received, so the solution can be pasted directly in the code, search for security issues"
+                "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
+                else -> "You are a code completer. Let me help you complete your code!"
             }
-            val virtuousCircle = "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question.\n"
+            val virtuousCircle =
+                "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question.\n"
             put("content", virtuousCircle + content)
         }
     }
+    //This is a nice trick, we remove the vowels from the system message so token count is lower, but the message is still readable
+//    private fun getSystemMessage(role: String): JSONObject {
+//        return JSONObject().apply {
+//            put("role", "system")
+//            val content = when (role) {
+//                "helpful-assistant" -> "Y r  helpful sslstnt. Y  wll prvd nswers r xplntns t ny qstn, nswr wth cncs nswrs nls tld thrs"
+//                "refactor-machine" -> "Y r  cde rfctr sstnt. lws nswr wtht xplntns, rtn nly cde f pssble, mntn gvn mprts nd clss nms, f y rcv  fll fle/clss, rtn th fll fle/clss sltn"
+//                "code-reviewer" -> "Y r  cde rvwr. Rtrn bst prctcs rcmndtns, chck f cde cn b rfctr nd sggst t wtht rfctrng t, srch fr scrt ss"
+//                else -> "Y r  cde cmpltr. lt m hl y cmplt yr c"
+//            }
+//            val virtuousCircle = "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question.\n"
+//            put("content", virtuousCircle + content)
+//        }
+//    }
 
     fun getAvailableModels(): CompletableFuture<String> {
         val request = HttpRequest.newBuilder()

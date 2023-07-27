@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.components.TextAreaExample
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
@@ -104,6 +105,9 @@ class MoneyPennyToolWindow(
             }
 
             3 -> {
+//                TextAreaExample().textAreaExample(innerPanel)
+//                TextAreaExample().createAndDisplayGUI()
+                innerPanel.add(TextAreaExample(), BorderLayout.CENTER)
 //                ChatWindowFactory().getChatWindowContent()?.let { innerPanel.add(it, BorderLayout.CENTER) }
             }
         }
