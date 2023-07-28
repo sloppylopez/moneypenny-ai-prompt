@@ -1,12 +1,13 @@
 package com.github.sloppylopez.moneypennyideaplugin.components
 
 import com.intellij.ui.JBColor
+import com.intellij.ui.components.JBList
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.*
 
 class ChatWindowContent : JPanel() {
-    private val chatList: JList<String> = JList<String>(DefaultListModel<String>()).apply {
+    val chatList: JBList<String> = JBList(DefaultListModel<String>()).apply {
         cellRenderer = ChatCellRenderer()
         layoutOrientation = JList.VERTICAL
         fixedCellWidth = 470
@@ -25,16 +26,16 @@ class ChatWindowContent : JPanel() {
         }
         border = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(JBColor.GRAY),
-            BorderFactory.createEmptyBorder(10, 10, 10, 0)
+            BorderFactory.createEmptyBorder(0, 10, 0, 0)
         )
         add(scrollPane, BorderLayout.CENTER)
     }
 
     fun addElement(element: String) {
-        (chatList.model as DefaultListModel<String>).addElement(element)
+            (chatList.model as DefaultListModel<String>).addElement(element)
     }
 
-    override fun getPreferredSize(): Dimension = Dimension(500, 350)
+    override fun getPreferredSize(): Dimension = Dimension(500, 400)
 
     private fun showNotification(selectedText: String) {
         JOptionPane.showMessageDialog(this, selectedText)
