@@ -21,11 +21,16 @@ class ChatCellRenderer : JTextArea(), ListCellRenderer<String?> {
         index: Int,
         isSelected: Boolean,
         cellHasFocus: Boolean
-    ): Component =
+    ): Component {
+        val sanitizedValue = value?.replace("\r\n", "\n")
+        val removedFollowUp: List<String>? = sanitizedValue?.split("\n")
         this.apply {
-            text = value
+            text = removedFollowUp?.joinToString("\n")
             background = if (isSelected) list.selectionBackground else list.background
             foreground = if (isSelected) list.selectionForeground else list.foreground
             preferredSize = null
+            rows = (removedFollowUp?.size?.plus(1)) ?: 100//TODO check what to do with this magic number
         }
+        return this
+    }
 }
