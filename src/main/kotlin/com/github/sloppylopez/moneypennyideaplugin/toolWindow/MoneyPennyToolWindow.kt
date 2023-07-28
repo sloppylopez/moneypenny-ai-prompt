@@ -107,7 +107,7 @@ class MoneyPennyToolWindow(
             3 -> {
 //                TextAreaExample().textAreaExample(innerPanel)
 //                TextAreaExample().createAndDisplayGUI()
-                innerPanel.add(TextAreaExample(), BorderLayout.CENTER)
+//                innerPanel.add(TextAreaExample(), BorderLayout.CENTER)
 //                ChatWindowFactory().getChatWindowContent()?.let { innerPanel.add(it, BorderLayout.CENTER) }
             }
         }

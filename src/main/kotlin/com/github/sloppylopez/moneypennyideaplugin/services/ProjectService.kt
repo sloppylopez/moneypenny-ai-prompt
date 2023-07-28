@@ -5,6 +5,8 @@ import com.github.sloppylopez.moneypennyideaplugin.actions.*
 import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.role
+import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
@@ -421,14 +423,46 @@ class ProjectService {
         return nestedTabbedPanes
     }
 
+    private fun addFollowUpQuestion(
+        splitParts: List<String>,
+        component: ChatWindowContent
+    ) {
+        val followUpQuestionLast =
+            splitParts[splitParts.size - 1]//this magic number is to take the follow-up question from the npm analysis response part of the previous request
+//            val followUpQuestionBeforeLast =
+//                splitParts[splitParts.size - 2]//this magic number is to take the follow-up question from the npm analysis response part of the previous request
+//            var followUpQuestion = followUpQuestionBeforeLast
+//            if (!followUpQuestionLast.contains("Response:", true)) {
+//                followUpQuestion += followUpQuestionLast
+//            }
+        if ((followUpQuestionLast.contains("Follow Up Question:", true) ||
+                    followUpQuestionLast.contains("Follow Up:", true) ||
+                    followUpQuestionLast.contains("Follow-Up Question:", true) ||
+                    followUpQuestionLast.contains("Follow-Up:", true)) &&
+            GlobalData.followUpActive
+        ) {
+            component.addElement("$role: -> $followUpQuestionLast")
+        }
+    }
 
-    fun addChatWindowContentListModelToGlobalData(container: Container, text: String, currentRole: String) {
-
+    //TODO: This method is not very robust, find a better way to do this
+    fun addChatWindowContentListModelToGlobalData(
+        container: Container,
+        text: String,
+        currentRole: String,
+        tabName: String
+    ) {
         fun findTabbedPanesRecursive(component: Component) {
             if (component is ChatWindowContent) {
-                component.addElement("$currentRole:\n$text")
                 val parentTabName = (component.parent.parent.parent as JBTabbedPane).getTitleAt(0)
-                GlobalData.tabNameToChatWindowContent[parentTabName] = component.listModel
+                if (tabName == parentTabName) {
+                    component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
+                    if (currentRole == "🤖 refactor-machine") {
+                        val splittedParts = text.split("\n")
+                        addFollowUpQuestion(splittedParts, component)
+                    }
+                    tabNameToChatWindowContent[parentTabName] = component.chatList
+                }
             } else if (component is Container) {
                 for (child in component.components) {
                     findTabbedPanesRecursive(child)
