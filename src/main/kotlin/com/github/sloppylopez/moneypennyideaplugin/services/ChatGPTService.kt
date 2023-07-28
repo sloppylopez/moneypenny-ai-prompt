@@ -123,7 +123,7 @@ class ChatGPTService(project: Project) {
                 else -> "You are a code completer. Let me help you complete your code!"
             }
             val virtuousCircle =
-                "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question.\n"
+                "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question. After responding return next logical Follow Up Question:\n"
             put("content", virtuousCircle + content)
         }
     }
