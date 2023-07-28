@@ -1,12 +1,13 @@
 package com.github.sloppylopez.moneypennyideaplugin.global
 
 import com.intellij.ui.components.JBTabbedPane
-import javax.swing.DefaultListModel
 import javax.swing.JCheckBox
+import javax.swing.JList
 import javax.swing.JPanel
 
 object GlobalData {
     var engine: String = "gpt-3.5-turbo-16k"
+    var followUpActive: Boolean = true
     var role: String = "🤖 refactor-machine"
     var userRole: String = "🤓 user"
     var downerTabName: Int = 1
@@ -14,7 +15,7 @@ object GlobalData {
     var index: Int = 1
     val tabNameToFilePathMap = mutableMapOf<String, String>()
     val tabNameToContentPromptTextMap = mutableMapOf<String, String>()
-    val tabNameToChatWindowContent = mutableMapOf<String, DefaultListModel<String>>()
+    val tabNameToChatWindowContent = mutableMapOf<String, JList<String>>()
     val prompts = mutableMapOf<String, Map<String, List<String>>>()
     val apiKey: String? = System.getenv("OPENAI_API_KEY")
     var emptyCheckBoxButton: JCheckBox? = null
