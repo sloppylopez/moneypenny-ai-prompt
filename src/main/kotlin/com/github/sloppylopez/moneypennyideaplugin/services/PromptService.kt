@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.Component
 import java.awt.Container
-import javax.swing.DefaultListModel
+import javax.swing.JList
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
@@ -51,7 +51,7 @@ class PromptService(project: Project) {
         return emptyMap<String, Map<String, List<String>>>().toMutableMap()
     }
 
-    fun setInChat(text: String, tabName: String, currentRole: String): MutableMap<String, DefaultListModel<String>> {
+    fun setInChat(text: String, tabName: String, currentRole: String): MutableMap<String, JList<String>> {
         val contentManager = service.getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
         for (i in 0 until contentCount!!) {
@@ -59,13 +59,18 @@ class PromptService(project: Project) {
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
                 simpleToolWindowPanel.components.forEach { component ->
-                    service.addChatWindowContentListModelToGlobalData(component as Container, text, currentRole)
+                    service.addChatWindowContentListModelToGlobalData(
+                        component as Container,
+                        text,
+                        currentRole,
+                        tabName
+                    )
                 }
 //                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
                 return GlobalData.tabNameToChatWindowContent
             }
         }
-        return emptyMap<String, DefaultListModel<String>>().toMutableMap()
+        return emptyMap<String, JList<String>>().toMutableMap()
     }
 
     private fun getPromptInfo(
