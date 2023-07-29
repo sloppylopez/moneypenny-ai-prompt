@@ -2,11 +2,8 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptTextEditorAction
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
-import com.github.sloppylopez.moneypennyideaplugin.intentions.ChatGptQuickFix
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
-import com.intellij.codeInsight.intention.IntentionManager
 import com.intellij.openapi.application.ApplicationActivationListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -16,7 +13,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.IdeFrame
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.psi.PsiManager
 import javax.swing.SwingUtilities
 
 class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {

@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.listeners
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToContentPromptTextMap
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service

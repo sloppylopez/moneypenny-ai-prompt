@@ -2,8 +2,8 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.apiKey
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.apiKey
 import com.google.gson.Gson
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
@@ -123,7 +123,7 @@ class ChatGPTService(project: Project) {
                 else -> "You are a code completer. Let me help you complete your code!"
             }
             val virtuousCircle =
-                "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question. After responding return next logical Follow Up Question:\n"
+                "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question. After responding return next logical Follow Up Question user would ask:\n"
             put("content", virtuousCircle + content)
         }
     }

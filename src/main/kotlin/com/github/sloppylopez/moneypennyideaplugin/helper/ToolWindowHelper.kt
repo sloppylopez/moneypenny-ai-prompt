@@ -1,8 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.helper
 
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.index
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabCounter
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.index
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabCounter
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow

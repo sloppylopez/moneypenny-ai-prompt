@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory

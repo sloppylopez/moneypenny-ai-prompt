@@ -1,7 +1,9 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.components.TextAreaExample
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
+import com.github.sloppylopez.moneypennyideaplugin.data.Event
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
@@ -10,12 +12,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.util.ui.JBUI
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.FlowLayout
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
 import java.io.File
-import javax.swing.BoxLayout
-import javax.swing.JComponent
-import javax.swing.JPanel
-import javax.swing.JTabbedPane
+import java.time.LocalDateTime
+import javax.swing.*
 import javax.swing.event.ChangeListener
 
 class MoneyPennyToolWindow(
@@ -53,14 +56,22 @@ class MoneyPennyToolWindow(
             gridBagConstraints.anchor = GridBagConstraints.NORTH
             gridBagConstraints.insets = JBUI.insets(2)
             val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
+            var innerPanel: JPanel? = null
             for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, file, contentPromptText, nestedPanel, tabbedPane)
+                innerPanel = createInnerPanel(j, file, contentPromptText, nestedPanel, tabbedPane)
 //                innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
                 gridBagConstraints.gridy = j - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
             service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
+            val events = mutableListOf(
+                Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true),
+                Event(LocalDateTime.of(2023, 7, 29, 12, 0), "Moneypenny AI started", false),
+            )
+            val timeLine = TimeLine(events).getTimeLine()
+            SwingUtilities.invokeLater { innerPanel?.add(timeLine) }
+            tabNameToTimeLine[tabbedPane.getTitleAt(0)] = timeLine
         }
         tabbedPane.toolkit.createImage("images/moneypenny-ai-main.png")
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
@@ -92,7 +103,9 @@ class MoneyPennyToolWindow(
         tabbedPane: JBTabbedPane
     ): JPanel {
         val innerPanel = JPanel(BorderLayout())
-        if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
+        val canonicalPath = file?.canonicalPath
+//        val tabName = tabbedPane.getTitleAt(tabbedPane.selectedIndex)
+        if (panelIndex == 1) innerPanel.name = canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
             1 -> {
@@ -101,10 +114,19 @@ class MoneyPennyToolWindow(
 
             2 -> {
                 promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
-                service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
+                service.invokeLater { fileEditorManager.openFileInEditor(canonicalPath, contentPromptText) }
             }
 
             3 -> {
+//                val events = mutableListOf(
+//                    Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true),
+//                    Event(LocalDateTime.of(2023, 7, 29, 12, 0), "Moneypenny AI started", false),
+//                    Event(LocalDateTime.of(2023, 7, 29, 13, 0), "Machine refactors code", false),
+//                    Event(LocalDateTime.of(2023, 7, 29, 14, 0), "Machine asks for more code to refactor", false)
+//                )
+//                val timeLine = TimeLine(events).getTimeLine()
+//                SwingUtilities.invokeLater { innerPanel.add(timeLine) }
+//                tabNameToTimeLine[canonicalPath ?: "No File"] = timeLine
 //                TextAreaExample().textAreaExample(innerPanel)
 //                TextAreaExample().createAndDisplayGUI()
 //                innerPanel.add(TextAreaExample(), BorderLayout.CENTER)

@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
 import com.intellij.icons.AllIcons
@@ -25,7 +25,8 @@ class CopyPromptAction(private var project: Project) : AnAction() {
 
         val tabName = GlobalData.tabbedPane?.getTitleAt(GlobalData.tabbedPane!!.selectedIndex)
         val prompts = promptService.getPrompts()
-        val promptList = service.getPromptListByKey(prompts!!, tabName!!)
+        val promptList = service.getPromptListByKey(prompts, tabName!!)
+
         if (promptList.isNotEmpty()) {
             val promptsText = promptList.joinToString("\n")
             service.copyToClipboard(promptsText)

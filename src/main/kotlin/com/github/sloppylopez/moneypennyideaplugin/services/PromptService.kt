@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -67,7 +67,7 @@ class PromptService(project: Project) {
                     )
                 }
 //                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
-                return GlobalData.tabNameToChatWindowContent
+                return GlobalData.tabNameToChatWindowContent//TODO we should not return this, it does not make sense
             }
         }
         return emptyMap<String, JList<String>>().toMutableMap()

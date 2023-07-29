@@ -3,12 +3,12 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
 import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.role
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToChatWindowContent
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.downerTabName
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToChatWindowContent
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToContentPromptTextMap
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.google.gson.Gson
 import com.intellij.icons.AllIcons
@@ -429,16 +429,12 @@ class ProjectService {
     ) {
         val followUpQuestionLast =
             splitParts[splitParts.size - 1]//this magic number is to take the follow-up question from the npm analysis response part of the previous request
-//            val followUpQuestionBeforeLast =
-//                splitParts[splitParts.size - 2]//this magic number is to take the follow-up question from the npm analysis response part of the previous request
-//            var followUpQuestion = followUpQuestionBeforeLast
-//            if (!followUpQuestionLast.contains("Response:", true)) {
-//                followUpQuestion += followUpQuestionLast
-//            }
-        if ((followUpQuestionLast.contains("Follow Up Question:", true) ||
+        if (/*(followUpQuestionLast.contains("Follow Up Question:", true) ||
                     followUpQuestionLast.contains("Follow Up:", true) ||
                     followUpQuestionLast.contains("Follow-Up Question:", true) ||
-                    followUpQuestionLast.contains("Follow-Up:", true)) &&
+                    followUpQuestionLast.contains("Follow-Up:", true) ||
+                    followUpQuestionLast.contains("Next Follow Up Question:", true) ||
+                    followUpQuestionLast.contains("Next Follow-Up Question:", true)) &&*/
             GlobalData.followUpActive
         ) {
             component.addElement("$role: -> $followUpQuestionLast")
@@ -458,8 +454,8 @@ class ProjectService {
                 if (tabName == parentTabName) {
                     component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
                     if (currentRole == "🤖 refactor-machine") {
-                        val splittedParts = text.split("\n")
-                        addFollowUpQuestion(splittedParts, component)
+                        val splitParts = text.split("\n")
+                        addFollowUpQuestion(splitParts, component)
                     }
                     tabNameToChatWindowContent[parentTabName] = component.chatList
                 }

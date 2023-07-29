@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.intellij.ui.JBColor
 import java.awt.*
 import java.awt.event.*

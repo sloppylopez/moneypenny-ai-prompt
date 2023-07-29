@@ -1,17 +1,15 @@
 package com.github.sloppylopez.moneypennyideaplugin.components
 
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
 import java.awt.Component
-import javax.swing.JList
-import javax.swing.JTextArea
-import javax.swing.ListCellRenderer
-import javax.swing.UIManager
+import javax.swing.*
 
 class ChatCellRenderer : JTextArea(), ListCellRenderer<String?> {
     init {
         isOpaque = true
         lineWrap = true
         wrapStyleWord = true
-        border = null // Removed the border
+        border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
         font = UIManager.getFont("List.font")
     }
 
@@ -22,14 +20,18 @@ class ChatCellRenderer : JTextArea(), ListCellRenderer<String?> {
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-        val sanitizedValue = value?.replace("\r\n", "\n")
-        val removedFollowUp: List<String>? = sanitizedValue?.split("\n")
+        val sanitizedValue = value?.replace("\r\n", "\n")?.trim()
+//        var removedFollowUp: List<String>? = sanitizedValue?.split("\n")
+        var removedFollowUp: List<String>? = emptyList()
+        if (role == "🤖 refactor-machine") {
+            removedFollowUp = sanitizedValue?.split("\n")
+        }
         this.apply {
             text = removedFollowUp?.joinToString("\n")
             background = if (isSelected) list.selectionBackground else list.background
             foreground = if (isSelected) list.selectionForeground else list.foreground
             preferredSize = null
-            rows = (removedFollowUp?.size?.plus(1)) ?: 100//TODO check what to do with this magic number
+            rows = (removedFollowUp?.size?.plus(1)) ?: 1000//TODO check what to do with this magic number
         }
         return this
     }

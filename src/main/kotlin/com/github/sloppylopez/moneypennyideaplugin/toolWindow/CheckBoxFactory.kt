@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.intellij.openapi.components.Service
 import javax.swing.JCheckBox
 import javax.swing.JPanel

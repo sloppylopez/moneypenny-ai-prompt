@@ -1,4 +1,4 @@
-package com.github.sloppylopez.moneypennyideaplugin.global
+package com.github.sloppylopez.moneypennyideaplugin.data
 
 import com.intellij.ui.components.JBTabbedPane
 import javax.swing.JCheckBox
@@ -16,6 +16,7 @@ object GlobalData {
     val tabNameToFilePathMap = mutableMapOf<String, String>()
     val tabNameToContentPromptTextMap = mutableMapOf<String, String>()
     val tabNameToChatWindowContent = mutableMapOf<String, JList<String>>()
+    val tabNameToTimeLine = mutableMapOf<String, JPanel>()
     val prompts = mutableMapOf<String, Map<String, List<String>>>()
     val apiKey: String? = System.getenv("OPENAI_API_KEY")
     var emptyCheckBoxButton: JCheckBox? = null

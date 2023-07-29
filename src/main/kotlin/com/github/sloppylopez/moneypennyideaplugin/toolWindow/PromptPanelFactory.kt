@@ -61,7 +61,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
 
             if (contentPromptTextArea != null) {
                 //Add chat window
-                innerPanel.add(ChatWindowContent(), BorderLayout.SOUTH)
+                innerPanel.add(ChatWindowContent(service.getProject()!!), BorderLayout.SOUTH)
                 //Add radio buttons
                 radioButtonFactory.radioButtonsPanel(innerPanel, prePromptTextArea!!)
                 val prePromptScrollPane = JBScrollPane(prePromptTextArea)
