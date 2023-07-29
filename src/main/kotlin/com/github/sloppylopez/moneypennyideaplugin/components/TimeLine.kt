@@ -2,8 +2,10 @@ package com.github.sloppylopez.moneypennyideaplugin.components
 
 import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.intellij.ui.JBColor
+import com.intellij.ui.PopupHandler
 import java.awt.Dimension
 import java.awt.Graphics
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 
 class TimeLine(events: MutableList<Event>) : JPanel() {
@@ -24,7 +26,7 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
         }
     }
 
-    fun getTimeLine(): TimeLine {
+    fun refresh(): TimeLine {
         val timeline = TimeLine(events)
         timeline.preferredSize = Dimension(400, 60)
         add(timeline)
@@ -36,5 +38,13 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
         events.add(newEvent)
         eventPoints.add(Triple(newEvent.time.hour, newEvent.description, newEvent.isUser))
         repaint()
+    }
+
+    init {
+        addMouseListener(object : PopupHandler() {
+            override fun invokePopup(comp: java.awt.Component?, x: Int, y: Int) {
+                JOptionPane.showMessageDialog(this@TimeLine, "Yay!")
+            }
+        })
     }
 }

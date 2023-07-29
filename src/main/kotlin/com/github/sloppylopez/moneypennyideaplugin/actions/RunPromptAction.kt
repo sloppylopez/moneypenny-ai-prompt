@@ -45,7 +45,8 @@ class RunPromptAction(private var project: Project) : AnAction() {
 
         val timeLine = tabNameToTimeLine[tabName] as TimeLine
         timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true))
-        timeLine.getTimeLine()
+        timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI 2", false))
+        timeLine.refresh()
         val role = role.split(" ")[1]
         if (role == "refactor-machine") {
             promptList[1] = "```\n" + promptList[1] + "\n```"

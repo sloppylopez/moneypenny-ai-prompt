@@ -66,16 +66,7 @@ class MoneyPennyToolWindow(
                 panel.add(innerPanel, gridBagConstraints)
             }
             service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
-            val events = mutableListOf(
-                Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true),
-                Event(LocalDateTime.of(2023, 7, 29, 12, 0), "Moneypenny AI started", false),
-            )
-            val timeLine = TimeLine(events)
-            val currentTimeLine = timeLine.getTimeLine()
-            SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
-            val tabbedPanedTitle = tabbedPane.getTitleAt(0)
-            tabNameToTimeLine[tabbedPanedTitle] = currentTimeLine
-            tabNameToInnerPanel[tabbedPanedTitle] = innerPanel!!
+            addTimeLine(innerPanel, tabbedPane)
         }
         tabbedPane.toolkit.createImage("images/moneypenny-ai-main.png")
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
@@ -88,6 +79,16 @@ class MoneyPennyToolWindow(
 //        ChatWindowFactory().getChatWindowContent()?.let { mainPanel2.add(it, BorderLayout.CENTER) }
 //        mainPanel.add(mainPanel2, BorderLayout.SOUTH)
         return mainPanel
+    }
+
+    private fun addTimeLine(innerPanel: JPanel?, tabbedPane: JBTabbedPane) {
+        val events = mutableListOf<Event>()
+        val timeLine = TimeLine(events)
+        val currentTimeLine = timeLine.refresh()
+        SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
+        val tabbedPanedTitle = tabbedPane.getTitleAt(0)
+        tabNameToTimeLine[tabbedPanedTitle] = currentTimeLine
+        tabNameToInnerPanel[tabbedPanedTitle] = innerPanel!!
     }
 
     private fun getChangeListener(tabbedPane: JBTabbedPane) = ChangeListener { _ ->
