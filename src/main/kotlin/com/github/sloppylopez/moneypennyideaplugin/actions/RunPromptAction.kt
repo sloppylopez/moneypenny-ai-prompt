@@ -1,8 +1,12 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
+import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToTimeLine
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabbedPane
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -16,6 +20,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
+import java.time.LocalDateTime
 
 class RunPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
@@ -32,11 +37,15 @@ class RunPromptAction(private var project: Project) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
         var prompt: String
-        val tabName = GlobalData.tabbedPane?.getTitleAt(GlobalData.tabbedPane!!.selectedIndex)
+        val tabName = tabbedPane?.getTitleAt(tabbedPane!!.selectedIndex)
         val jProgressBar = progressBarFactory.getProgressBar()
         progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
         val prompts = promptService.getPrompts()
         val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
+
+        val timeLine = tabNameToTimeLine[tabName] as TimeLine
+        timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true))
+        timeLine.getTimeLine()
         val role = role.split(" ")[1]
         if (role == "refactor-machine") {
             promptList[1] = "```\n" + promptList[1] + "\n```"

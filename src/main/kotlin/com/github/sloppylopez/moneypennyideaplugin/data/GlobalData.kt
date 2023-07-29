@@ -17,6 +17,7 @@ object GlobalData {
     val tabNameToContentPromptTextMap = mutableMapOf<String, String>()
     val tabNameToChatWindowContent = mutableMapOf<String, JList<String>>()
     val tabNameToTimeLine = mutableMapOf<String, JPanel>()
+    val tabNameToInnerPanel = mutableMapOf<String, JPanel>()
     val prompts = mutableMapOf<String, Map<String, List<String>>>()
     val apiKey: String? = System.getenv("OPENAI_API_KEY")
     var emptyCheckBoxButton: JCheckBox? = null

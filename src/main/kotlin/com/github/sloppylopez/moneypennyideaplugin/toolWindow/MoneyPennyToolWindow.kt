@@ -3,6 +3,7 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
 import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToInnerPanel
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
@@ -69,9 +70,12 @@ class MoneyPennyToolWindow(
                 Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true),
                 Event(LocalDateTime.of(2023, 7, 29, 12, 0), "Moneypenny AI started", false),
             )
-            val timeLine = TimeLine(events).getTimeLine()
-            SwingUtilities.invokeLater { innerPanel?.add(timeLine) }
-            tabNameToTimeLine[tabbedPane.getTitleAt(0)] = timeLine
+            val timeLine = TimeLine(events)
+            val currentTimeLine = timeLine.getTimeLine()
+            SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
+            val tabbedPanedTitle = tabbedPane.getTitleAt(0)
+            tabNameToTimeLine[tabbedPanedTitle] = currentTimeLine
+            tabNameToInnerPanel[tabbedPanedTitle] = innerPanel!!
         }
         tabbedPane.toolkit.createImage("images/moneypenny-ai-main.png")
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))

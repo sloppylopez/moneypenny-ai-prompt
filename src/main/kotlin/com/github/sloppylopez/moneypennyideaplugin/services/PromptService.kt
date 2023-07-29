@@ -67,7 +67,7 @@ class PromptService(project: Project) {
                     )
                 }
 //                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
-                return GlobalData.tabNameToChatWindowContent//TODO we should not return this, it does not make sense
+                    return GlobalData.tabNameToChatWindowContent//TODO we should not return this, it does not make sense
             }
         }
         return emptyMap<String, JList<String>>().toMutableMap()

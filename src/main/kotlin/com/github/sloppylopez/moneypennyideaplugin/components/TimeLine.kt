@@ -32,6 +32,7 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
     }
 
     fun addPointInTimeLine(newEvent: Event) {
+        removeAll()
         events.add(newEvent)
         eventPoints.add(Triple(newEvent.time.hour, newEvent.description, newEvent.isUser))
         repaint()
