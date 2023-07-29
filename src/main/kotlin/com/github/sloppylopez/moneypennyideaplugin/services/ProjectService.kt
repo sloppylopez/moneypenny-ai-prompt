@@ -450,8 +450,15 @@ class ProjectService {
     ) {
         fun findTabbedPanesRecursive(component: Component) {
             if (component is ChatWindowContent) {
-                val parentTabName = (component.parent.parent.parent as JBTabbedPane).getTitleAt(0)
-                if (tabName == parentTabName) {
+                var parentTabName: String? = null
+                val parentComponent: Component = (component.parent.parent.parent as JBTabbedPane)
+                for (i in 0 until (parentComponent as JBTabbedPane).tabCount) {
+                    if (parentComponent.getTitleAt(i) == tabName) {
+                        parentTabName = parentComponent.getTitleAt(i)
+                        break
+                    }
+                }
+                if (parentTabName != null) {
                     component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
                     if (currentRole == "🤖 refactor-machine") {
                         val splitParts = text.split("\n")
@@ -582,17 +589,17 @@ class ProjectService {
 //    this@SQLPluginPanel, "Can't read file '$file'", "Error",
 //    JOptionPane.ERROR_MESSAGE
 //    )
-    ////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
+////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
 
-    //    fun hola(){
-    //        getProject().getModelAccess().executeCommand(object : DefaultCommand() {
-    //            fun run() {
-    //                createConsoleModel()
-    //                addBuiltInImports()
-    //                loadHistory(history)
-    //                createEditor()
-    //                myFileEditor = ConsoleFileEditor(myEditor)
-    //            }
-    //        })
-    //    }
+//    fun hola(){
+//        getProject().getModelAccess().executeCommand(object : DefaultCommand() {
+//            fun run() {
+//                createConsoleModel()
+//                addBuiltInImports()
+//                loadHistory(history)
+//                createEditor()
+//                myFileEditor = ConsoleFileEditor(myEditor)
+//            }
+//        })
+//    }
 }

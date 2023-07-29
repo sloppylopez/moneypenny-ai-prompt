@@ -54,8 +54,8 @@ class PromptService(project: Project) {
     fun setInChat(text: String, tabName: String, currentRole: String): MutableMap<String, JList<String>> {
         val contentManager = service.getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
-        for (i in 0 until contentCount!!) {
-            val content = contentManager.getContent(i)
+        for (index in 0 until contentCount!!) {
+            val content = contentManager.getContent(index)
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
             if (simpleToolWindowPanel != null) {
                 simpleToolWindowPanel.components.forEach { component ->
@@ -67,7 +67,7 @@ class PromptService(project: Project) {
                     )
                 }
 //                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
-                    return GlobalData.tabNameToChatWindowContent//TODO we should not return this, it does not make sense
+                return GlobalData.tabNameToChatWindowContent//TODO we should not return this, it does not make sense
             }
         }
         return emptyMap<String, JList<String>>().toMutableMap()
