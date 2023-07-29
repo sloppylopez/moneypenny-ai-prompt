@@ -7,6 +7,8 @@ import java.awt.Dimension
 import java.awt.Graphics
 import javax.swing.JOptionPane
 import javax.swing.JPanel
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 class TimeLine(events: MutableList<Event>) : JPanel() {
     private val events: MutableList<Event> = events.sortedBy { it.time }.toMutableList()
@@ -40,10 +42,20 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
         repaint()
     }
 
+
     init {
-        addMouseListener(object : PopupHandler() {
-            override fun invokePopup(comp: java.awt.Component?, x: Int, y: Int) {
-                JOptionPane.showMessageDialog(this@TimeLine, "Yay!")
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                val x = e.x
+                val y = e.y
+                eventPoints.forEachIndexed { i, (hour, description, isUser) ->
+                    val dotX = 50 + i * (width - 100) / (eventPoints.size - 1)
+                    val dotY = height / 2
+                    if(Math.abs(dotX - x) <= 5 && Math.abs(dotY - y) <= 5) {
+                        JOptionPane.showMessageDialog(this@TimeLine, "Dot Clicked!")
+                        return
+                    }
+                }
             }
         })
     }
