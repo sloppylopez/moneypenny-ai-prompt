@@ -4,7 +4,7 @@ import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
 import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToInnerPanel
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToTimeLine
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
@@ -32,15 +32,16 @@ class MoneyPennyToolWindow(
 
     fun getContent(
         fileList: List<*>? = emptyList<Any>(),
-        contentPromptText: String? = null
+        contentPromptText: String? = null,
+        upperTabName: String? = null,
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(fileList!!, contentPromptText))
+            add(moneyPennyPromptPanel(fileList!!, contentPromptText, upperTabName))
         }
     }
 
     private fun moneyPennyPromptPanel(
-        fileList: List<*>, contentPromptText: String? = null
+        fileList: List<*>, contentPromptText: String? = null, upperTabName: String?
     ): JComponent {
         var file: File? = null
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
@@ -65,7 +66,7 @@ class MoneyPennyToolWindow(
                 panel.add(innerPanel, gridBagConstraints)
             }
             service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
-            addTimeLine(innerPanel, tabbedPane, i)
+            addTimeLine(innerPanel, tabbedPane, i, upperTabName)
         }
         tabbedPane.toolkit.createImage("images/moneypenny-ai-main.png")
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
@@ -80,13 +81,24 @@ class MoneyPennyToolWindow(
         return mainPanel
     }
 
-    private fun addTimeLine(innerPanel: JPanel?, tabbedPane: JBTabbedPane, i: Int) {
+    private fun addTimeLine(innerPanel: JPanel?, tabbedPane: JBTabbedPane, i: Int, upperTabName: String?) {
         val events = mutableListOf<Event>()
-        val timeLine = TimeLine(events)
-        val currentTimeLine = timeLine.refresh()
-        SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
+        var currentTimeLine: JPanel?
+        val currentUpperTabName = upperTabName ?: "hola"
+        if (i == 0) {
+            val timeLine = TimeLine(events)
+            currentTimeLine = timeLine.refresh()
+            SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
+            upperTabNameToTimeLine[currentUpperTabName] = currentTimeLine
+        } else {
+//            SwingUtilities.invokeLater { innerPanel?.add(tabNameToTimeLine[currentUpperTabName]) }
+            val timeLine = TimeLine(events)
+            currentTimeLine = timeLine.refresh()
+            SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
+            upperTabNameToTimeLine[currentUpperTabName] = currentTimeLine
+        }
         val tabbedPanedTitle = tabbedPane.getTitleAt(i)
-        tabNameToTimeLine[tabbedPanedTitle] = currentTimeLine
+
         tabNameToInnerPanel[tabbedPanedTitle] = innerPanel!!
     }
 

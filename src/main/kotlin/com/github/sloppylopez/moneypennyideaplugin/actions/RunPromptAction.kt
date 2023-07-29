@@ -5,7 +5,7 @@ import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
 import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToTimeLine
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabbedPane
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
@@ -44,7 +44,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
             val prompts = promptService.getPrompts()
             val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
 
-            val timeLine = tabNameToTimeLine[tabName] as TimeLine
+            val timeLine = upperTabNameToTimeLine[tabName] as TimeLine
             timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true))
             timeLine.addPointInTimeLine(
                 Event(

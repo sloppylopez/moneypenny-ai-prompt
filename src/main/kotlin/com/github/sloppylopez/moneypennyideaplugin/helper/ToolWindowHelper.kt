@@ -89,10 +89,11 @@ class ToolWindowHelper {
                 )
             } else {
                 val expandedFileList = service.expandFolders(fileList)
+                val upperTabName = getDisplayName(expandedFileList)
                 ContentFactory.getInstance()
                     .createContent(
-                        moneyPennyToolWindow.getContent(expandedFileList, selectedText),
-                        getDisplayName(expandedFileList),
+                        moneyPennyToolWindow.getContent(expandedFileList, selectedText, upperTabName),
+                        upperTabName,
                         true
                     )
             }
