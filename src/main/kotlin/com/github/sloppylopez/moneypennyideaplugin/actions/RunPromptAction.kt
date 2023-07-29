@@ -37,33 +37,45 @@ class RunPromptAction(private var project: Project) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
         var prompt: String
-        val tabName = tabbedPane?.getTitleAt(tabbedPane!!.selectedIndex)
         val jProgressBar = progressBarFactory.getProgressBar()
-        progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
-        val prompts = promptService.getPrompts()
-        val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
+        try {
+            val tabName = tabbedPane?.getTitleAt(tabbedPane!!.selectedIndex)
+            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
+            val prompts = promptService.getPrompts()
+            val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
 
-        val timeLine = tabNameToTimeLine[tabName] as TimeLine
-        timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true))
-        timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI 2", false))
-        timeLine.refresh()
-        val role = role.split(" ")[1]
-        if (role == "refactor-machine") {
-            promptList[1] = "```\n" + promptList[1] + "\n```"
-        }
-        if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-            prompt = if (role == "refactor-machine") {
-                promptList.joinToString("\n")
-            } else {
-                promptList.joinToString(" ")
+            val timeLine = tabNameToTimeLine[tabName] as TimeLine
+            timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true))
+            timeLine.addPointInTimeLine(
+                Event(
+                    LocalDateTime.of(2023, 7, 29, 12, 0),
+                    "User starts MoneyPenny AI 2",
+                    false
+                )
+            )
+            timeLine.refresh()
+            val role = role.split(" ")[1]
+            if (role == "refactor-machine") {
+                promptList[1] = "```\n" + promptList[1] + "\n```"
             }
-            prompt = prompt.replace("\r\n", "\n")
-            promptService.setInChat(prompt, tabName, GlobalData.userRole)
-            chatGPTService.sendChatPrompt(
-                prompt, createCallback(tabName)
-            ).whenComplete { _, _ ->
-                progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
+            if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
+                prompt = if (role == "refactor-machine") {
+                    promptList.joinToString("\n")
+                } else {
+                    promptList.joinToString(" ")
+                }
+                prompt = prompt.replace("\r\n", "\n")
+                promptService.setInChat(prompt, tabName, GlobalData.userRole)
+                chatGPTService.sendChatPrompt(
+                    prompt, createCallback(tabName)
+                ).whenComplete { _, _ ->
+                    thisLogger().info("ChatGPTService.sendChatPrompt completed")
+                }
             }
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
+        } finally {
+            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
 

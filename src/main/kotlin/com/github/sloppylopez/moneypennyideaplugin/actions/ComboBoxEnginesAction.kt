@@ -50,13 +50,6 @@ class ComboBoxEnginesAction(
     }
 
     private fun addEngineToGlobalData(selectedOption: String) {
-//        val notification = Notification(
-//            "MoneyPenny",
-//            "Selected Option",
-//            selectedOption,
-//            NotificationType.INFORMATION
-//        )
-//        Notifications.Bus.notify(notification)
         GlobalData.engine = selectedOption
     }
 

@@ -1,9 +1,11 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptCompletion
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
+import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
+import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -17,7 +19,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
-import java.util.concurrent.CompletableFuture
+import java.time.LocalDateTime
 
 class RunAllPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
@@ -33,34 +35,57 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
-        var prompt: String
         val jProgressBar = progressBarFactory.getProgressBar()
-        progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
-        val prompts = promptService.getPrompts()
-        val role = role.split(" ")[1]
-        val sendChatPromptFutures =
-            mutableListOf<CompletableFuture<ChatGptCompletion>>() // Create a list to hold the CompletableFuture objects
-        prompts.forEach { (_, promptMap) ->
-            promptMap.forEach { (tabName, promptList) ->
-                if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-                    prompt = if (role == "refactor-machine") {
-                        promptList.joinToString("\n")
-                    } else {
-                        promptList.joinToString(" ")
-                    }
-                    prompt = prompt.replace("\r\n", "\n")
-                    promptService.setInChat(prompt, tabName, GlobalData.userRole)
-                    // Add the CompletableFuture object to the list
-                    sendChatPromptFutures.add(
+        var prompt: String
+        try {
+            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
+            val prompts = promptService.getPrompts()
+
+            val role = role.split(" ")[1]
+//            val sendChatPromptFutures =
+//                mutableListOf<CompletableFuture<ChatGptCompletion>>() // Create a list to hold the CompletableFuture objects
+            prompts.forEach { (_, promptMap) ->
+                promptMap.forEach { (tabName, promptList) ->
+                    if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
+                        val timeLine = tabNameToTimeLine[tabName] as TimeLine
+                        timeLine.addPointInTimeLine(
+                            Event(
+                                LocalDateTime.of(2023, 7, 29, 12, 0),
+                                "User starts MoneyPenny AI",
+                                true
+                            )
+                        )
+                        timeLine.addPointInTimeLine(
+                            Event(
+                                LocalDateTime.of(2023, 7, 29, 12, 0),
+                                "User starts MoneyPenny AI 2",
+                                false
+                            )
+                        )
+                        timeLine.refresh()
+                        prompt = if (role == "refactor-machine") {
+                            promptList.joinToString("\n")
+                        } else {
+                            promptList.joinToString(" ")
+                        }
+                        prompt = prompt.replace("\r\n", "\n")
+                        promptService.setInChat(prompt, tabName, GlobalData.userRole)
                         chatGPTService.sendChatPrompt(
                             prompt, createCallback(tabName)
-                        )
-                    )
+                        ).whenComplete { _, _ ->
+                            thisLogger().info("ChatGPTService.sendChatPrompt completed")
+                        }
+                    }
                 }
             }
-        }
-        // Use CompletableFuture.allOf to complete all the CompletableFuture objects in the list
-        CompletableFuture.allOf(*sendChatPromptFutures.toTypedArray()).whenComplete { hol, adios ->
+            // Use CompletableFuture.allOf to complete all the CompletableFuture objects in the list
+//            CompletableFuture.allOf(*sendChatPromptFutures.toTypedArray())
+//                .whenComplete { hol, adios ->
+//                progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            }
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
+        } finally {
             progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }

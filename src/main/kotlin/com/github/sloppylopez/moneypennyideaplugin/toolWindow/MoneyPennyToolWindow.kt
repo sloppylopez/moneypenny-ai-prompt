@@ -18,7 +18,6 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
-import java.time.LocalDateTime
 import javax.swing.*
 import javax.swing.event.ChangeListener
 
@@ -66,7 +65,7 @@ class MoneyPennyToolWindow(
                 panel.add(innerPanel, gridBagConstraints)
             }
             service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
-            addTimeLine(innerPanel, tabbedPane)
+            addTimeLine(innerPanel, tabbedPane, i)
         }
         tabbedPane.toolkit.createImage("images/moneypenny-ai-main.png")
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
@@ -81,12 +80,12 @@ class MoneyPennyToolWindow(
         return mainPanel
     }
 
-    private fun addTimeLine(innerPanel: JPanel?, tabbedPane: JBTabbedPane) {
+    private fun addTimeLine(innerPanel: JPanel?, tabbedPane: JBTabbedPane, i: Int) {
         val events = mutableListOf<Event>()
         val timeLine = TimeLine(events)
         val currentTimeLine = timeLine.refresh()
         SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
-        val tabbedPanedTitle = tabbedPane.getTitleAt(0)
+        val tabbedPanedTitle = tabbedPane.getTitleAt(i)
         tabNameToTimeLine[tabbedPanedTitle] = currentTimeLine
         tabNameToInnerPanel[tabbedPanedTitle] = innerPanel!!
     }

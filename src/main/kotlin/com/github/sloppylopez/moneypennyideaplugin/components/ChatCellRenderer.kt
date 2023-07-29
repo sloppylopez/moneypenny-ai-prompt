@@ -20,11 +20,12 @@ class ChatCellRenderer : JTextArea(), ListCellRenderer<String?> {
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-        val sanitizedValue = value?.replace("\r\n", "\n")?.trim()
+        val valueWithCarryReturn = value + "\n"
+        val sanitizedValue = valueWithCarryReturn.replace("\r\n", "\n").trim()
 //        var removedFollowUp: List<String>? = sanitizedValue?.split("\n")
         var removedFollowUp: List<String>? = emptyList()
         if (role == "🤖 refactor-machine") {
-            removedFollowUp = sanitizedValue?.split("\n")
+            removedFollowUp = sanitizedValue.split("\n")
         }
         this.apply {
             text = removedFollowUp?.joinToString("\n")
