@@ -94,12 +94,6 @@ class MoneyPennyToolWindow(
             }
             upperTabNameToTimeLine[currentUpperTabName] = currentTimeLine
         }
-//        } else {
-//            val timeLine = TimeLine(events)
-//            currentTimeLine = timeLine.refresh()
-//            SwingUtilities.invokeLater { innerPanel?.add(upperTabNameToTimeLine[currentUpperTabName]) }
-//            upperTabNameToTimeLine[currentUpperTabName] = currentTimeLine
-//        }
         val tabbedPanedTitle = tabbedPane.getTitleAt(i)
 
         tabNameToInnerPanel[tabbedPanedTitle] = innerPanel!!

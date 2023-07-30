@@ -4,7 +4,7 @@ import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
 import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabbedPane
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.selectedTabbedPane
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
@@ -41,7 +41,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
             //This cannot work when we delete tabs, we cannot add last tab to global and then
             //expect it to be there, this is not well though
             //you can instead get the selected tab and then search for whatever you need!!!
-            val tabName = tabbedPane?.getTitleAt(tabbedPane!!.selectedIndex)
+            val tabName = selectedTabbedPane?.getTitleAt(selectedTabbedPane!!.selectedIndex)
             progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
             val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()

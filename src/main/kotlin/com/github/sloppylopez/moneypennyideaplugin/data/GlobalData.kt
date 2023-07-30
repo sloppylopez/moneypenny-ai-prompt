@@ -23,7 +23,7 @@ object GlobalData {
     var emptyCheckBoxButton: JCheckBox? = null
     var innerPanel: JPanel? = null
     var nestedPanel: JPanel? = null
-    var tabbedPane: JBTabbedPane? = null
+    var selectedTabbedPane: JBTabbedPane? = null
     val engineModelStrings = arrayOf(
         "gpt-3.5-turbo",
         "gpt-3.5-turbo-16k",

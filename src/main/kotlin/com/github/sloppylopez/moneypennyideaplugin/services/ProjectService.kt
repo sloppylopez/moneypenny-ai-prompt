@@ -562,7 +562,7 @@ class ProjectService {
     ) {
         GlobalData.nestedPanel = nestedPanel
         GlobalData.innerPanel = innerPanel
-        GlobalData.tabbedPane = tabbedPane
+        GlobalData.selectedTabbedPane = tabbedPane
     }
 
     fun loadDataFromExtensionFolder(): String {

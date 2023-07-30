@@ -23,7 +23,7 @@ class CopyPromptAction(private var project: Project) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
 
-        val tabName = GlobalData.tabbedPane?.getTitleAt(GlobalData.tabbedPane!!.selectedIndex)
+        val tabName = GlobalData.selectedTabbedPane?.getTitleAt(GlobalData.selectedTabbedPane!!.selectedIndex)
         val prompts = promptService.getPrompts()
         val promptList = service.getPromptListByKey(prompts, tabName!!)
 
