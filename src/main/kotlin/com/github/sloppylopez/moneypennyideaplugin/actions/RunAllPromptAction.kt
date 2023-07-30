@@ -51,14 +51,14 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         timeLine.addPointInTimeLine(
                             Event(
                                 LocalDateTime.now(),
-                                promptList[1],
+                                promptList[0],
                                 true
                             )
                         )
                         timeLine.addPointInTimeLine(
                             Event(
                                 LocalDateTime.now(),
-                                promptList[1],
+                                promptList[0],
                                 false
                             )
                         )

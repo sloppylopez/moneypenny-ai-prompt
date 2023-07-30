@@ -85,11 +85,15 @@ class MoneyPennyToolWindow(
         val events = mutableListOf<Event>()
         val currentTimeLine: JPanel?
         val currentUpperTabName = upperTabName ?: "Prompt"
-//        if (i == 0) {//TODO W.I.P
+        if (i == 0) {//TODO W.I.P
             val timeLine = TimeLine(events)
             currentTimeLine = timeLine.refresh()
-            SwingUtilities.invokeLater { innerPanel?.add(currentTimeLine) }
+            SwingUtilities.invokeLater {
+                val parentParentOfDownerTab = (innerPanel?.parent?.parent?.parent as JPanel)
+                parentParentOfDownerTab.add(currentTimeLine)
+            }
             upperTabNameToTimeLine[currentUpperTabName] = currentTimeLine
+        }
 //        } else {
 //            val timeLine = TimeLine(events)
 //            currentTimeLine = timeLine.refresh()

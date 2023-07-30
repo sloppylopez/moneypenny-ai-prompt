@@ -30,7 +30,7 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
 
     fun refresh(): TimeLine {
         val timeline = TimeLine(events)
-        timeline.preferredSize = Dimension(400, 60)
+        timeline.preferredSize = Dimension(600, 60)
         add(timeline)
         return this
     }
