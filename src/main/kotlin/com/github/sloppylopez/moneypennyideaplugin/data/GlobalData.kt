@@ -6,7 +6,7 @@ import javax.swing.JList
 import javax.swing.JPanel
 
 object GlobalData {
-    var engine: String = "gpt-3.5-turbo-16k"
+    var engine: String = "gpt-3.5-turbo"
     var followUpActive: Boolean = true
     var role: String = "🤖 refactor-machine"
     var userRole: String = "🤓 user"
@@ -16,7 +16,7 @@ object GlobalData {
     val tabNameToFilePathMap = mutableMapOf<String, String>()
     val tabNameToContentPromptTextMap = mutableMapOf<String, String>()
     val tabNameToChatWindowContent = mutableMapOf<String, JList<String>>()
-    val tabNameToTimeLine = mutableMapOf<String, JPanel>()
+    val upperTabNameToTimeLine = mutableMapOf<String, JPanel>()
     val tabNameToInnerPanel = mutableMapOf<String, JPanel>()
     val prompts = mutableMapOf<String, Map<String, List<String>>>()
     val apiKey: String? = System.getenv("OPENAI_API_KEY")

@@ -44,21 +44,21 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
             val role = role.split(" ")[1]
 //            val sendChatPromptFutures =
 //                mutableListOf<CompletableFuture<ChatGptCompletion>>() // Create a list to hold the CompletableFuture objects
-            prompts.forEach { (_, promptMap) ->
+            prompts.forEach { (upperTabName, promptMap) ->
                 promptMap.forEach { (tabName, promptList) ->
                     if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-                        val timeLine = upperTabNameToTimeLine[tabName] as TimeLine
+                        val timeLine = upperTabNameToTimeLine[upperTabName] as TimeLine
                         timeLine.addPointInTimeLine(
                             Event(
-                                LocalDateTime.of(2023, 7, 29, 12, 0),
-                                "User starts MoneyPenny AI",
+                                LocalDateTime.now(),
+                                promptList[1],
                                 true
                             )
                         )
                         timeLine.addPointInTimeLine(
                             Event(
-                                LocalDateTime.of(2023, 7, 29, 12, 0),
-                                "User starts MoneyPenny AI 2",
+                                LocalDateTime.now(),
+                                promptList[1],
                                 false
                             )
                         )

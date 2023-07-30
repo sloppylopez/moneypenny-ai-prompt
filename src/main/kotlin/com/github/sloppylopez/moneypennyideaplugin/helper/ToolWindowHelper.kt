@@ -81,13 +81,14 @@ class ToolWindowHelper {
             service: ProjectService,
             selectedText: @NlsSafe String? = null
         ): Content {
+            //Here we enter when we construct the prompt form for the first time, in other words, when we don't have a file attached to the form prompt
             val contentTab = if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
-                    moneyPennyToolWindow.getContent(),
+                    moneyPennyToolWindow.getContent(emptyList<Any>(), selectedText, "Prompt"),
                     "Prompt",
                     true,
                 )
-            } else {
+            } else {//Here we enter when we have a file attached to the form prompt
                 val expandedFileList = service.expandFolders(fileList)
                 val upperTabName = getDisplayName(expandedFileList)
                 ContentFactory.getInstance()

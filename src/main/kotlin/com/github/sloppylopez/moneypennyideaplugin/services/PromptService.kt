@@ -2,7 +2,6 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToInnerPanel
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabCounter
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -36,28 +35,19 @@ class PromptService(project: Project) {
                 jBTabbedPanes.forEach { tabbedPane ->
                     nestedJBTabbedPanes.addAll(service.findNestedJBTabbedPanes(tabbedPane))
                 }
-                //The problem is that we are adding something to the rpompt twice
-                for (tabbedPaneIndex in 0 until nestedJBTabbedPanes.size) {//TODO here you need another index to count properly
-                    var lastUpperTabName: String? = ""
-                    upperTabCounter = 0
+                for (tabbedPaneIndex in 0 until nestedJBTabbedPanes.size) {
                     val tabbedPane = nestedJBTabbedPanes[tabbedPaneIndex]
                     for (tabIndex in 0 until tabbedPane.tabCount) {
-                        val tabComponents =
-                            (tabbedPane.getComponentAt(tabIndex) as Container).components[1] as Container
-//                        var lastTabName: String? = null
+                        val tabComponents = (tabbedPane.getComponentAt(tabIndex) as Container)
+                            .components[1] as Container
                         val tabName = tabbedPane.getTitleAt(tabIndex)
                         val upperTabName =//TODO refactor this
                             (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as JBTabbedPane).getTitleAt(
                                 tabbedPaneIndex
                             )
-                        if (lastUpperTabName != upperTabName) {
-                            upperTabCounter = 0
-                        }
                         tabComponents.components.forEach { tabComponent ->
-                            getPromptInfo(tabComponent, textAreas, tabbedPane, tabIndex, tabName)
+                            getPromptInfo(tabComponent, textAreas, tabIndex, tabName, upperTabName)
                         }
-                        lastUpperTabName = upperTabName
-                        upperTabCounter++//TODO PASS PARAMETER
                     }
                 }
                 val promptsAsJson = service.getPromptsAsJson(GlobalData.prompts)
@@ -93,15 +83,15 @@ class PromptService(project: Project) {
     private fun getPromptInfo(
         tabComponent: Component?,
         textAreas: MutableList<String>,
-        tabbedPane: JBTabbedPane,
         tabIndex: Int,
-        tabName: String
+        tabName: String,
+        upperTabName: String
     ) {
         if (tabComponent is JScrollPane) {
             val textArea = tabComponent.viewport.view as? JTextArea
             textArea?.let {
                 textAreas.add(it.text)
-                extractPromptInfo(tabName, textAreas, tabIndex, it.text)
+                extractPromptInfo(tabName, textAreas, tabIndex, it.text, upperTabName)
             }
         }
     }
@@ -110,19 +100,14 @@ class PromptService(project: Project) {
         tabName: String,
         textAreas: MutableList<String>,
         index: Int,
-        text: String
+        text: String,
+        upperTabName: String
     ) {
         try {
-            val shortSha = gitService.getShortSha(GlobalData.tabNameToFilePathMap[tabName]) ?: index.toString()
-            val upperTabName =//TODO refactor this
-                (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as JBTabbedPane).getTitleAt(
-                    upperTabCounter
-                )
+//            val filePaths = GlobalData.tabNameToFilePathMap[tabName]
+//            val shortSha = gitService.getShortSha(filePaths) ?: index.toString() TBI
             val promptMap = GlobalData.prompts.getOrDefault(upperTabName, mutableMapOf())
             val promptList = promptMap.getOrDefault(tabName, listOf())
-            if (index == 0 && tabName != "No File") {
-                promptList.plus(shortSha)
-            }
             GlobalData.prompts[upperTabName] = promptMap + (tabName to promptList.plus(text))
             textAreas.add(text)
         } catch (e: Exception) {

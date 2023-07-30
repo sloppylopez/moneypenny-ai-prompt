@@ -2,13 +2,13 @@ package com.github.sloppylopez.moneypennyideaplugin.components
 
 import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.intellij.ui.JBColor
-import com.intellij.ui.PopupHandler
 import java.awt.Dimension
 import java.awt.Graphics
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JOptionPane
 import javax.swing.JPanel
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import kotlin.math.abs
 
 class TimeLine(events: MutableList<Event>) : JPanel() {
     private val events: MutableList<Event> = events.sortedBy { it.time }.toMutableList()
@@ -42,7 +42,6 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
         repaint()
     }
 
-
     init {
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
@@ -51,7 +50,7 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
                 eventPoints.forEachIndexed { i, (hour, description, isUser) ->
                     val dotX = 50 + i * (width - 100) / (eventPoints.size - 1)
                     val dotY = height / 2
-                    if(Math.abs(dotX - x) <= 5 && Math.abs(dotY - y) <= 5) {
+                    if (abs(dotX - x) <= 5 && abs(dotY - y) <= 5) {
                         JOptionPane.showMessageDialog(this@TimeLine, "Dot Clicked!")
                         return
                     }
