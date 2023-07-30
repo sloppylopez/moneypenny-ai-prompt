@@ -11,10 +11,7 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.BorderFactory
-import javax.swing.DefaultListModel
-import javax.swing.JList
-import javax.swing.JPanel
+import javax.swing.*
 import javax.swing.event.ListSelectionEvent
 
 
@@ -58,8 +55,25 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
                       //your implementation here
                         service.showNotification("Double click", "Double click", NotificationType.INFORMATION)
                     }
+                    val popupMenu = JPopupMenu()
+                    val replyMenuItem = JMenuItem("Replay")
+
+                    replyMenuItem.addActionListener {
+                        service.showNotification("Replay", "Replay", NotificationType.INFORMATION)
+                    }
+
+                    popupMenu.add(replyMenuItem)
+
+                    addMouseListener(object: MouseAdapter() {
+                        override fun mouseClicked(e: MouseEvent?) {
+                            if (SwingUtilities.isRightMouseButton(e)) {
+                                e?.x?.let { e.y.let { it1 -> popupMenu.show(e.component, it, it1) } }
+                            }
+                        }
+                    })
                 }
             })
+
         }
     }
 
