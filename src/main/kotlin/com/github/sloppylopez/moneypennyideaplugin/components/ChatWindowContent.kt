@@ -9,6 +9,8 @@ import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.JList
@@ -49,6 +51,15 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
                     service.showNotification(copiedMessage, selectedValue, NotificationType.INFORMATION)
                 }
             }
+            addMouseListener(object: MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent?) {
+                    super.mouseClicked(e)
+                    if (e?.clickCount == 2) {
+                      //your implementation here
+                        service.showNotification("Double click", "Double click", NotificationType.INFORMATION)
+                    }
+                }
+            })
         }
     }
 
