@@ -4,9 +4,8 @@ import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
 import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabbedPane
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -43,18 +42,25 @@ class RunPromptAction(private var project: Project) : AnAction() {
             progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
             val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
-
-            val timeLine = upperTabNameToTimeLine[tabName] as TimeLine
-            timeLine.addPointInTimeLine(Event(LocalDateTime.of(2023, 7, 29, 12, 0), "User starts MoneyPenny AI", true))
+            //Write code that will return the key from prompts that contains this value in the list tabName
+            val upperTabName = prompts.entries.find { it.value.contains(tabName) }?.key
+            val timeLine = upperTabNameToTimeLine[upperTabName] as TimeLine
             timeLine.addPointInTimeLine(
                 Event(
-                    LocalDateTime.of(2023, 7, 29, 12, 0),
-                    "User starts MoneyPenny AI 2",
-                    false
+                    LocalDateTime.now(),
+                    promptList[0],
+                    GlobalData.role == GlobalData.userRole
+                )
+            )
+            timeLine.addPointInTimeLine(
+                Event(
+                    LocalDateTime.now(),
+                    promptList[0],
+                    GlobalData.role == GlobalData.userRole
                 )
             )
             timeLine.refresh()
-            val role = role.split(" ")[1]
+            val role = GlobalData.role.split(" ")[1]
             if (role == "refactor-machine") {
                 promptList[1] = "```\n" + promptList[1] + "\n```"
             }
@@ -111,7 +117,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
                     promptService.setInChat(
                         choice.content,
                         tabName,
-                        role
+                        GlobalData.role
                     )//In the chat window we want to display the NPL analysis as well
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())

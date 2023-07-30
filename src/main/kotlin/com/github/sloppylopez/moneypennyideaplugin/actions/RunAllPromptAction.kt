@@ -52,14 +52,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                             Event(
                                 LocalDateTime.now(),
                                 promptList[0],
-                                true
-                            )
-                        )
-                        timeLine.addPointInTimeLine(
-                            Event(
-                                LocalDateTime.now(),
-                                promptList[0],
-                                false
+                                GlobalData.role == GlobalData.userRole
                             )
                         )
                         timeLine.refresh()
