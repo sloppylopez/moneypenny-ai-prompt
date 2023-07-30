@@ -23,8 +23,8 @@ class TimeLine(events: MutableList<Event>) : JPanel() {
             g.color = if (isUser) JBColor.RED else JBColor.BLUE
             g.fillOval(x - 5, height / 2 - 5, 10, 10)
             g.color = JBColor.BLACK
-            g.drawString(description, x, height / 2 - 20)
-            g.drawString(hour.toString(), x, height / 2 + 20)
+            g.drawString(description, x, height / 2 + 20) // Inverted position for text labels
+            g.drawString(hour.toString(), x, height / 2 - 20) // Inverted position for number labels
         }
     }
 
