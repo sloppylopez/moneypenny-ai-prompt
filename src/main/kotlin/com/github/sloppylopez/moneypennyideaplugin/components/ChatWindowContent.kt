@@ -40,7 +40,12 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
             addListSelectionListener { event ->
                 val selectedText = selectedValue
                 if (selectedText != null) {
-                    showNotification(selectedText)
+                    val popup = JPopupMenu()
+                    val textPane = JTextPane()
+                    textPane.text = selectedText
+                    textPane.isEditable = false
+                    popup.add(textPane)
+                    popup.show(this, event.firstIndex, event.lastIndex)
                     val chatListModel = this.model as DefaultListModel<String>
                     val chatDataList = mutableListOf<String>()
 
@@ -60,9 +65,5 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
         (chatList?.model as DefaultListModel<String>).addElement(element)
     }
 
-    override fun getPreferredSize(): Dimension = Dimension(500, 175)
-
-    private fun showNotification(selectedText: String) {
-        JOptionPane.showMessageDialog(this, selectedText)
-    }
+    override fun getPreferredSize(): Dimension = Dimension(500, 350)
 }

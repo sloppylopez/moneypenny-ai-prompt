@@ -9,7 +9,7 @@ class ChatCellRenderer : JTextArea(), ListCellRenderer<String?> {
         isOpaque = true
         lineWrap = true
         wrapStyleWord = true
-        border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
+        border = BorderFactory.createEmptyBorder(0, 0, 1, 8)
         font = UIManager.getFont("List.font")
     }
 
