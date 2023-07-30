@@ -102,7 +102,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         service.showNotification(
                             copiedMessage, content, NotificationType.INFORMATION
                         )
-                        if (tabName != "No File") {
+                        if (tabName.split(")")[1] != "No File") {
                             try {
                                 val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
                                 service.modifySelectedTextInEditorByFile(

@@ -291,29 +291,25 @@ class ProjectService {
         file: File?,
         tabbedPane: JBTabbedPane,
         panel: JPanel,
-        contentPromptText: String?
+        contentPromptText: String?,
+        tabName: String
     ) {
         if (i < fileList.size && file != null) {
-            val tabName = "${getNextTabName()}) ${file.name}"
             tabbedPane.addTab(tabName, panel)
             tabNameToFilePathMap[tabName] = file.canonicalPath
-            if (contentPromptText != null) {
+            if (contentPromptText != null) {//TODO I think this needs to me moved outside of this if statement
                 tabNameToContentPromptTextMap[tabName] = contentPromptText
             } else {
                 tabNameToContentPromptTextMap[tabName] = file.readText()
             }
         } else {
-            tabbedPane.addTab("No File", panel)
+            tabbedPane.addTab(tabName, panel)
         }
 
         if (contentPromptText != null && file != null) {
             val tabName = "$downerTabName) ${file.name}"
             tabNameToContentPromptTextMap[tabName] = contentPromptText
         }
-    }
-
-    private fun getNextTabName(): String {
-        return downerTabName++.toString()
     }
 
     fun getProject(): Project? {
@@ -450,21 +446,38 @@ class ProjectService {
     ) {
         fun findTabbedPanesRecursive(component: Component) {
             if (component is ChatWindowContent) {
+                val tabCountIndex = component.getTabCountIndex()
+                val parentComponent: JBTabbedPane = (component.parent.parent.parent as JBTabbedPane)
                 var parentTabName: String? = null
-                val parentComponent: Component = (component.parent.parent.parent as JBTabbedPane)
-                for (i in 0 until (parentComponent as JBTabbedPane).tabCount) {
-                    if (parentComponent.getTitleAt(i) == tabName) {
-                        parentTabName = parentComponent.getTitleAt(i)
-                        break
-                    }
+                //                for (i in 0 until (parentComponent as JBTabbedPane).tabCount) {
+                if (parentComponent.getTitleAt(tabCountIndex) == tabName) {
+                    parentTabName = parentComponent.getTitleAt(tabCountIndex)
+//                        break
                 }
+//                }
                 if (parentTabName != null) {
+//                    val chatWindowContent = tabNameToChatWindowContent[parentTabName]
+//                    (chatWindowContent as ChatWindowContent).addElement(
+//                        "$currentRole:\n${
+//                            text.split("\n").dropLast(1).joinToString("\n")
+//                        }"
+//                    )
+//                    tabNameToChatWindowContent[parentTabName] = component
                     component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
+//                    if (chatWindowContent != null) {
+//                        (chatWindowContent as ChatWindowContent).addElement(
+//                            "$currentRole:\n${
+//                                text.split("\n").dropLast(1).joinToString("\n")
+//                            }"
+//                        )
+//                    } else {
+//                        component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
+//                        tabNameToChatWindowContent[parentTabName] = component
+//                    }
                     if (currentRole == "🤖 refactor-machine") {
                         val splitParts = text.split("\n")
                         addFollowUpQuestion(splitParts, component)
                     }
-                    tabNameToChatWindowContent[parentTabName] = component.chatList
                 }
             } else if (component is Container) {
                 for (child in component.components) {

@@ -7,11 +7,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.putUserData
-import com.intellij.openapi.util.Key
 import com.intellij.ui.components.JBScrollPane
 import java.awt.BorderLayout
-import java.awt.Font
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -34,11 +31,12 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private var prePromptTextArea: JTextArea? = JTextArea()
     private var contentPromptTextArea: JTextArea? = JTextArea()
     private var postPromptTextArea: JTextArea? = JTextArea()
-
+    //TODO pass an index here better
     fun promptPanel(
         innerPanel: JPanel,
         file: File?,
-        contentPromptText: String?
+        contentPromptText: String?,
+        tabCountIndex: Int
     ) {
         try {
             prePromptTextArea = textAreaFactory
@@ -64,7 +62,21 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             if (contentPromptTextArea != null) {
 //                val chatWindowContent = ChatWindowContent(service.getProject()!!) If you comment this line something very starnge happens, when we runt he code witha  breaking point on, we see 2 chat windows, but if the breaking point is removed it does not happen, and this only happens because of this line which is bizarre
 //                chatWindowContent.putUserData(Key(file?.name?:"nofile"), file?.canonicalFile?:"nocanonical")
-                innerPanel.add(ChatWindowContent(service.getProject()!!), BorderLayout.SOUTH)
+//                tabNameToChatWindowContent[parentTabName] = ChatWindowContent(service.getProject()!!)
+//                val createChatWindowContent = ChatWindowContentFactory.createChatWindowContent(service.getProject()!!)
+//                createChatWindowContent.initializeChatList()
+                innerPanel.add(
+                    ChatWindowContent(service.getProject()!!, tabCountIndex),
+                    BorderLayout.SOUTH
+                )
+//                innerPanel.add(
+//                    ChatWindowContent2(service.getProject()!!),
+//                    BorderLayout.SOUTH
+//                )
+//                innerPanel.add(
+//                    ChatWindowContentFactory.createChatWindowContent(service.getProject()!!),
+//                    BorderLayout.SOUTH
+//                )
                 //Add radio buttons
                 radioButtonFactory.radioButtonsPanel(innerPanel, prePromptTextArea!!)
                 val prePromptScrollPane = JBScrollPane(prePromptTextArea)

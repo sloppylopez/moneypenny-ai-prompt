@@ -15,7 +15,7 @@ object GlobalData {
     var index: Int = 1
     val tabNameToFilePathMap = mutableMapOf<String, String>()
     val tabNameToContentPromptTextMap = mutableMapOf<String, String>()
-    val tabNameToChatWindowContent = mutableMapOf<String, JList<String>>()
+    val tabNameToChatWindowContent = mutableMapOf<String, JPanel>()
     val upperTabNameToTimeLine = mutableMapOf<String, JPanel>()
     val tabNameToInnerPanel = mutableMapOf<String, JPanel>()
     val prompts = mutableMapOf<String, Map<String, List<String>>>()

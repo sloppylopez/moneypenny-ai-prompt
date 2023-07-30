@@ -10,14 +10,12 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.Component
 import java.awt.Container
-import javax.swing.JList
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
 class PromptService(project: Project) {
     private val service = project.service<ProjectService>()
-    private val gitService = project.service<GitService>()
     fun getPrompts(): MutableMap<String, Map<String, List<String>>> {
         GlobalData.prompts.clear()
         val contentManager = service.getToolWindow()?.contentManager
@@ -41,7 +39,7 @@ class PromptService(project: Project) {
                         val tabComponents = (tabbedPane.getComponentAt(tabIndex) as Container)
                             .components[1] as Container
                         val tabName = tabbedPane.getTitleAt(tabIndex)
-                        val upperTabName =//TODO refactor this
+                        val upperTabName =//TODO refactor this, maybe it an be recursive
                             (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as JBTabbedPane).getTitleAt(
                                 tabbedPaneIndex
                             )
@@ -58,26 +56,22 @@ class PromptService(project: Project) {
         return emptyMap<String, Map<String, List<String>>>().toMutableMap()
     }
 
-    fun setInChat(text: String, tabName: String, currentRole: String): MutableMap<String, JList<String>> {
+    fun setInChat(text: String, tabName: String, currentRole: String) {
         val contentManager = service.getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
         for (index in 0 until contentCount!!) {
             val content = contentManager.getContent(index)
             val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
-            if (simpleToolWindowPanel != null) {
-                simpleToolWindowPanel.components.forEach { component ->
-                    service.addChatWindowContentListModelToGlobalData(
-                        component as Container,
-                        text,
-                        currentRole,
-                        tabName
-                    )
-                }
-//                GlobalData.tabNameToChatWindowContent[tabName]?.addElement("$currentRole:\n$text")
-                return GlobalData.tabNameToChatWindowContent//TODO we should not return this, it does not make sense
+            simpleToolWindowPanel?.components?.forEach { component ->
+//                component.getComponentAt(0, 0)
+                service.addChatWindowContentListModelToGlobalData(
+                    component as Container,
+                    text,
+                    currentRole,
+                    tabName
+                )
             }
         }
-        return emptyMap<String, JList<String>>().toMutableMap()
     }
 
     private fun getPromptInfo(

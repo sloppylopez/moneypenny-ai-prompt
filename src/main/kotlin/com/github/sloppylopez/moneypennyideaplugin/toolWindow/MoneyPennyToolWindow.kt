@@ -47,10 +47,11 @@ class MoneyPennyToolWindow(
         val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
         val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
 
-        for (i in 0..tabCount) {
+        for (tabCountIndex in 0..tabCount) {
             if (fileList.isNotEmpty()) {
-                file = service.readFile(fileList, i)
+                file = service.readFile(fileList, tabCountIndex)
             }
+            val tabName = "${getNextTabName()}) ${file?.name?: "No File"}"
             val panel = JPanel(GridBagLayout())
 
             val gridBagConstraints = GridBagConstraints()
@@ -58,15 +59,16 @@ class MoneyPennyToolWindow(
             gridBagConstraints.insets = JBUI.insets(2)
             val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
             var innerPanel: JPanel? = null
-            for (j in 1..3) {
-                innerPanel = createInnerPanel(j, file, contentPromptText, nestedPanel, tabbedPane)
+            for (innedPanelIndex in 1..3) {
+                innerPanel =
+                    createInnerPanel(innedPanelIndex, file, contentPromptText, nestedPanel, tabbedPane, tabCountIndex)
 //                innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
-                gridBagConstraints.gridy = j - 1
+                gridBagConstraints.gridy = innedPanelIndex - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-            service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
-            addTimeLine(innerPanel, tabbedPane, i, upperTabName)
+            service.setTabName(tabCountIndex, fileList, file, tabbedPane, panel, contentPromptText, tabName)
+            addTimeLine(innerPanel, tabbedPane, tabCountIndex, upperTabName)
         }
         tabbedPane.toolkit.createImage("images/moneypenny-ai-main.png")
         tabbedPane.addChangeListener(getChangeListener(tabbedPane))
@@ -113,12 +115,13 @@ class MoneyPennyToolWindow(
         file: File?,
         contentPromptText: String?,
         nestedPanel: JPanel,
-        tabbedPane: JBTabbedPane
+        tabbedPane: JBTabbedPane,
+        tabCountIndex: Int
     ): JPanel {
         val innerPanel = JPanel(BorderLayout())
         val canonicalPath = file?.canonicalPath
 //        val tabName = tabbedPane.getTitleAt(tabbedPane.selectedIndex)
-        if (panelIndex == 1) innerPanel.name = canonicalPath ?: "Prompt"
+//        if (panelIndex == 1) innerPanel.name = canonicalPath ?: "Prompt"
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
             1 -> {
@@ -126,7 +129,7 @@ class MoneyPennyToolWindow(
             }
 
             2 -> {
-                promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
+                promptPanelFactory.promptPanel(innerPanel, file, contentPromptText,tabCountIndex)
                 service.invokeLater { fileEditorManager.openFileInEditor(canonicalPath, contentPromptText) }
             }
 
@@ -147,5 +150,9 @@ class MoneyPennyToolWindow(
             }
         }
         return innerPanel
+    }
+
+    private fun getNextTabName(): String {
+        return GlobalData.downerTabName++.toString()
     }
 }
