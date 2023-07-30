@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.components
 
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
-import com.google.gson.Gson
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.JBColor
@@ -9,11 +9,17 @@ import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.DefaultListModel
+import javax.swing.JList
+import javax.swing.JPanel
+import javax.swing.event.ListSelectionEvent
+
 
 class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPanel() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private var chatList: JBList<String>? = null
+    private val copiedMessage = "Copied to clipboard: "
 
     init {
         initializeChatList()
@@ -37,25 +43,10 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
             cellRenderer = ChatCellRenderer()
             layoutOrientation = JList.VERTICAL
             fixedCellWidth = 470
-            addListSelectionListener { event ->
-                val selectedText = selectedValue
-                if (selectedText != null) {
-                    val popup = JPopupMenu()
-                    val textPane = JTextPane()
-                    textPane.text = selectedText
-                    textPane.isEditable = false
-                    popup.add(textPane)
-                    popup.show(this, event.firstIndex, event.lastIndex)
-                    val chatListModel = this.model as DefaultListModel<String>
-                    val chatDataList = mutableListOf<String>()
-
-                    for (i in 0 until chatListModel.size()) {
-                        val chatData = chatListModel.getElementAt(i)
-                        chatDataList.add(chatData)
-                    }
-
-                    val gson = Gson()
-                    service.copyToClipboard(gson.toJson(chatDataList))
+            addListSelectionListener { e: ListSelectionEvent ->
+                if (!e.valueIsAdjusting) {
+                    service.copyToClipboard(selectedValue)
+                    service.showNotification(copiedMessage, selectedValue, NotificationType.INFORMATION)
                 }
             }
         }
