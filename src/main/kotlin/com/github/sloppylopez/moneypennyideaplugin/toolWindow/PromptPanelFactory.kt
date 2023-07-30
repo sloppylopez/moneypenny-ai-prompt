@@ -7,6 +7,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.putUserData
+import com.intellij.openapi.util.Key
 import com.intellij.ui.components.JBScrollPane
 import java.awt.BorderLayout
 import java.awt.Font
@@ -60,7 +62,8 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             postPromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
 
             if (contentPromptTextArea != null) {
-                //Add chat window
+//                val chatWindowContent = ChatWindowContent(service.getProject()!!) If you comment this line something very starnge happens, when we runt he code witha  breaking point on, we see 2 chat windows, but if the breaking point is removed it does not happen, and this only happens because of this line which is bizarre
+//                chatWindowContent.putUserData(Key(file?.name?:"nofile"), file?.canonicalFile?:"nocanonical")
                 innerPanel.add(ChatWindowContent(service.getProject()!!), BorderLayout.SOUTH)
                 //Add radio buttons
                 radioButtonFactory.radioButtonsPanel(innerPanel, prePromptTextArea!!)

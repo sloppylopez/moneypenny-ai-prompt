@@ -88,6 +88,11 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         return object : ChatGPTService.ChatGptChoiceCallback {
             override fun onCompletion(choice: ChatGptMessage) {
                 try {
+//                            component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
+//                            if (currentRole == "🤖 refactor-machine") {
+//                                val splitParts = text.split("\n")
+//                                addFollowUpQuestion(splitParts, component)
+//                            }
                     var content = choice.content
                     if (service.isCodeCommented(content)) {
                         content = service.extractCommentsFromCode(content)
