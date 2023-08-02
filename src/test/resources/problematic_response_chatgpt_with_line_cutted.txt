@@ -1,0 +1,15 @@
+🤖 refactor-machine:
+Refactor Solution:
+```kotlin
+package com.github.sloppylopez.moneypennyideaplugin.gineapigs
+
+import kotlin.math.sqrt
+
+class NumbersCalculator {
+    fun getPrimeNumbers(numbers: List<Int>): List<Int> = numbers.filter { isPrime(it) }
+
+    private fun isPrime(n: Int): Boolean = n > 1 && (2..sqrt(n.toDouble()).toInt()).none { n % it == 0 }
+}
+```
+
+The code has been refactored by extracting the prime number checking logic into a separate private function called `isPrime`. The `getPrimeNumbers` function now simply filters the input numbers list using the `isPrime` function. This follows the DRY (Don't Repeat Yourself) principle by avoiding code duplication and making the code more readable and maintainable. The refactored code uses a one-liner for the `getPrimeNumbers` function, which improves its readability.

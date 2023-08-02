@@ -1,11 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
-import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
-import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -41,30 +37,21 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
             progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
 
-            val role = role.split(" ")[1]
+            val role = GlobalData.role.split(" ")[1]
 //            val sendChatPromptFutures =
 //                mutableListOf<CompletableFuture<ChatGptCompletion>>() // Create a list to hold the CompletableFuture objects
             prompts.forEach { (upperTabName, promptMap) ->
                 promptMap.forEach { (tabName, promptList) ->
                     if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-                        val timeLine = upperTabNameToTimeLine[upperTabName] as TimeLine
-                        timeLine.addPointInTimeLine(
-                            Event(
-                                LocalDateTime.now(),
-                                promptList[0],
-                                GlobalData.role == GlobalData.userRole
-                            )
-                        )
-                        timeLine.refresh()
                         prompt = if (role == "refactor-machine") {
                             promptList.joinToString("\n")
                         } else {
                             promptList.joinToString(" ")
                         }
                         prompt = prompt.replace("\r\n", "\n")
-                        promptService.setInChat(prompt, tabName, GlobalData.userRole)
+//                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
                         chatGPTService.sendChatPrompt(
-                            prompt, createCallback(tabName)
+                            prompt, createCallback(tabName), upperTabName, promptList
                         ).whenComplete { _, _ ->
                             thisLogger().info("ChatGPTService.sendChatPrompt completed")
                         }
@@ -86,7 +73,12 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     //TODO: needs DRYing
     private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
-            override fun onCompletion(choice: ChatGptMessage) {
+            override fun onCompletion(
+                choice: ChatGptMessage,
+                prompt: String,
+                upperTabName: String?,
+                promptList: List<String>?
+            ) {
                 try {
 //                            component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
 //                            if (currentRole == "🤖 refactor-machine") {
@@ -120,7 +112,9 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                     promptService.setInChat(
                         choice.content,
                         tabName,
-                        role
+                        GlobalData.role,
+                        upperTabName,
+                        promptList
                     )//In the chat window we want to display the NPL analysis as well
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())

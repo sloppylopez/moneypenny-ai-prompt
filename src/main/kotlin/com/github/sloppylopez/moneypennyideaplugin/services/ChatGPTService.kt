@@ -30,7 +30,9 @@ class ChatGPTService(project: Project) {
 
     fun sendChatPrompt(
         prompt: String,
-        callback: ChatGptChoiceCallback
+        callback: ChatGptChoiceCallback,
+        upperTabName: String? = null,
+        promptList: List<String>? = null
     ): CompletableFuture<ChatGptCompletion> {
         val requestBody = getRequestBodyJson(prompt)
         val request = createHttpRequest(requestBody)
@@ -40,7 +42,7 @@ class ChatGPTService(project: Project) {
                 gson.fromJson(responseBody, ChatGptCompletion::class.java)
             }
             .whenComplete { choice: ChatGptCompletion?, throwable: Throwable? ->
-                handleCompletion(choice, throwable, callback)
+                handleCompletion(choice, throwable, callback, prompt, upperTabName, promptList)
             }
     }
 
@@ -60,14 +62,22 @@ class ChatGPTService(project: Project) {
     private fun handleCompletion(
         choice: ChatGptCompletion?,
         throwable: Throwable?,
-        callback: ChatGptChoiceCallback
+        callback: ChatGptChoiceCallback,
+        prompt: String,
+        upperTabName: String?,
+        promptList: List<String>?
     ) {
         if (throwable != null) {
             service.showNotification("Error", throwable.message!!, NotificationType.INFORMATION)
-            callback.onCompletion(ChatGptMessage("system", "Error: ${throwable.message}"))
+            callback.onCompletion(
+                ChatGptMessage("system", "Error: ${throwable.message}"),
+                prompt,
+                upperTabName!!,
+                promptList!!
+            )
         } else {
             val message = getMessage(choice)
-            callback.onCompletion(message)
+            callback.onCompletion(message, prompt, upperTabName!!, promptList!!)
         }
     }
 
@@ -155,6 +165,6 @@ class ChatGPTService(project: Project) {
     }
 
     interface ChatGptChoiceCallback {
-        fun onCompletion(choice: ChatGptMessage)
+        fun onCompletion(choice: ChatGptMessage, prompt: String, upperTabName: String?, promptList: List<String>?)
     }
 }

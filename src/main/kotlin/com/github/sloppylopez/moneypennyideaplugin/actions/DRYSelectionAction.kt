@@ -36,7 +36,7 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
             editor
         )
         chatGPTService.sendChatPrompt(
-            getPrompt(selectedText), createCallback(file)
+            getPrompt(selectedText), createCallback(file), null, null
         ).whenComplete { _, _ ->
             progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
@@ -66,7 +66,12 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
 
     private fun createCallback(file: VirtualFile): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
-            override fun onCompletion(choice: ChatGptMessage) {
+            override fun onCompletion(
+                choice: ChatGptMessage,
+                prompt: String,
+                upperTabName: String?,
+                promptList: List<String>?
+            ) {
                 try {
                     var content = choice.content
                     val role = GlobalData.role.split(" ")[1]

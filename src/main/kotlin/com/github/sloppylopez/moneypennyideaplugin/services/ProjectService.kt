@@ -3,10 +3,11 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
 import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
+import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
+import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
@@ -45,6 +46,7 @@ import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
+import java.time.LocalDateTime
 import java.util.*
 import javax.swing.*
 
@@ -442,42 +444,47 @@ class ProjectService {
         container: Container,
         text: String,
         currentRole: String,
-        tabName: String
+        tabName: String,
+        upperTabName: String?,
+        promptList: List<String>?
     ) {
         fun findTabbedPanesRecursive(component: Component) {
             if (component is ChatWindowContent) {
                 val tabCountIndex = component.getTabCountIndex()
                 val parentComponent: JBTabbedPane = (component.parent.parent.parent as JBTabbedPane)
                 var parentTabName: String? = null
-                //                for (i in 0 until (parentComponent as JBTabbedPane).tabCount) {
                 if (parentComponent.getTitleAt(tabCountIndex) == tabName) {
                     parentTabName = parentComponent.getTitleAt(tabCountIndex)
-//                        break
                 }
-//                }
                 if (parentTabName != null) {
-//                    val chatWindowContent = tabNameToChatWindowContent[parentTabName]
-//                    (chatWindowContent as ChatWindowContent).addElement(
-//                        "$currentRole:\n${
-//                            text.split("\n").dropLast(1).joinToString("\n")
-//                        }"
-//                    )
-//                    tabNameToChatWindowContent[parentTabName] = component
+                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
+                    timeLine.addPointInTimeLine(
+                        Event(
+                            LocalDateTime.now(),
+                            promptList!![0],
+                            true
+                        )
+                    )
+                    timeLine.addPointInTimeLine(
+                        Event(
+                            LocalDateTime.now(),
+                            "Response",
+                            false
+                        )
+                    )
                     component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
-//                    if (chatWindowContent != null) {
-//                        (chatWindowContent as ChatWindowContent).addElement(
-//                            "$currentRole:\n${
-//                                text.split("\n").dropLast(1).joinToString("\n")
-//                            }"
-//                        )
-//                    } else {
-//                        component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
-//                        tabNameToChatWindowContent[parentTabName] = component
-//                    }
                     if (currentRole == "🤖 refactor-machine") {
                         val splitParts = text.split("\n")
                         addFollowUpQuestion(splitParts, component)
+                        timeLine.addPointInTimeLine(
+                            Event(
+                                LocalDateTime.now(),
+                                "Follow Up Question:",
+                                false
+                            )
+                        )
                     }
+                    timeLine.refresh()
                 }
             } else if (component is Container) {
                 for (child in component.components) {

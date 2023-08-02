@@ -14,8 +14,7 @@ import java.awt.event.MouseEvent
 import javax.swing.*
 import javax.swing.event.ListSelectionEvent
 
-
-class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPanel() {
+class ChatWindowContent(private val project: Project, private val tabCountIndex: Int) : JPanel() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private var chatList: JBList<String>? = null
     private val copiedMessage = "Copied to clipboard: "
@@ -33,9 +32,7 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
         add(scrollPane, BorderLayout.CENTER)
     }
 
-    fun getTabCountIndex(): Int {
-        return tabCountIndex
-    }
+    fun getTabCountIndex(): Int = tabCountIndex
 
     private fun initializeChatList() {
         chatList = JBList(DefaultListModel<String>()).apply {
@@ -52,7 +49,6 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
                     if (e?.clickCount == 2) {
-                      //your implementation here
                         service.showNotification("Double click", "Double click", NotificationType.INFORMATION)
                     }
                     val popupMenu = JPopupMenu()
@@ -82,4 +78,5 @@ class ChatWindowContent(project: Project, private val tabCountIndex: Int) : JPan
     }
 
     override fun getPreferredSize(): Dimension = Dimension(500, 350)
+    fun getChatList(): JBList<String>? = chatList
 }

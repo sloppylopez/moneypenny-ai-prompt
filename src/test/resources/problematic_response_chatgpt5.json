@@ -1,0 +1,14 @@
+Refactored Code:
+package com.example.projectname.services
+
+import kotlin.math.sqrt
+
+class StringsService {
+
+fun filterPrimeNumbers(numbers: Array<Int>) = numbers.filter(::isPrime)
+
+private fun isPrime(number: Int) = number > 1 && (2..sqrt(number.toDouble()).toInt()).none { number % it == 0 }
+}
+- Since the given code is already following best practices and already using one-liners where possible, there is no need for further DRY refactoring.
+
+Follow Up Question: Are there any security issues in the given code?

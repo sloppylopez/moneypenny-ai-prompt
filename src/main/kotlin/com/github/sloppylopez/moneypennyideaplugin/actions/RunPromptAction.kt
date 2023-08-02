@@ -1,11 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
-import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
-import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.selectedTabbedPane
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.upperTabNameToTimeLine
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -19,7 +16,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
-import java.time.LocalDateTime
 
 class RunPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
@@ -47,22 +43,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
             val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
             //Write code that will return the key from prompts that contains this value in the list tabName
             val upperTabName = prompts.entries.find { it.value.contains(tabName) }?.key
-            val timeLine = upperTabNameToTimeLine[upperTabName] as TimeLine
-            timeLine.addPointInTimeLine(
-                Event(
-                    LocalDateTime.now(),
-                    promptList[0],
-                    GlobalData.role == GlobalData.userRole
-                )
-            )
-            timeLine.addPointInTimeLine(
-                Event(
-                    LocalDateTime.now(),
-                    promptList[0],
-                    GlobalData.role == GlobalData.userRole
-                )
-            )
-            timeLine.refresh()
+
             val role = GlobalData.role.split(" ")[1]
             if (role == "refactor-machine") {
                 promptList[1] = "```\n" + promptList[1] + "\n```"
@@ -74,9 +55,9 @@ class RunPromptAction(private var project: Project) : AnAction() {
                     promptList.joinToString(" ")
                 }
                 prompt = prompt.replace("\r\n", "\n")
-                promptService.setInChat(prompt, tabName, GlobalData.userRole)
+//                promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
                 chatGPTService.sendChatPrompt(
-                    prompt, createCallback(tabName)
+                    prompt, createCallback(tabName), upperTabName!!, promptList
                 ).whenComplete { _, _ ->
                     thisLogger().info("ChatGPTService.sendChatPrompt completed")
                 }
@@ -91,7 +72,12 @@ class RunPromptAction(private var project: Project) : AnAction() {
     //TODO: needs DRYing
     private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
-            override fun onCompletion(choice: ChatGptMessage) {
+            override fun onCompletion(
+                choice: ChatGptMessage,
+                prompt: String,
+                upperTabName: String?,
+                promptList: List<String>?
+            ) {
                 try {
                     var content = choice.content
                     if (service.isCodeCommented(content)) {
@@ -120,7 +106,9 @@ class RunPromptAction(private var project: Project) : AnAction() {
                     promptService.setInChat(
                         choice.content,
                         tabName,
-                        GlobalData.role
+                        GlobalData.role,
+                        upperTabName,
+                        promptList
                     )//In the chat window we want to display the NPL analysis as well
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())

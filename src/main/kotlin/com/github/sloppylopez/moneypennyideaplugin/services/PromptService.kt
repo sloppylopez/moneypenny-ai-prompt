@@ -56,7 +56,7 @@ class PromptService(project: Project) {
         return emptyMap<String, Map<String, List<String>>>().toMutableMap()
     }
 
-    fun setInChat(text: String, tabName: String, currentRole: String) {
+    fun setInChat(text: String, tabName: String, currentRole: String, upperTabName: String?, promptList: List<String>?) {
         val contentManager = service.getToolWindow()?.contentManager
         val contentCount = contentManager?.contentCount
         for (index in 0 until contentCount!!) {
@@ -68,7 +68,9 @@ class PromptService(project: Project) {
                     component as Container,
                     text,
                     currentRole,
-                    tabName
+                    tabName,
+                    upperTabName,
+                    promptList
                 )
             }
         }
