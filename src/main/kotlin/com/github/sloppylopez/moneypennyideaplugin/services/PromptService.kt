@@ -111,6 +111,8 @@ class PromptService(project: Project) {
         }
     }
 
+//    fun setAllCheckboxesSelected(toolwindow: ToolWindow) {
+
 //    fun setAllCheckboxesNotSelected(toolwindow: ToolWindow) {
 //        toolwindow.content.forEach { content ->
 //            if (content is Checkbox) {

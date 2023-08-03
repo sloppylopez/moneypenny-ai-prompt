@@ -31,31 +31,28 @@ class RunPromptAction(private var project: Project) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
-        var prompt: String
+        val prompt: String
         val jProgressBar = progressBarFactory.getProgressBar()
         try {
-            //This cannot work when we delete tabs, we cannot add last tab to global and then
-            //expect it to be there, this is not well though
-            //you can instead get the selected tab and then search for whatever you need!!!
             val tabName = selectedTabbedPane?.getTitleAt(selectedTabbedPane!!.selectedIndex)
             progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
             val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
             //Write code that will return the key from prompts that contains this value in the list tabName
             val upperTabName = prompts.entries.find { it.value.contains(tabName) }?.key
-
             val role = GlobalData.role.split(" ")[1]
-            if (role == "refactor-machine") {
+            if (role == "refactor-machine" &&
+                promptList.size >= 2 &&
+                promptList[1].isNotBlank()
+            ) {
                 promptList[1] = "```\n" + promptList[1] + "\n```"
             }
-            if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
+            if (promptList.isNotEmpty()) {
                 prompt = if (role == "refactor-machine") {
                     promptList.joinToString("\n")
                 } else {
                     promptList.joinToString(" ")
-                }
-                prompt = prompt.replace("\r\n", "\n")
-//                promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
+                }.replace("\r\n", "\n")
                 chatGPTService.sendChatPrompt(
                     prompt, createCallback(tabName), upperTabName!!, promptList
                 ).whenComplete { _, _ ->

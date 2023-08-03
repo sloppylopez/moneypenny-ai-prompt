@@ -3,8 +3,6 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
 import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
-import com.github.sloppylopez.moneypennyideaplugin.components.TimeLine
-import com.github.sloppylopez.moneypennyideaplugin.data.Event
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
@@ -38,7 +36,6 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.SmartPointerManager
-import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
 import io.ktor.util.*
@@ -47,8 +44,8 @@ import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import java.time.LocalDateTime
 import java.util.*
+import java.util.stream.Collectors
 import javax.swing.*
 
 
@@ -532,7 +529,12 @@ class ProjectService {
         for (outerKey in prompts.keys) {
             val innerMap = prompts[outerKey] ?: continue
             if (innerMap.containsKey(key)) {
-                return innerMap[key] ?: emptyList()
+                return if (innerMap[key]!!.isNotEmpty()) {
+                    innerMap[key]!!.stream()
+                        .filter(String::isNotEmpty).collect(Collectors.toList())
+                } else {
+                    emptyList()
+                }
             }
         }
         return emptyList()

@@ -39,6 +39,13 @@ class ChatGPTService(project: Project) {
         return sendAsyncRequest(request)
             .thenApply { obj: HttpResponse<String>? -> obj?.body() }
             .thenApply { responseBody: String? ->
+                if (responseBody!!.startsWith("{\n  \"error\": {"))
+                    throw Exception(responseBody)
+                else {
+                    responseBody
+                }
+            }
+            .thenApply { responseBody: String? ->
                 gson.fromJson(responseBody, ChatGptCompletion::class.java)
             }
             .whenComplete { choice: ChatGptCompletion?, throwable: Throwable? ->
@@ -114,10 +121,10 @@ class ChatGPTService(project: Project) {
 
     private fun getMaxTokenCountPerEngine(promptLength: Int): Int {
         return when (GlobalData.engine) {
-            "gpt-3.5-turbo-16k" -> 16384 - 1 - promptLength
-            "gpt-4-32k" -> 32768 - 1 - promptLength
-            "gpt-4" -> 8192 - 1 - promptLength
-            else -> 4096 - 1 - promptLength
+            "gpt-3.5-turbo-16k" -> 16384 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength//62 is the prompt length
+            "gpt-4-32k" -> 32768 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
+            "gpt-4" -> 8192 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
+            else -> 4096 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
         }
     }
 
@@ -126,14 +133,13 @@ class ChatGPTService(project: Project) {
         return JSONObject().apply {
             put("role", "system")
             val content = when (role) {
-                "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
+//                "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
 //                "code-completer" -> "You are a code completer. Let me help you complete your code!"
-                "refactor-machine" -> "You are a code refactor assistant. Return always code solutions fitting the code you received, so the solution can be pasted directly in the code, search for security issues"
-                "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
-                else -> "You are a code completer. Let me help you complete your code!"
+                "refactor-machine" -> GlobalData.refactorMachineRolePromptDescription
+//                "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
+                else -> GlobalData.refactorMachineRolePromptDescription
             }
-            val virtuousCircle =
-                "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question. After responding return next logical Follow Up Question user would ask:\n"
+            val virtuousCircle = GlobalData.virtuousCircleRolePromptDescription
             put("content", virtuousCircle + content)
         }
     }
