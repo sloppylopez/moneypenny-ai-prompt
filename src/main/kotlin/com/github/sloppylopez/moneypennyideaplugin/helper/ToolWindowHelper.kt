@@ -6,18 +6,26 @@ import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabCounter
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
+import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.Constraints
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.openapi.wm.ex.ToolWindowEx
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManager
+import java.awt.Dimension
 import java.io.File
 import javax.swing.ImageIcon
+
 
 class ToolWindowHelper {
     companion object {
@@ -59,6 +67,18 @@ class ToolWindowHelper {
 //                service.createToolbarPanel(toolWindowContent)
                 // Add a change listener to handle tab close events
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
+//                val tw = toolWindow as ToolWindowEx?
+//                val actionManager = ActionManager.getInstance()
+//                val popupMenu = actionManager.getAction("ProjectViewPopupMenu")
+//                val defaultActionGroup = popupMenu as? DefaultActionGroup
+//                defaultActionGroup?.addSeparator()
+//                val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
+//                defaultActionGroup?.add(sendToPromptFileFolderTreeAction, Constraints.LAST)
+//                tw!!.setAdditionalGearActions(
+//                    ActionGroup.EMPTY_GROUP
+//                )
+//                val width = tw!!.component.width
+//                tw.stretchWidth(400 - width)
             } catch (e: Exception) {
                 thisLogger().error(e.stackTraceToString())
             }
@@ -73,6 +93,11 @@ class ToolWindowHelper {
                     true
                 )
             )
+            setToolWindowMinWidth(toolWindow)
+        }
+
+        private fun setToolWindowMinWidth(toolWindow: ToolWindow) {
+            toolWindow.contentManager.getContent(0)?.component?.minimumSize?.width = 400
         }
 
         private fun getContentTab(
@@ -98,6 +123,7 @@ class ToolWindowHelper {
                         true
                     )
             }
+//            contentTab.component.preferredSize = contentTab.component.minimumSize
             return contentTab
         }
 

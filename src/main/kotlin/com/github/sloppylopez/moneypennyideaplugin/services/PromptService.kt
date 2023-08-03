@@ -37,7 +37,7 @@ class PromptService(project: Project) {
                     val tabbedPane = nestedJBTabbedPanes[tabbedPaneIndex]
                     for (tabIndex in 0 until tabbedPane.tabCount) {
                         val tabComponents = (tabbedPane.getComponentAt(tabIndex) as Container)
-                            .components[1] as Container
+                            .components[0] as Container
                         val tabName = tabbedPane.getTitleAt(tabIndex)
                         val upperTabName =//TODO refactor this, maybe it an be recursive
                             (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as JBTabbedPane).getTitleAt(

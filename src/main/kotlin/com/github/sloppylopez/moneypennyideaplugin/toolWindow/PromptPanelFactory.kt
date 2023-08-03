@@ -60,23 +60,10 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             postPromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
 
             if (contentPromptTextArea != null) {
-//                val chatWindowContent = ChatWindowContent(service.getProject()!!) If you comment this line something very starnge happens, when we runt he code witha  breaking point on, we see 2 chat windows, but if the breaking point is removed it does not happen, and this only happens because of this line which is bizarre
-//                chatWindowContent.putUserData(Key(file?.name?:"nofile"), file?.canonicalFile?:"nocanonical")
-//                tabNameToChatWindowContent[parentTabName] = ChatWindowContent(service.getProject()!!)
-//                val createChatWindowContent = ChatWindowContentFactory.createChatWindowContent(service.getProject()!!)
-//                createChatWindowContent.initializeChatList()
                 innerPanel.add(
                     ChatWindowContent(service.getProject()!!, tabCountIndex),
                     BorderLayout.SOUTH
                 )
-//                innerPanel.add(
-//                    ChatWindowContent2(service.getProject()!!),
-//                    BorderLayout.SOUTH
-//                )
-//                innerPanel.add(
-//                    ChatWindowContentFactory.createChatWindowContent(service.getProject()!!),
-//                    BorderLayout.SOUTH
-//                )
                 //Add radio buttons
                 radioButtonFactory.radioButtonsPanel(innerPanel, prePromptTextArea!!)
                 val prePromptScrollPane = JBScrollPane(prePromptTextArea)

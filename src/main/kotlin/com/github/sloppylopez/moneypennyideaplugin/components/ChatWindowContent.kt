@@ -52,13 +52,24 @@ class ChatWindowContent(private val project: Project, private val tabCountIndex:
                         service.showNotification("Double click", "Double click", NotificationType.INFORMATION)
                     }
                     val popupMenu = JPopupMenu()
-                    val replyMenuItem = JMenuItem("Replay")
+                    val runMenuItem = JMenuItem("Run")
 
-                    replyMenuItem.addActionListener {
-                        service.showNotification("Replay", "Replay", NotificationType.INFORMATION)
+                    runMenuItem.addActionListener {
+                        getSelectedCellText()?.let { cellText ->
+                            service.showNotification("Run",
+                                cellText, NotificationType.INFORMATION)
+                        }
                     }
 
-                    popupMenu.add(replyMenuItem)
+                    popupMenu.add(runMenuItem)
+
+                    val runFromHereItem = JMenuItem("Run from here")
+
+                    runFromHereItem.addActionListener {
+                        service.showNotification("Run from here", getChatList().toString(), NotificationType.INFORMATION)
+                    }
+
+                    popupMenu.add(runFromHereItem)
 
                     addMouseListener(object: MouseAdapter() {
                         override fun mouseClicked(e: MouseEvent?) {
@@ -78,5 +89,8 @@ class ChatWindowContent(private val project: Project, private val tabCountIndex:
     }
 
     override fun getPreferredSize(): Dimension = Dimension(500, 350)
-    fun getChatList(): JBList<String>? = chatList
+    fun getChatList(): Unit? = chatList?.list()
+    fun getSelectedCellText(): String? {
+        return chatList?.selectedValue
+    }
 }

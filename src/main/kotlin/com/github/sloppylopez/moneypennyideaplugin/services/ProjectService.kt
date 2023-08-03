@@ -38,6 +38,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.SmartPointerManager
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.content.Content
 import io.ktor.util.*
@@ -309,8 +310,8 @@ class ProjectService {
         }
 
         if (contentPromptText != null && file != null) {
-            val tabName = "$downerTabName) ${file.name}"
-            tabNameToContentPromptTextMap[tabName] = contentPromptText
+            val currentTabName = "$downerTabName) ${file.name}"
+            tabNameToContentPromptTextMap[currentTabName] = contentPromptText
         }
     }
 
@@ -457,34 +458,34 @@ class ProjectService {
                     parentTabName = parentComponent.getTitleAt(tabCountIndex)
                 }
                 if (parentTabName != null) {
-                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
-                    timeLine.addPointInTimeLine(
-                        Event(
-                            LocalDateTime.now(),
-                            promptList!![0],
-                            true
-                        )
-                    )
-                    timeLine.addPointInTimeLine(
-                        Event(
-                            LocalDateTime.now(),
-                            "Response",
-                            false
-                        )
-                    )
+                    component.addElement("${GlobalData.userRole}:\n${promptList!!.joinToString("\n")}")
                     component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
+//                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
+//                    timeLine.addPointInTimeLine(
+//                        Event(
+//                            LocalDateTime.now(),
+//                            promptList[0],
+//                            true
+//                        )
+//                    )
+//                    timeLine.addPointInTimeLine(
+//                        Event(
+//                            LocalDateTime.now(),
+//                            "Response",
+//                            false
+//                        )
+//                    )
                     if (currentRole == "🤖 refactor-machine") {
                         val splitParts = text.split("\n")
                         addFollowUpQuestion(splitParts, component)
-                        timeLine.addPointInTimeLine(
-                            Event(
-                                LocalDateTime.now(),
-                                "Follow Up Question:",
-                                false
-                            )
-                        )
+//                        timeLine.addPointInTimeLine(
+//                            Event(
+//                                LocalDateTime.now(),
+//                                "Follow Up Question:",
+//                                false
+//                            )
+//                        )
                     }
-                    timeLine.refresh()
                 }
             } else if (component is Container) {
                 for (child in component.components) {
