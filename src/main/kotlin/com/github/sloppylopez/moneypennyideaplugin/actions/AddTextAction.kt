@@ -18,7 +18,7 @@ class AddTextAction(private val project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
 
     init {
-        templatePresentation.icon = AllIcons.Duplicates.SendToTheLeft
+        templatePresentation.icon = AllIcons.Chooser.Left
         templatePresentation.text = "Send to Editor"
     }
 

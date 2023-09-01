@@ -552,6 +552,7 @@ class ProjectService {
         actionGroup.add(AddTextAction(project))
         actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))
+        actionGroup.add(RunAllInTabPromptAction(project))
         actionGroup.add(RunAllPromptAction(project))
         actionGroup.add(CopyPromptAction(project))
         actionGroup.addSeparator()

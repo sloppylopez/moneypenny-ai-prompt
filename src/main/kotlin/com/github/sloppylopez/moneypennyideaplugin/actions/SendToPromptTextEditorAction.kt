@@ -15,7 +15,7 @@ class SendToPromptTextEditorAction(project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
 
     init {
-        templatePresentation.icon = AllIcons.Duplicates.SendToTheRight
+        templatePresentation.icon = AllIcons.Chooser.Right
         templatePresentation.text = "Send to Prompt"
     }
 

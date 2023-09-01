@@ -16,7 +16,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
 
-class RunAllPromptAction(private var project: Project) : AnAction() {
+class RunAllInTabPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
@@ -24,8 +24,8 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     private val copiedMessage = "Copied to clipboard: "
 
     init {
-        templatePresentation.icon = AllIcons.Actions.RunAll
-        templatePresentation.text = "Run All Prompts"
+        templatePresentation.icon = AllIcons.Debugger.ThreadGroup
+        templatePresentation.text = "Run All Prompts In Tab"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -35,39 +35,31 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         try {
             progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
-
+            val tabName = GlobalData.selectedTabbedPane?.getTitleAt(GlobalData.selectedTabbedPane!!.selectedIndex)
             val role = GlobalData.role.split(" ")[1]
-//            val sendChatPromptFutures =
-//                mutableListOf<CompletableFuture<ChatGptCompletion>>() // Create a list to hold the CompletableFuture objects
-            prompts.forEach { (upperTabName, promptMap) ->
-                promptMap.forEach { (tabName, promptList) ->
-                    //Here maybe we can do if promptMap.size >=2 to distinguish use cases gracefully
-                    if (promptMap.size >= 2) {
-                        prompt = getGroupedPrompt(prompt, role, promptMap)
-//                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
-                        chatGPTService.sendChatPrompt(
-                            prompt, createCallback(tabName), upperTabName, promptList
-                        ).whenComplete { _, _ ->
-                            thisLogger().info("ChatGPTService.sendChatPrompt completed")
-                        }
-                    } else {
-                        if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-                            prompt = getPrompt(prompt, role, promptList)
-//                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
-                            chatGPTService.sendChatPrompt(
-                                prompt, createCallback(tabName), upperTabName, promptList
-                            ).whenComplete { _, _ ->
-                                thisLogger().info("ChatGPTService.sendChatPrompt completed")
-                            }
-                        }
-                    }
-                }
+            val selectedTabPrompts = prompts[tabName]
+            selectedTabPrompts?.forEach { (tabName, promptList) ->
+                //Here maybe we can do if promptMap.size >=2 to distinguish use cases gracefully
+//                if (promptList.size >= 2) {
+//                    prompt = getGroupedPrompt(prompt, role, promptMap)
+////                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
+//                    chatGPTService.sendChatPrompt(
+//                        prompt, createCallback(tabName), upperTabName, promptList
+//                    ).whenComplete { _, _ ->
+//                        thisLogger().info("ChatGPTService.sendChatPrompt completed")
+//                    }
+//                } else {
+//                    if (promptList[0].isNotBlank()) {
+//                        prompt = getPrompt(prompt, role, promptList)
+////                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
+//                        chatGPTService.sendChatPrompt(
+//                            prompt, createCallback(tabName), upperTabName, promptList
+//                        ).whenComplete { _, _ ->
+//                            thisLogger().info("ChatGPTService.sendChatPrompt completed")
+//                        }
+//                    }
+//                }
             }
-            // Use CompletableFuture.allOf to complete all the CompletableFuture objects in the list
-//            CompletableFuture.allOf(*sendChatPromptFutures.toTypedArray())
-//                .whenComplete { hol, adios ->
-//                progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
-//            }
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
         } finally {
@@ -186,3 +178,4 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         return ActionUpdateThread.EDT
     }
 }
+
