@@ -2,6 +2,7 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.lastCode
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -40,11 +41,15 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
 //            val sendChatPromptFutures =
 //                mutableListOf<CompletableFuture<ChatGptCompletion>>() // Create a list to hold the CompletableFuture objects
             prompts.forEach { (upperTabName, promptMap) ->
+                println("upperTabName: $upperTabName")
                 promptMap.forEach { (tabName, promptList) ->
+                    println("tabName: $tabName")
                     //Here maybe we can do if promptMap.size >=2 to distinguish use cases gracefully
                     if (promptMap.size >= 2) {
-                        prompt = getGroupedPrompt(prompt, role, promptMap)
-//                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
+                        prompt = getGroupedPrompt(
+                            promptList, role, promptMap
+                        )//TODO maybe adding 1 extra \n here the indenting poblem we have
+                        println("prompt: $prompt")
                         chatGPTService.sendChatPrompt(
                             prompt, createCallback(tabName), upperTabName, promptList
                         ).whenComplete { _, _ ->
@@ -53,7 +58,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                     } else {
                         if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
                             prompt = getPrompt(prompt, role, promptList)
-//                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
+                            println("prompt: $prompt")
                             chatGPTService.sendChatPrompt(
                                 prompt, createCallback(tabName), upperTabName, promptList
                             ).whenComplete { _, _ ->
@@ -76,11 +81,11 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     }
 
     private fun getGroupedPrompt(
-        prompt: String,
+        prompt: List<String>,
         role: String,
         promptMap: Map<String, List<String>>
     ): String {
-        var currentPrompt = prompt
+        var currentPrompt = prompt.toString()
         promptMap.forEach { (tabName, promptList) ->
             run {
                 if (!promptList[0].contains("Refactor Code:")) {
@@ -89,17 +94,11 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                     } else {
                         promptList.joinToString(" ")
                     }
-                } else {
-                    currentPrompt = if (role == "refactor-machine") {
-                        promptList.joinToString("\n")
-                    } else {
-                        promptList.joinToString(" ")
-                    }
                 }
             }
         }
         currentPrompt = currentPrompt.replace("\r\n", "\n")
-        return currentPrompt
+        return currentPrompt + "\n"//This fixes text vertical indentation problem
     }
 
     private fun getPrompt(
@@ -151,6 +150,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         )
                         if (tabName.split(")")[1] != "No File") {
                             try {
+                                lastCode[tabName] = content
                                 val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
                                 service.modifySelectedTextInEditorByFile(
                                     content, service.fileToVirtualFile(file)!!

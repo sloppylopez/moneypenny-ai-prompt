@@ -36,9 +36,11 @@ class ChatGPTService(project: Project) {
     ): CompletableFuture<ChatGptCompletion> {
         val requestBody = getRequestBodyJson(prompt)
         val request = createHttpRequest(requestBody)
+        println("requestBody: $requestBody")
         return sendAsyncRequest(request)
             .thenApply { obj: HttpResponse<String>? -> obj?.body() }
             .thenApply { responseBody: String? ->
+                println("responseBody: $responseBody")
                 if (responseBody!!.startsWith("{\n  \"error\": {"))
                     throw Exception(responseBody)
                 else {
@@ -157,7 +159,7 @@ class ChatGPTService(project: Project) {
 //            put("content", virtuousCircle + content)
 //        }
 //    }
-
+    //TODO make this work, it's useful
     fun getAvailableModels(): CompletableFuture<String> {
         val request = HttpRequest.newBuilder()
             .uri(URI.create("https://api.openai.com/v1/engines"))

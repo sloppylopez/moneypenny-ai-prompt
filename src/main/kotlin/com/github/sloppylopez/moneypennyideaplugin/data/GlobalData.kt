@@ -24,11 +24,13 @@ object GlobalData {
     const val refactorMachineRolePromptDescription: String = "You are a refactor-machine that can also answer questions about any topic. When you are asked about programming code, always respond with code. Otherwise, when asked about anything else, you will answer like regular chatGPT"
     const val virtuousCircleRolePromptDescription: String = "First, Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop. Then answer the question taking in account previous analysis, after that, return a follow up question.\n"
     var selectedTabbedPane: JBTabbedPane? = null
+    val lastCode = mutableMapOf<String, String>()
     val engineModelStrings = arrayOf(
         "gpt-3.5-turbo",
         "gpt-3.5-turbo-16k",
         "gpt-4-32k",
-        "gpt-4"
+        "gpt-4",
+        "gpt-4o"
     )
     val roleModelStrings = arrayOf(
         "🤖 refactor-machine",

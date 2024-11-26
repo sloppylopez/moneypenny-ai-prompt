@@ -52,7 +52,7 @@ class CheckBoxFactory {
 
     private fun appendText(selectedCheckBox: JCheckBox, postPromptTextArea: JTextArea) {
         when (selectedCheckBox.text) {
-            "With" -> postPromptTextArea.append("Answer with an explanation \n")
+            "With" -> postPromptTextArea.append("Getting same error, return full file with that problem fixed \n")
             "Method" -> postPromptTextArea.append("Write a method that \n")
             "DRY" -> postPromptTextArea.append("DRY it following best practices and using one-liners if possible \n")
             "Class" -> postPromptTextArea.append("Write a class that \n")
