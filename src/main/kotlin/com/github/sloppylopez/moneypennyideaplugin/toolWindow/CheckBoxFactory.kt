@@ -1,41 +1,47 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.project.Project
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
-class CheckBoxFactory {
+class CheckBoxFactory(private val project: Project) : AutoCloseable {
+
+    private val logger = thisLogger()
+    private val checkBoxList = mutableListOf<JCheckBox>()
 
     fun checkboxesPanel(panel: JPanel, postPromptTextArea: JTextArea) {
-        val checkboxPanel = JPanel()
-        val checkboxLabels = arrayOf(
-            "DRY", "Add", "Create", "Remove", "Gives", "With", "Method", "Class", "Empty"
-        )
+        try {
+            val checkboxPanel = JPanel()
+            val checkboxLabels = arrayOf(
+                "DRY", "Add", "Create", "Remove", "Gives", "With", "Method", "Class", "Empty"
+            )
 
-        checkboxLabels.forEach { label ->
-            val checkBox = createCheckBox(label, label == "DRY", postPromptTextArea)
-            checkBox.font = checkBox.font.deriveFont(13f) // Change font size to 13
-            checkboxPanel.add(checkBox)
+            checkboxLabels.forEach { label ->
+                val checkBox = createCheckBox(label, label == "DRY", postPromptTextArea)
+                checkBox.font = checkBox.font.deriveFont(13f) // Change font size to 13
+                checkboxPanel.add(checkBox)
+                checkBoxList.add(checkBox)
 
-            if (label == "DRY") {
-                updatePostPromptText(checkBox, postPromptTextArea)
+                if (label == "DRY") {
+                    updatePostPromptText(checkBox, postPromptTextArea)
+                }
             }
-            if (label == "Empty") {
-                GlobalData.emptyCheckBoxButton = checkBox
-            }
+
+            panel.add(checkboxPanel)
+        } catch (e: Exception) {
+            logger.error("Error creating checkbox panel", e)
         }
-
-        panel.add(checkboxPanel)
     }
 
     private fun createCheckBox(text: String, selected: Boolean = false, postPromptTextArea: JTextArea): JCheckBox {
         val checkBox = JCheckBox(text, selected)
 
         checkBox.addActionListener { event ->
-            val selectedCheckBox = event.source as? JCheckBox ?: GlobalData.emptyCheckBoxButton
+            val selectedCheckBox = event.source as? JCheckBox
             selectedCheckBox?.let {
                 updatePostPromptText(selectedCheckBox, postPromptTextArea)
             }
@@ -59,5 +65,15 @@ class CheckBoxFactory {
             "Empty" -> postPromptTextArea.text = ""
             else -> postPromptTextArea.append("${selectedCheckBox.text} \n")
         }
+    }
+
+    override fun close() {
+        // Remove all listeners and clear the checkBoxList to prevent memory leaks
+        checkBoxList.forEach { checkBox ->
+            for (listener in checkBox.actionListeners) {
+                checkBox.removeActionListener(listener)
+            }
+        }
+        checkBoxList.clear()
     }
 }

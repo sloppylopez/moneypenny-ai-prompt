@@ -2,7 +2,6 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.lastCode
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -152,7 +151,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         )
                         if (tabName.split(")")[1] != "No File") {
                             try {
-                                lastCode[tabName] = content
+//                                lastCode[tabName] = content
                                 val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
                                 service.modifySelectedTextInEditorByFile(
                                     content, service.fileToVirtualFile(file)!!
