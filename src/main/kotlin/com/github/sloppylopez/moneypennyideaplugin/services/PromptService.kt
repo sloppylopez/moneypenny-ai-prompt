@@ -16,54 +16,63 @@ import javax.swing.JTextArea
 @Service(Service.Level.PROJECT)
 class PromptService(project: Project) {
     private val service = project.service<ProjectService>()
+    private val logger = thisLogger()
+
     fun getPrompts(): MutableMap<String, Map<String, List<String>>> {
         GlobalData.prompts.clear()
-        val contentManager = service.getToolWindow()?.contentManager
-        val contentCount = contentManager?.contentCount
-        val textAreas = mutableListOf<String>()
-        for (upperTabIndex in 0 until contentCount!!) {
-            val content = contentManager.getContent(upperTabIndex)
-            val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
-            if (simpleToolWindowPanel != null) {
-                val jBTabbedPanes = mutableListOf<JBTabbedPane>()
-                simpleToolWindowPanel.components.forEach { component ->
-                    jBTabbedPanes.addAll(service.findJBTabbedPanes(component as Container))
-                }
-                val nestedJBTabbedPanes = mutableListOf<JBTabbedPane>()
-                jBTabbedPanes.forEach { tabbedPane ->
-                    nestedJBTabbedPanes.addAll(service.findNestedJBTabbedPanes(tabbedPane))
-                }
-                for (tabbedPaneIndex in 0 until nestedJBTabbedPanes.size) {
-                    val tabbedPane = nestedJBTabbedPanes[tabbedPaneIndex]
+
+        val contentManager = service.getToolWindow()?.contentManager ?: run {
+            logger.warn("Tool window content manager not found")
+            return mutableMapOf()
+        }
+
+        try {
+            for (upperTabIndex in 0 until contentManager.contentCount) {
+                val content = contentManager.getContent(upperTabIndex) ?: continue
+                val simpleToolWindowPanel = content.component as? SimpleToolWindowPanel ?: continue
+
+                val jBTabbedPanes = findJBTabbedPanes(simpleToolWindowPanel)
+                val nestedJBTabbedPanes = jBTabbedPanes.flatMap { findNestedJBTabbedPanes(it) }
+
+                for ((tabbedPaneIndex, tabbedPane) in nestedJBTabbedPanes.withIndex()) {
                     for (tabIndex in 0 until tabbedPane.tabCount) {
-                        val tabComponents = (tabbedPane.getComponentAt(tabIndex) as Container)
-                            .components[0] as Container
+                        val tabComponents =
+                            (tabbedPane.getComponentAt(tabIndex) as? Container)?.components?.firstOrNull() as? Container
                         val tabName = tabbedPane.getTitleAt(tabIndex)
-                        val upperTabName =//TODO refactor this, maybe it an be recursive
-                            (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as JBTabbedPane).getTitleAt(
-                                tabbedPaneIndex
-                            )
-                        tabComponents.components.forEach { tabComponent ->
-                            getPromptInfo(tabComponent, textAreas, tabIndex, tabName, upperTabName)
+                        val upperTabName = try {
+                            (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as? JBTabbedPane)
+                                ?.getTitleAt(tabbedPaneIndex) ?: ""
+                        } catch (e: Exception) {
+                            logger.warn("Failed to resolve upperTabName: ${e.message}")
+                            ""
+                        }
+
+                        tabComponents?.components?.forEach { tabComponent ->
+                            getPromptInfo(tabComponent, tabIndex, tabName, upperTabName)
                         }
                     }
                 }
-                val promptsAsJson = service.getPromptsAsJson(GlobalData.prompts)
-                service.saveDataToExtensionFolder(promptsAsJson)
-                return GlobalData.prompts
             }
+
+            val promptsAsJson = service.getPromptsAsJson(GlobalData.prompts)
+            service.saveDataToExtensionFolder(promptsAsJson)
+            return GlobalData.prompts
+
+        } catch (e: Exception) {
+            logger.error("Error in getPrompts: ${e.message}")
         }
-        return emptyMap<String, Map<String, List<String>>>().toMutableMap()
+
+        return mutableMapOf()
     }
 
     fun setInChat(text: String, tabName: String, currentRole: String, upperTabName: String?, promptList: List<String>?) {
-        val contentManager = service.getToolWindow()?.contentManager
-        val contentCount = contentManager?.contentCount
-        for (index in 0 until contentCount!!) {
-            val content = contentManager.getContent(index)
-            val simpleToolWindowPanel = content?.component as? SimpleToolWindowPanel
-            simpleToolWindowPanel?.components?.forEach { component ->
-//                component.getComponentAt(0, 0)
+        val contentManager = service.getToolWindow()?.contentManager ?: return
+
+        for (index in 0 until contentManager.contentCount) {
+            val content = contentManager.getContent(index) ?: continue
+            val simpleToolWindowPanel = content.component as? SimpleToolWindowPanel ?: continue
+
+            simpleToolWindowPanel.components.forEach { component ->
                 service.addChatWindowContentListModelToGlobalData(
                     component as Container,
                     text,
@@ -78,7 +87,6 @@ class PromptService(project: Project) {
 
     private fun getPromptInfo(
         tabComponent: Component?,
-        textAreas: MutableList<String>,
         tabIndex: Int,
         tabName: String,
         upperTabName: String
@@ -86,38 +94,47 @@ class PromptService(project: Project) {
         if (tabComponent is JScrollPane) {
             val textArea = tabComponent.viewport.view as? JTextArea
             textArea?.let {
-                textAreas.add(it.text)
-                extractPromptInfo(tabName, textAreas, tabIndex, it.text, upperTabName)
+                try {
+                    extractPromptInfo(tabName, it.text, upperTabName)
+                } catch (e: Exception) {
+                    logger.error("Error in getPromptInfo: ${e.message}")
+                }
             }
         }
     }
 
     private fun extractPromptInfo(
         tabName: String,
-        textAreas: MutableList<String>,
-        index: Int,
         text: String,
         upperTabName: String
     ) {
-        try {
-//            val filePaths = GlobalData.tabNameToFilePathMap[tabName]
-//            val shortSha = gitService.getShortSha(filePaths) ?: index.toString() TBI
-            val promptMap = GlobalData.prompts.getOrDefault(upperTabName, mutableMapOf())
-            val promptList = promptMap.getOrDefault(tabName, listOf())
-            GlobalData.prompts[upperTabName] = promptMap + (tabName to promptList.plus(text))
-            textAreas.add(text)
-        } catch (e: Exception) {
-            thisLogger().error(e.stackTraceToString())
-        }
+        val promptMap = GlobalData.prompts.getOrPut(upperTabName) { mutableMapOf() }
+        val promptList = promptMap.getOrDefault(tabName, listOf())
+        GlobalData.prompts[upperTabName] = promptMap + (tabName to promptList.plus(text))
     }
 
-//    fun setAllCheckboxesSelected(toolwindow: ToolWindow) {
+    private fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
+        val tabbedPanes = mutableListOf<JBTabbedPane>()
+        container.components.forEach { component ->
+            if (component is JBTabbedPane) {
+                tabbedPanes.add(component)
+            } else if (component is Container) {
+                tabbedPanes.addAll(findJBTabbedPanes(component))
+            }
+        }
+        return tabbedPanes
+    }
 
-//    fun setAllCheckboxesNotSelected(toolwindow: ToolWindow) {
-//        toolwindow.content.forEach { content ->
-//            if (content is Checkbox) {
-//                content.isSelected = false
-//            }
-//        }
-//    }
+    private fun findNestedJBTabbedPanes(tabbedPane: JBTabbedPane): List<JBTabbedPane> {
+        val nestedPanes = mutableListOf<JBTabbedPane>()
+        for (i in 0 until tabbedPane.tabCount) {
+            val component = tabbedPane.getComponentAt(i)
+            if (component is JBTabbedPane) {
+                nestedPanes.add(component)
+            } else if (component is Container) {
+                nestedPanes.addAll(findJBTabbedPanes(component))
+            }
+        }
+        return nestedPanes
+    }
 }
