@@ -372,7 +372,7 @@ class ProjectService {
         SwingUtilities.invokeLater {
             ApplicationManager.getApplication().invokeLater(
                 functionsToRunLater,
-                ModalityState.NON_MODAL
+                ModalityState.any()
             )
         }
     }

@@ -45,7 +45,7 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
                         refactorIntentionFactory.removeIntentionsFromEditor()
                         refactorIntentionFactory.addIntentionToEditor()
                     },
-                    ModalityState.NON_MODAL
+                    ModalityState.any()
                 )
             }
             addTabbedPaneToToolWindow(project)
