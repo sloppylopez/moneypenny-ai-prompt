@@ -12,7 +12,7 @@
         <p>Initial release of MoneyPenny AI plugin for IntelliJ IDEA</p>
     ]]></change-notes>
     <version>1.1.0-SNAPSHOT</version>
-    <idea-version since-build="231" until-build="233.*"/>
+    <idea-version since-build="242"/>
 
     <!--    <depends>com.intellij.modules.java</depends>-->
 
@@ -27,21 +27,22 @@
     <depends>com.intellij.modules.platform</depends>
     <!-- Markdown plugin. -->
     <depends>org.intellij.plugins.markdown</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory"
                     id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
     </extensions>
 
-<!--    <actions>-->
-<!--        <action id="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
-<!--                class="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
-<!--                text="MoneyPenny AI Prompt"-->
-<!--                description="Open MoneyPenny AI Prompt"-->
-<!--                icon="/images/MoneyPenny-Icon_13x13-alpha.png">-->
-<!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
-<!--        </action>-->
-<!--    </actions>-->
+    <!--    <actions>-->
+    <!--        <action id="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
+    <!--                class="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
+    <!--                text="MoneyPenny AI Prompt"-->
+    <!--                description="Open MoneyPenny AI Prompt"-->
+    <!--                icon="/images/MoneyPenny-Icon_13x13-alpha.png">-->
+    <!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
+    <!--        </action>-->
+    <!--    </actions>-->
 
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"
