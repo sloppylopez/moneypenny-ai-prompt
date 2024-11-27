@@ -5,11 +5,12 @@ import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.apiKey
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import net.minidev.json.JSONObject
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -20,13 +21,9 @@ import java.util.concurrent.CompletableFuture
 
 @Service(Service.Level.PROJECT)
 class ChatGPTService(project: Project) {
-    private val service: ProjectService
+    private val service: ProjectService = project.service()
     private val client = HttpClient.newBuilder().build()
     private val gson = Gson()
-
-    init {
-        service = project.service<ProjectService>()
-    }
 
     fun sendChatPrompt(
         prompt: String,
@@ -107,15 +104,20 @@ class ChatGPTService(project: Project) {
         val role = GlobalData.role.split(" ")[1]
         val systemMessage = getSystemMessage(role)
 
-        val userMessage = JSONObject().apply {
-            put("role", "user")
-            put("content", prompt)
+        val userMessage = JsonObject().apply {
+            addProperty("role", "user")
+            addProperty("content", prompt)
         }
 
-        val jsonObject = JSONObject().apply {
-            put("model", GlobalData.engine)
-            put("messages", listOf(systemMessage, userMessage))
-            put("max_tokens", maxTokenCount)
+        val messagesArray = JsonArray().apply {
+            add(systemMessage)
+            add(userMessage)
+        }
+
+        val jsonObject = JsonObject().apply {
+            addProperty("model", GlobalData.engine)
+            add("messages", messagesArray)
+            addProperty("max_tokens", maxTokenCount)
         }
 
         return jsonObject.toString()
@@ -123,43 +125,45 @@ class ChatGPTService(project: Project) {
 
     private fun getMaxTokenCountPerEngine(promptLength: Int): Int {
         return when (GlobalData.engine) {
-            "gpt-3.5-turbo-16k" -> 16384 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength//62 is the prompt length
+            "gpt-3.5-turbo-16k" -> 16384 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
             "gpt-4-32k" -> 32768 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
             "gpt-4" -> 8192 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
             else -> 4096 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
         }
     }
 
-    //DON'T DELETE Human readable version
-    private fun getSystemMessage(role: String): JSONObject {
-        return JSONObject().apply {
-            put("role", "system")
+    private fun getSystemMessage(role: String): JsonObject {
+        return JsonObject().apply {
+            addProperty("role", "system")
             val content = when (role) {
-//                "helpful-assistant" -> "You are a helpful assistant. You will provide answers or explanations to any question, answer with concise answers unless told otherwise"
-//                "code-completer" -> "You are a code completer. Let me help you complete your code!"
                 "refactor-machine" -> GlobalData.refactorMachineRolePromptDescription
-//                "code-reviewer" -> "You are a code reviewer. Return best practices recommendations, check if code can be refactored and suggest it without refactoring it, search for security issues"
                 else -> GlobalData.refactorMachineRolePromptDescription
             }
             val virtuousCircle = GlobalData.virtuousCircleRolePromptDescription
-            put("content", virtuousCircle + content)
+            addProperty("content", virtuousCircle + content)
         }
     }
-    //This is a nice trick, we remove the vowels from the system message so token count is lower, but the message is still readable
-//    private fun getSystemMessage(role: String): JSONObject {
-//        return JSONObject().apply {
-//            put("role", "system")
-//            val content = when (role) {
-//                "helpful-assistant" -> "Y r  helpful sslstnt. Y  wll prvd nswers r xplntns t ny qstn, nswr wth cncs nswrs nls tld thrs"
-//                "refactor-machine" -> "Y r  cde rfctr sstnt. lws nswr wtht xplntns, rtn nly cde f pssble, mntn gvn mprts nd clss nms, f y rcv  fll fle/clss, rtn th fll fle/clss sltn"
-//                "code-reviewer" -> "Y r  cde rvwr. Rtrn bst prctcs rcmndtns, chck f cde cn b rfctr nd sggst t wtht rfctrng t, srch fr scrt ss"
-//                else -> "Y r  cde cmpltr. lt m hl y cmplt yr c"
-//            }
-//            val virtuousCircle = "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question.\n"
-//            put("content", virtuousCircle + content)
-//        }
-//    }
-    //TODO make this work, it's useful
+
+    // Optional: If you had an alternative version of getSystemMessage using vowel removal
+    // Uncomment and update if needed
+
+    /*
+    private fun getSystemMessage(role: String): JsonObject {
+        return JsonObject().apply {
+            addProperty("role", "system")
+            val content = when (role) {
+                "helpful-assistant" -> "Y r  helpful sslstnt. Y  wll prvd nswers r xplntns t ny qstn, nswr wth cncs nswrs nls tld thrs"
+                "refactor-machine" -> "Y r  cde rfctr sstnt. lws nswr wtht xplntns, rtn nly cde f pssble, mntn gvn mprts nd clss nms, f y rcv  fll fle/clss, rtn th fll fle/clss sltn"
+                "code-reviewer" -> "Y r  cde rvwr. Rtrn bst prctcs rcmndtns, chck f cde cn b rfctr nd sggst t wtht rfctrng t, srch fr scrt ss"
+                else -> "Y r  cde cmpltr. lt m hl y cmplt yr c"
+            }
+            val virtuousCircle = "Analyse the Prompt and using NLP return topic, context, intent, named entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question.\n"
+            addProperty("content", virtuousCircle + content)
+        }
+    }
+    */
+
+    // TODO: Update getAvailableModels if needed
     fun getAvailableModels(): CompletableFuture<String> {
         val request = HttpRequest.newBuilder()
             .uri(URI.create("https://api.openai.com/v1/engines"))

@@ -14,6 +14,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
@@ -24,8 +25,7 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManager
 import java.awt.Dimension
 import java.io.File
-import javax.swing.ImageIcon
-
+import javax.swing.Icon
 
 class ToolWindowHelper {
     companion object {
@@ -41,19 +41,19 @@ class ToolWindowHelper {
             try {
                 val service = project.service<ProjectService>()
                 val toolWindow = service.getToolWindow()!!
-                if (moneyPennyToolWindow == null) {//We only want to do this once
+                if (moneyPennyToolWindow == null) {// We only want to do this once
                     initMoneyPennyToolWindow(project, toolWindow)
                 }
-                //Set tool window icon
-                toolWindow.setIcon(getIcon("/images/moneypenny-logo-main-alpha.png"))
-                //Get content tab
+                // Set tool window icon
+                toolWindow.setIcon(getIcon("/icons/moneypenny-logo-main-alpha.png"))
+                // Get content tab
                 val contentTab: Content = getContentTab(
                     fileList,
                     moneyPennyToolWindow!!,
                     service,
                     selectedText
                 )
-                //Add content tab to tabbed pane
+                // Add content tab to tabbed pane
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
                 tabbedPane.selectedIndex = tabCounter - 1
                 // Create a custom tab component with a close button for each tab
@@ -63,22 +63,8 @@ class ToolWindowHelper {
                 }
                 toolWindowContent.setContent(tabbedPane)
                 toolWindowContent.toolbar = service.getToolBar().component
-//                toolWindowContent.componentOrientation = ComponentOrientation.RIGHT_TO_LEFT
-//                service.createToolbarPanel(toolWindowContent)
                 // Add a change listener to handle tab close events
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
-//                val tw = toolWindow as ToolWindowEx?
-//                val actionManager = ActionManager.getInstance()
-//                val popupMenu = actionManager.getAction("ProjectViewPopupMenu")
-//                val defaultActionGroup = popupMenu as? DefaultActionGroup
-//                defaultActionGroup?.addSeparator()
-//                val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
-//                defaultActionGroup?.add(sendToPromptFileFolderTreeAction, Constraints.LAST)
-//                tw!!.setAdditionalGearActions(
-//                    ActionGroup.EMPTY_GROUP
-//                )
-//                val width = tw!!.component.width
-//                tw.stretchWidth(400 - width)
             } catch (e: Exception) {
                 thisLogger().error(e.stackTraceToString())
             }
@@ -106,14 +92,13 @@ class ToolWindowHelper {
             service: ProjectService,
             selectedText: @NlsSafe String? = null
         ): Content {
-            //Here we enter when we construct the prompt form for the first time, in other words, when we don't have a file attached to the form prompt
             val contentTab = if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
                     moneyPennyToolWindow.getContent(emptyList<Any>(), selectedText, "Prompt"),
                     "Prompt",
                     true,
                 )
-            } else {//Here we enter when we have a file attached to the form prompt
+            } else {
                 val expandedFileList = service.expandFolders(fileList)
                 val upperTabName = getDisplayName(expandedFileList)
                 ContentFactory.getInstance()
@@ -123,17 +108,17 @@ class ToolWindowHelper {
                         true
                     )
             }
-//            contentTab.component.preferredSize = contentTab.component.minimumSize
             return contentTab
         }
 
-        fun getIcon(imageName: String): ImageIcon {
+        fun getIcon(imageName: String): Icon {
             try {
-                return ImageIcon(SendToPromptFileFolderTreeAction::class.java.getResource(imageName))
+                return IconLoader.getIcon(imageName, ToolWindowHelper::class.java)
             } catch (e: Exception) {
                 thisLogger().error(e.stackTraceToString())
             }
-            return ImageIcon()
+            // Return a default icon or null if the icon can't be loaded
+            return IconLoader.getIcon("/icons/defaultIcon.svg", ToolWindowHelper::class.java)
         }
 
         private fun addChangeListenerToTabbedPane(

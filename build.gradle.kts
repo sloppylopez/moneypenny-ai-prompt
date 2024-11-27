@@ -26,6 +26,7 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0-M1")
     testImplementation("org.mockito:mockito-core:5.4.0")
+    testImplementation("junit:junit:4.13.2")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
