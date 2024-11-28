@@ -83,7 +83,7 @@ class ChatGPTService(project: Project) {
             )
         } else {
             val message = getMessage(choice)
-            callback.onCompletion(message, prompt, upperTabName!!, promptList!!)
+            callback.onCompletion(message, prompt, upperTabName, promptList)
         }
     }
 
