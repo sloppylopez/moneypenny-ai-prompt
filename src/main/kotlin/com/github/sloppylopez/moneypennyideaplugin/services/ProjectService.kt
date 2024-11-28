@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
@@ -182,6 +183,28 @@ class ProjectService {
                 editor.caretModel.moveToOffset(textOffset)
                 editor.selectionModel.setSelection(textOffset, textOffset + normalizedContentPromptText.length)
             }
+        }
+    }
+
+    fun highlightTextInAllEditors(contentPromptText: String) {
+        val editors = getAllOpenEditors() // New helper function to get all editors
+        val normalizedContentPromptText = contentPromptText.replace("\r\n", "\n")
+
+        editors.forEach { editor ->
+            val document = editor.document
+            val textOffset = document.text.indexOf(normalizedContentPromptText)
+            if (textOffset != -1) {
+                editor.caretModel.moveToOffset(textOffset)
+                editor.selectionModel.setSelection(textOffset, textOffset + normalizedContentPromptText.length)
+            }
+        }
+    }
+
+    // Helper function to get all open editors in the project
+    private fun getAllOpenEditors(): List<Editor> {
+        val fileEditorManager = FileEditorManager.getInstance(this.getProject()!!)
+        return fileEditorManager.allEditors.mapNotNull { editor ->
+            (editor as? TextEditor)?.editor
         }
     }
 
