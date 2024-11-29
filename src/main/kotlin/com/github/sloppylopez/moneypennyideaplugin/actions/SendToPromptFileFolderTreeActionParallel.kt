@@ -3,7 +3,6 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.PromptPanelFactory
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project

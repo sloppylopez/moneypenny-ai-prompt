@@ -30,7 +30,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.20")
-    implementation("com.google.api:gax:2.31.0")
+    implementation("com.google.api:gax:2.58.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
     implementation("org.jetbrains:annotations:23.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")

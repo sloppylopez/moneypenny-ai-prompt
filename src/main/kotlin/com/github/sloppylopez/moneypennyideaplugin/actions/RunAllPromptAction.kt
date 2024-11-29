@@ -11,7 +11,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -79,6 +78,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
             progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
+
     //this code is too ugly and too abstract
     private fun getGroupedPrompt(
         prompt: List<String>,
