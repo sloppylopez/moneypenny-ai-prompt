@@ -11,7 +11,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
-@Service(Service.Level.PROJECT)
 class CopyPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }

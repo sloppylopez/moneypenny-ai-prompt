@@ -8,7 +8,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 
-@Service(Service.Level.PROJECT)
 class SendToPromptFileFolderTreeActionParallel(private var project: Project) : AnAction() {
     private val promptPanelFactory = project.service<PromptPanelFactory>()
 

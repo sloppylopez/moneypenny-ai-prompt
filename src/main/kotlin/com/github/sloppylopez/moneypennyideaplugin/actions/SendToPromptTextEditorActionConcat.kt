@@ -10,7 +10,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
-@Service(Service.Level.PROJECT)
 class SendToPromptTextEditorActionConcat(project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
 

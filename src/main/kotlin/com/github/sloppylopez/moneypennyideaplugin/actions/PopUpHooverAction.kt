@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 
-@Service(Service.Level.PROJECT)
 class PopUpHooverAction : ActionGroup() {
 
     companion object {

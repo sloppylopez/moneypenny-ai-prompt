@@ -17,7 +17,6 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
 
-@Service(Service.Level.PROJECT)
 class RunAllPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
