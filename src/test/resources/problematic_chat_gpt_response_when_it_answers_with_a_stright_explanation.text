@@ -1,0 +1,10 @@
+Topic: Code refactoring and debugging.
+Context: The user is a coder seeking assistance with debugging their code. They are having an issue where creating a chat window content per prompt panel results in duplicate chat lists in all panels, rather than unique lists for each one.
+Intent: User wants to fix the code issue where every new instance of 'ChatWindowContent' displays the same list of chat messages instead of different lists for each instance.
+Named Entities: JPanel, File, textAreaFactory, ChatWindowContent, BorderLayout, innerPanel.
+Keywords: code, solution, security issues, ChatWindowContent, duplicate.
+Sentiment: Neutral sentiment, the user expresses confusion.
+
+Regarding the code you provided, it seems the main problem is related to the use of services and how they are managed within the application lifecycle. Each service in the IntelliJ IDE is created only once to provide global state or functionality for a particular scope, so using the `service.getProject()!!` might likely be pointing to the same instance of the chat window.
+
+Are there any other events or operations involved that are causing this issue besides the `innerPanel.add(ChatWindowContent(service.getProject()!!), BorderLayout.SOUTH)` line of code?

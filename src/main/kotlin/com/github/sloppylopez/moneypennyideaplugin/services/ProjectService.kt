@@ -2,10 +2,12 @@ package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.downerTabName
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToContentPromptTextMap
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabNameToFilePathMap
+import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.downerTabName
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToContentPromptTextMap
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.google.gson.Gson
 import com.intellij.icons.AllIcons
@@ -21,11 +23,10 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.keymap.impl.ui.KeymapPanel.*
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -45,6 +46,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
+import java.util.stream.Collectors
 import javax.swing.*
 
 
@@ -154,7 +156,7 @@ class ProjectService {
             message.escapeHTML(),
             notificationType ?: NotificationType.INFORMATION
         )
-        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/MoneyPenny-Icon_13x13-alpha.png"))
+        notification.setIcon(customIcon ?: createCustomIcon(imageName ?: "/images/moneypenny-ai-notification.png"))
         Notifications.Bus.notify(notification, this.getProject()!!)
     }
 
@@ -181,6 +183,28 @@ class ProjectService {
                 editor.caretModel.moveToOffset(textOffset)
                 editor.selectionModel.setSelection(textOffset, textOffset + normalizedContentPromptText.length)
             }
+        }
+    }
+
+    fun highlightTextInAllEditors(contentPromptText: String) {
+        val editors = getAllOpenEditors() // New helper function to get all editors
+        val normalizedContentPromptText = contentPromptText.replace("\r\n", "\n")
+
+        editors.forEach { editor ->
+            val document = editor.document
+            val textOffset = document.text.indexOf(normalizedContentPromptText)
+            if (textOffset != -1) {
+                editor.caretModel.moveToOffset(textOffset)
+                editor.selectionModel.setSelection(textOffset, textOffset + normalizedContentPromptText.length)
+            }
+        }
+    }
+
+    // Helper function to get all open editors in the project
+    private fun getAllOpenEditors(): List<Editor> {
+        val fileEditorManager = FileEditorManager.getInstance(this.getProject()!!)
+        return fileEditorManager.allEditors.mapNotNull { editor ->
+            (editor as? TextEditor)?.editor
         }
     }
 
@@ -290,29 +314,25 @@ class ProjectService {
         file: File?,
         tabbedPane: JBTabbedPane,
         panel: JPanel,
-        contentPromptText: String?
+        contentPromptText: String?,
+        tabName: String
     ) {
         if (i < fileList.size && file != null) {
-            val tabName = "${getNextTabName()}) ${file.name}"
             tabbedPane.addTab(tabName, panel)
             tabNameToFilePathMap[tabName] = file.canonicalPath
-            if (contentPromptText != null) {
+            if (contentPromptText != null) {//TODO I think this needs to me moved outside of this if statement
                 tabNameToContentPromptTextMap[tabName] = contentPromptText
             } else {
                 tabNameToContentPromptTextMap[tabName] = file.readText()
             }
         } else {
-            tabbedPane.addTab("No File", panel)
+            tabbedPane.addTab(tabName, panel)
         }
 
         if (contentPromptText != null && file != null) {
-            val tabName = "$downerTabName) ${file.name}"
-            tabNameToContentPromptTextMap[tabName] = contentPromptText
+            val currentTabName = "$downerTabName) ${file.name}"
+            tabNameToContentPromptTextMap[currentTabName] = contentPromptText
         }
-    }
-
-    private fun getNextTabName(): String {
-        return downerTabName++.toString()
     }
 
     fun getProject(): Project? {
@@ -375,7 +395,7 @@ class ProjectService {
         SwingUtilities.invokeLater {
             ApplicationManager.getApplication().invokeLater(
                 functionsToRunLater,
-                ModalityState.NON_MODAL
+                ModalityState.any()
             )
         }
     }
@@ -422,6 +442,80 @@ class ProjectService {
         return nestedTabbedPanes
     }
 
+    private fun addFollowUpQuestion(
+        splitParts: List<String>,
+        component: ChatWindowContent
+    ) {
+        val followUpQuestionLast =
+            splitParts[splitParts.size - 1]//this magic number is to take the follow-up question from the npm analysis response part of the previous request
+        if (/*(followUpQuestionLast.contains("Follow Up Question:", true) ||
+                    followUpQuestionLast.contains("Follow Up:", true) ||
+                    followUpQuestionLast.contains("Follow-Up Question:", true) ||
+                    followUpQuestionLast.contains("Follow-Up:", true) ||
+                    followUpQuestionLast.contains("Next Follow Up Question:", true) ||
+                    followUpQuestionLast.contains("Next Follow-Up Question:", true)) &&*/
+            GlobalData.followUpActive
+        ) {
+            component.addElement("$role: -> $followUpQuestionLast")
+        }
+    }
+
+    //TODO: This method is not very robust, find a better way to do this
+    fun addChatWindowContentListModelToGlobalData(
+        container: Container,
+        text: String,
+        currentRole: String,
+        tabName: String,
+        upperTabName: String?,
+        promptList: List<String>?
+    ) {
+        fun findTabbedPanesRecursive(component: Component) {
+            if (component is ChatWindowContent) {
+                val tabCountIndex = component.getTabCountIndex()
+                val parentComponent: JBTabbedPane = (component.parent.parent.parent as JBTabbedPane)
+                var parentTabName: String? = null
+                if (parentComponent.getTitleAt(tabCountIndex) == tabName) {
+                    parentTabName = parentComponent.getTitleAt(tabCountIndex)
+                }
+                if (parentTabName != null) {
+                    component.addElement("${GlobalData.userRole}:\n${promptList!!.joinToString("\n")}")
+                    component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
+//                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
+//                    timeLine.addPointInTimeLine(
+//                        Event(
+//                            LocalDateTime.now(),
+//                            promptList[0],
+//                            true
+//                        )
+//                    )
+//                    timeLine.addPointInTimeLine(
+//                        Event(
+//                            LocalDateTime.now(),
+//                            "Response",
+//                            false
+//                        )
+//                    )
+                    if (currentRole == "🤖 refactor-machine") {
+                        val splitParts = text.split("\n")
+                        addFollowUpQuestion(splitParts, component)
+//                        timeLine.addPointInTimeLine(
+//                            Event(
+//                                LocalDateTime.now(),
+//                                "Follow Up Question:",
+//                                false
+//                            )
+//                        )
+                    }
+                }
+            } else if (component is Container) {
+                for (child in component.components) {
+                    findTabbedPanesRecursive(child)
+                }
+            }
+        }
+
+        findTabbedPanesRecursive(container)
+    }
 
     fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
         val tabbedPanes = mutableListOf<JBTabbedPane>()
@@ -458,13 +552,18 @@ class ProjectService {
         for (outerKey in prompts.keys) {
             val innerMap = prompts[outerKey] ?: continue
             if (innerMap.containsKey(key)) {
-                return innerMap[key] ?: emptyList()
+                return if (innerMap[key]!!.isNotEmpty()) {
+                    innerMap[key]!!.stream()
+                        .filter(String::isNotEmpty).collect(Collectors.toList())
+                } else {
+                    emptyList()
+                }
             }
         }
         return emptyList()
     }
 
-    fun addToolBar(toolWindowContent: SimpleToolWindowPanel) {
+    fun getToolBar(): ActionToolbar {
         val actionGroup = DefaultActionGroup()
         val project = this.getProject()!!
         val toolBar = ActionManager.getInstance().createActionToolbar(
@@ -473,8 +572,10 @@ class ProjectService {
             true
         )
         actionGroup.add(SendToPromptTextEditorAction(project))
+        actionGroup.add(AddTextAction(project))
         actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))
+        actionGroup.add(RunAllInTabPromptAction(project))
         actionGroup.add(RunAllPromptAction(project))
         actionGroup.add(CopyPromptAction(project))
         actionGroup.addSeparator()
@@ -498,7 +599,7 @@ class ProjectService {
             )
         )
         actionGroup.addSeparator()
-        toolWindowContent.toolbar = toolBar.component
+        return toolBar
     }
 
     fun addPanelsToGlobalData(
@@ -508,7 +609,7 @@ class ProjectService {
     ) {
         GlobalData.nestedPanel = nestedPanel
         GlobalData.innerPanel = innerPanel
-        GlobalData.tabbedPane = tabbedPane
+        GlobalData.selectedTabbedPane = tabbedPane
     }
 
     fun loadDataFromExtensionFolder(): String {
@@ -535,17 +636,17 @@ class ProjectService {
 //    this@SQLPluginPanel, "Can't read file '$file'", "Error",
 //    JOptionPane.ERROR_MESSAGE
 //    )
-    ////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
+////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
 
-    //    fun hola(){
-    //        getProject().getModelAccess().executeCommand(object : DefaultCommand() {
-    //            fun run() {
-    //                createConsoleModel()
-    //                addBuiltInImports()
-    //                loadHistory(history)
-    //                createEditor()
-    //                myFileEditor = ConsoleFileEditor(myEditor)
-    //            }
-    //        })
-    //    }
+//    fun hola(){
+//        getProject().getModelAccess().executeCommand(object : DefaultCommand() {
+//            fun run() {
+//                createConsoleModel()
+//                addBuiltInImports()
+//                loadHistory(history)
+//                createEditor()
+//                myFileEditor = ConsoleFileEditor(myEditor)
+//            }
+//        })
+//    }
 }

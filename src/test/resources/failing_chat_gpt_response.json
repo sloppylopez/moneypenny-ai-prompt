@@ -1,0 +1,12 @@
+``` kotlin
+fun addBorder() {
+val border: Border = BorderFactory.createLineBorder(Color.BLACK)
+border.also {
+border.createEmptyBorder(10, 10, 10, 10)
+border.createTitledBorder("Chat Window Content")
+}
+this.border = border
+}
+```
+
+Add the `addBorder()` function inside the `ChatWindowContent` class.

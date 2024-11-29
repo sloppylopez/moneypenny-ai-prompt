@@ -1,7 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.selectedTabbedPane
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
@@ -11,11 +12,13 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
 
+@Service(Service.Level.PROJECT)
 class RunPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
@@ -25,41 +28,58 @@ class RunPromptAction(private var project: Project) : AnAction() {
 
     init {
         templatePresentation.icon = AllIcons.Actions.Execute
-        templatePresentation.text = "Run prompt"
+        templatePresentation.text = "Run Prompt"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
         val prompt: String
-        val tabName = GlobalData.tabbedPane?.getTitleAt(GlobalData.tabbedPane!!.selectedIndex)
         val jProgressBar = progressBarFactory.getProgressBar()
-        progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
-        val prompts = promptService.getPrompts()
-        val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
-        if (GlobalData.role == "refactor-machine") {
-            promptList[1] = "```\n" + promptList[1] + "\n```"
-        }
-        if (promptList[1].isNotBlank()) {
-            prompt = if (GlobalData.role == "refactor-machine") {
-                promptList.joinToString("\n")
-            } else {
-                promptList.joinToString(" ")
+        try {
+            val tabName = selectedTabbedPane?.getTitleAt(selectedTabbedPane!!.selectedIndex)
+            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
+            val prompts = promptService.getPrompts()
+            val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
+            //Write code that will return the key from prompts that contains this value in the list tabName
+            val upperTabName = prompts.entries.find { it.value.contains(tabName) }?.key
+            val role = GlobalData.role.split(" ")[1]
+            if (role == "refactor-machine" &&
+                promptList.size >= 2 &&
+                promptList[1].isNotBlank()
+            ) {
+                promptList[1] = "```\n" + promptList[1] + "\n```"
             }
-            chatGPTService.sendChatPrompt(
-                prompt, createCallback(tabName)
-            ).whenComplete { _, _ ->
-                progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
+            if (promptList.isNotEmpty()) {
+                prompt = if (role == "refactor-machine") {
+                    promptList.joinToString("\n")
+                } else {
+                    promptList.joinToString(" ")
+                }.replace("\r\n", "\n")
+                chatGPTService.sendChatPrompt(
+                    prompt, createCallback(tabName), upperTabName!!, promptList
+                ).whenComplete { _, _ ->
+                    thisLogger().info("ChatGPTService.sendChatPrompt completed")
+                }
             }
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
+        } finally {
+            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
+
     //TODO: needs DRYing
     private fun createCallback(tabName: String): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
-            override fun onCompletion(choice: ChatGptMessage) {
+            override fun onCompletion(
+                choice: ChatGptMessage,
+                prompt: String,
+                upperTabName: String?,
+                promptList: List<String>?
+            ) {
                 try {
                     var content = choice.content
-                    if(GlobalData.role == "refactor-machine" &&
-                        service.isCodeCommented(content)){
+                    if (service.isCodeCommented(content)) {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {
@@ -67,15 +87,28 @@ class RunPromptAction(private var project: Project) : AnAction() {
                         service.showNotification(
                             copiedMessage, content, NotificationType.INFORMATION
                         )
-                        val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
-                        service.modifySelectedTextInEditorByFile(
-                            content, service.fileToVirtualFile(file)!!
-                        )
+                        if (tabName.split(")")[1] != "No File") {
+                            try {
+                                val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
+                                service.modifySelectedTextInEditorByFile(
+                                    content, service.fileToVirtualFile(file)!!
+                                )
+                            } catch (e: Exception) {
+                                thisLogger().error(e.stackTraceToString())
+                            }
+                        }
                     } else {
                         service.showNotification(
                             copiedMessage, content, NotificationType.ERROR
                         )
                     }
+                    promptService.setInChat(
+                        choice.content,
+                        tabName,
+                        GlobalData.role,
+                        upperTabName,
+                        promptList
+                    )//In the chat window we want to display the NPL analysis as well
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())
                 }

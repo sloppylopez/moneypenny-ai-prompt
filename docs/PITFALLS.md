@@ -208,3 +208,23 @@
     </table>
     <p class="notion-text notion-block-5649da35ca0f43e3bf40151f26a16966"><em>Last updated March 11th, 2023
         from </em><em><a class="notion-link" href="https://openai.com/pricing">openai.com/pricing</a></em></p></section>
+
+5) I prefix each new Prompt with this phrase : analyse the Prompt and using NLP return topic, context, intent, named
+   entities, keywords and sentiment ending each sentence with a full stop and then respond to the Follow Up question.
+
+It results in useful NLP analysis of the Response and creates a virtuous circle with the next Prompt. An example of such
+an analysis was: Topic: Heinrich Schliemann and Homer’s Iliad and Odyssey: Context: Excavation at Hissarlik: Intent: To
+search for and verify the historical accuracy of Homer’s descriptions of the cities: Named Entities: Heinrich
+Schliemann, Hissarlik, Homer’s Iliad and Odyssey: Keywords: Excavate, verify, historical accuracy, Homer’s descriptions,
+cities: Sentiment: Neutral
+
+The period symbol ‘.’ helps separate discreet elements of the response. It is also good practise to terminate prompts
+with characters such as ‘?.!’ which helps GPT recognise questions, sentences and exclamations.
+
+![img.png](img.png)
+
+6) How to debug
+   A) From main IDE run config 'runIde'
+   B) From second IDE run 'Attach to process'
+   C) Breaking points go on FIRST IDE
+   D) Profit :)

@@ -11,14 +11,12 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
 
-@Service(Service.Level.PROJECT)
-class RunAllPromptAction(private var project: Project) : AnAction() {
+class RunAllInTabPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
@@ -26,8 +24,8 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     private val copiedMessage = "Copied to clipboard: "
 
     init {
-        templatePresentation.icon = AllIcons.Actions.RunAll
-        templatePresentation.text = "Run All Prompts"
+        templatePresentation.icon = AllIcons.Debugger.ThreadGroup
+        templatePresentation.text = "Run All Prompts In Tab"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -37,43 +35,31 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         try {
             progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
-
+            val tabName = GlobalData.selectedTabbedPane?.getTitleAt(GlobalData.selectedTabbedPane!!.selectedIndex)
             val role = GlobalData.role.split(" ")[1]
-//            val sendChatPromptFutures =
-//                mutableListOf<CompletableFuture<ChatGptCompletion>>() // Create a list to hold the CompletableFuture objects
-            prompts.forEach { (upperTabName, promptMap) ->
-                println("upperTabName: $upperTabName")
-                promptMap.forEach { (tabName, promptList) ->
-                    println("tabName: $tabName")
-                    //Here maybe we can do if promptMap.size >=2 to distinguish use cases gracefully
-                    if (promptMap.size >= 2) {
-                        prompt = getGroupedPrompt(
-                            promptList, role, promptMap
-                        )//TODO maybe adding 1 extra \n here the indenting poblem we have
-                        println("prompt: $prompt")
-                        chatGPTService.sendChatPrompt(
-                            prompt, createCallback(tabName), upperTabName, promptList
-                        ).whenComplete { _, _ ->
-                            thisLogger().info("ChatGPTService.sendChatPrompt completed")
-                        }
-                    } else {
-                        if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-                            prompt = getPrompt(prompt, role, promptList)
-                            println("prompt: $prompt")
-                            chatGPTService.sendChatPrompt(
-                                prompt, createCallback(tabName), upperTabName, promptList
-                            ).whenComplete { _, _ ->
-                                thisLogger().info("ChatGPTService.sendChatPrompt completed")
-                            }
-                        }
-                    }
-                }
+            val selectedTabPrompts = prompts[tabName]
+            selectedTabPrompts?.forEach { (tabName, promptList) ->
+                //Here maybe we can do if promptMap.size >=2 to distinguish use cases gracefully
+//                if (promptList.size >= 2) {
+//                    prompt = getGroupedPrompt(prompt, role, promptMap)
+////                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
+//                    chatGPTService.sendChatPrompt(
+//                        prompt, createCallback(tabName), upperTabName, promptList
+//                    ).whenComplete { _, _ ->
+//                        thisLogger().info("ChatGPTService.sendChatPrompt completed")
+//                    }
+//                } else {
+//                    if (promptList[0].isNotBlank()) {
+//                        prompt = getPrompt(prompt, role, promptList)
+////                        promptService.setInChat(prompt, tabName, GlobalData.userRole, upperTabName, promptList)
+//                        chatGPTService.sendChatPrompt(
+//                            prompt, createCallback(tabName), upperTabName, promptList
+//                        ).whenComplete { _, _ ->
+//                            thisLogger().info("ChatGPTService.sendChatPrompt completed")
+//                        }
+//                    }
+//                }
             }
-            // Use CompletableFuture.allOf to complete all the CompletableFuture objects in the list
-//            CompletableFuture.allOf(*sendChatPromptFutures.toTypedArray())
-//                .whenComplete { hol, adios ->
-//                progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
-//            }
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
         } finally {
@@ -82,11 +68,11 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     }
 
     private fun getGroupedPrompt(
-        prompt: List<String>,
+        prompt: String,
         role: String,
         promptMap: Map<String, List<String>>
     ): String {
-        var currentPrompt = prompt.toString()
+        var currentPrompt = prompt
         promptMap.forEach { (tabName, promptList) ->
             run {
                 if (!promptList[0].contains("Refactor Code:")) {
@@ -95,11 +81,17 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                     } else {
                         promptList.joinToString(" ")
                     }
+                } else {
+                    currentPrompt = if (role == "refactor-machine") {
+                        promptList.joinToString("\n")
+                    } else {
+                        promptList.joinToString(" ")
+                    }
                 }
             }
         }
         currentPrompt = currentPrompt.replace("\r\n", "\n")
-        return currentPrompt + "\n"//This fixes text vertical indentation problem
+        return currentPrompt
     }
 
     private fun getPrompt(
@@ -151,7 +143,6 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         )
                         if (tabName.split(")")[1] != "No File") {
                             try {
-//                                lastCode[tabName] = content
                                 val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
                                 service.modifySelectedTextInEditorByFile(
                                     content, service.fileToVirtualFile(file)!!
@@ -187,3 +178,4 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         return ActionUpdateThread.EDT
     }
 }
+

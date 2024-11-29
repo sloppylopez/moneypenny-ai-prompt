@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
@@ -50,13 +50,6 @@ class ComboBoxEnginesAction(
     }
 
     private fun addEngineToGlobalData(selectedOption: String) {
-//        val notification = Notification(
-//            "MoneyPenny",
-//            "Selected Option",
-//            selectedOption,
-//            NotificationType.INFORMATION
-//        )
-//        Notifications.Bus.notify(notification)
         GlobalData.engine = selectedOption
     }
 

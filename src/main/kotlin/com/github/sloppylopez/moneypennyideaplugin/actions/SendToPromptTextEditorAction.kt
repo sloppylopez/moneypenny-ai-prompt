@@ -15,12 +15,12 @@ class SendToPromptTextEditorAction(project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
 
     init {
-        templatePresentation.icon = AllIcons.Duplicates.SendToTheRight
+        templatePresentation.icon = AllIcons.Chooser.Right
         templatePresentation.text = "Send to Prompt"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        val file = getFile(e) ?: return
+         val file = getFile(e) ?: return
         val editor = getEditor(e) ?: return
         service.getSelectedTextFromEditor(
             editor

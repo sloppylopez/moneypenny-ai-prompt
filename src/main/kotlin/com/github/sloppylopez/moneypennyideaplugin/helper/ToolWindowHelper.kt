@@ -1,15 +1,17 @@
 package com.github.sloppylopez.moneypennyideaplugin.helper
 
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.index
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData.tabCounter
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.index
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabCounter
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.components.JBTabbedPane
@@ -17,13 +19,14 @@ import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.ContentManager
 import java.io.File
-import javax.swing.ImageIcon
+import javax.swing.Icon
 
 class ToolWindowHelper {
     companion object {
         private val toolWindowContent = SimpleToolWindowPanel(true)
         private var moneyPennyToolWindow: MoneyPennyToolWindow? = null
         private var tabbedPane = JBTabbedPane()
+        private var toolWindowDisposable: Disposable? = null
 
         fun addTabbedPaneToToolWindow(
             project: Project,
@@ -33,31 +36,29 @@ class ToolWindowHelper {
             try {
                 val service = project.service<ProjectService>()
                 val toolWindow = service.getToolWindow()!!
-                if (moneyPennyToolWindow == null) {//We only want to do this once
+
+                if (toolWindowDisposable == null) { // Initialize disposable only once
+                    toolWindowDisposable = Disposer.newDisposable("ToolWindowDisposable")
+                    Disposer.register(project, toolWindowDisposable!!)
+                }
+
+                if (moneyPennyToolWindow == null) {
                     initMoneyPennyToolWindow(project, toolWindow)
                 }
-                //Set tool window icon
+
                 toolWindow.setIcon(getIcon("/images/moneypenny-logo-main-alpha.png"))
-                //Get content tab
-                val contentTab: Content = getContentTab(
-                    fileList,
-                    moneyPennyToolWindow!!,
-                    service,
-                    selectedText
-                )
-                //Add content tab to tabbed pane
+                val contentTab: Content = getContentTab(fileList, moneyPennyToolWindow!!, service, selectedText)
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
+
                 tabbedPane.selectedIndex = tabCounter - 1
-                // Create a custom tab component with a close button for each tab
+
                 for (i in 0 until tabbedPane.tabCount) {
-                    val tabComponent = ButtonTabComponent(tabbedPane)
+                    val tabComponent = ButtonTabComponent(tabbedPane, toolWindowDisposable!!)
                     tabbedPane.setTabComponentAt(i, tabComponent)
                 }
+
                 toolWindowContent.setContent(tabbedPane)
-                service.addToolBar(toolWindowContent)
-//                toolWindowContent.componentOrientation = ComponentOrientation.RIGHT_TO_LEFT
-//                service.createToolbarPanel(toolWindowContent)
-                // Add a change listener to handle tab close events
+                toolWindowContent.toolbar = service.getToolBar().component
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
             } catch (e: Exception) {
                 thisLogger().error(e.stackTraceToString())
@@ -73,6 +74,11 @@ class ToolWindowHelper {
                     true
                 )
             )
+            setToolWindowMinWidth(toolWindow)
+        }
+
+        private fun setToolWindowMinWidth(toolWindow: ToolWindow) {
+            toolWindow.contentManager.getContent(0)?.component?.minimumSize?.width = 400
         }
 
         private fun getContentTab(
@@ -83,29 +89,31 @@ class ToolWindowHelper {
         ): Content {
             val contentTab = if (fileList!!.isEmpty()) {
                 ContentFactory.getInstance().createContent(
-                    moneyPennyToolWindow.getContent(),
+                    moneyPennyToolWindow.getContent(emptyList<Any>(), selectedText, "Prompt"),
                     "Prompt",
                     true,
                 )
             } else {
                 val expandedFileList = service.expandFolders(fileList)
+                val upperTabName = getDisplayName(expandedFileList)
                 ContentFactory.getInstance()
                     .createContent(
-                        moneyPennyToolWindow.getContent(expandedFileList, selectedText),
-                        getDisplayName(expandedFileList),
+                        moneyPennyToolWindow.getContent(expandedFileList, selectedText, upperTabName),
+                        upperTabName,
                         true
                     )
             }
             return contentTab
         }
 
-        fun getIcon(imageName: String): ImageIcon {
+        fun getIcon(imageName: String): Icon {
             try {
-                return ImageIcon(SendToPromptFileFolderTreeAction::class.java.getResource(imageName))
+                return IconLoader.getIcon(imageName, ToolWindowHelper::class.java)
             } catch (e: Exception) {
                 thisLogger().error(e.stackTraceToString())
             }
-            return ImageIcon()
+            // Return a default icon or null if the icon can't be loaded
+            return IconLoader.getIcon("/icons/defaultIcon.svg", ToolWindowHelper::class.java)
         }
 
         private fun addChangeListenerToTabbedPane(

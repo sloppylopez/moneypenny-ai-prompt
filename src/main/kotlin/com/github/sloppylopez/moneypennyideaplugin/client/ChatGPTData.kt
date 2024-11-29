@@ -6,7 +6,8 @@ data class ChatGptCompletion(
     val created: Long,
     val model: String,
     val choices: List<ChatGptChoice>,
-    val usage: ChatGptUsage
+    val usage: ChatGptUsage,
+    val error: String? = null
 )
 
 data class ChatGptChoice(

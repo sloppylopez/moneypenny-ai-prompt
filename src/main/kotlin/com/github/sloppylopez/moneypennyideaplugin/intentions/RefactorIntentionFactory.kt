@@ -13,7 +13,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 
 private const val CUSTOM_INTENTIONS = "Custom Intentions"
-private const val SEND_TO_MONEY_PENNY = "Send to Prompt"
+private const val SEND_TO_PROMPT = "Send to Prompt"
 
 @Service(Service.Level.PROJECT)
 class RefactorIntentionFactory(private val project: Project) {
@@ -25,7 +25,7 @@ class RefactorIntentionFactory(private val project: Project) {
 
             // Create a new IntentionAction for "MoneyPenny Refactor"
             val customIntention = object : IntentionAction {
-                override fun getText(): String = SEND_TO_MONEY_PENNY
+                override fun getText(): String = SEND_TO_PROMPT
 
                 override fun getFamilyName(): String = CUSTOM_INTENTIONS
 

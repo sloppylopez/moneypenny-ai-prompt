@@ -1,73 +1,86 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToInnerPanel
 import com.github.sloppylopez.moneypennyideaplugin.listeners.AncestorListener
 import com.github.sloppylopez.moneypennyideaplugin.managers.FileEditorManager
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
+import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
-import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
-import javax.swing.BoxLayout
-import javax.swing.JComponent
-import javax.swing.JPanel
-import javax.swing.JTabbedPane
+import javax.swing.*
 import javax.swing.event.ChangeListener
 
 class MoneyPennyToolWindow(
-    project: Project
-) {
+    private val project: Project
+) : Disposable {
 
     private val promptPanelFactory = project.service<PromptPanelFactory>()
     private val ancestorListener = project.service<AncestorListener>()
     private val fileEditorManager = project.service<FileEditorManager>()
     private val service = project.service<ProjectService>()
+    private val disposables = mutableListOf<Disposable>()
+    private var tabbedPane: JBTabbedPane? = null
 
     fun getContent(
         fileList: List<*>? = emptyList<Any>(),
-        contentPromptText: String? = null
+        contentPromptText: String? = null,
+        upperTabName: String? = null,
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(fileList!!, contentPromptText))
+            add(moneyPennyPromptPanel(fileList!!, contentPromptText, upperTabName))
         }
     }
 
     private fun moneyPennyPromptPanel(
-        fileList: List<*>, contentPromptText: String? = null
+        fileList: List<*>, contentPromptText: String? = null, upperTabName: String?
     ): JComponent {
         var file: File? = null
-        val tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
-        val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
+        tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
 
-        for (i in 0..tabCount) {
-            if (fileList.isNotEmpty()) {
-                file = service.readFile(fileList, i)
-            }
+        val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
+        for (tabCountIndex in 0..tabCount) {
+            val innerFile = if (fileList.isNotEmpty()) service.readFile(fileList, tabCountIndex) else null
+            val tabName = "${getNextTabName()}) ${innerFile?.name ?: "No File"}"
             val panel = JPanel(GridBagLayout())
 
-            val gridBagConstraints = GridBagConstraints()
-            gridBagConstraints.anchor = GridBagConstraints.NORTH
-            gridBagConstraints.insets = JBUI.insets(2)
-            val nestedPanel = JPanel(FlowLayout(FlowLayout.LEFT))
-            for (j in 1..3) {
-                val innerPanel = createInnerPanel(j, file, contentPromptText, nestedPanel, tabbedPane)
-//                innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
+            val gridBagConstraints = GridBagConstraints().apply {
+                anchor = GridBagConstraints.NORTH
+                insets = JBUI.insets(2)
+            }
+
+            val innerPanel = JPanel(BorderLayout())
+            for (innerPanelIndex in 1..3) {
+                addPromptsToInnerPanel(
+                    innerPanelIndex,
+                    innerFile,
+                    contentPromptText,
+                    tabCountIndex,
+                    innerPanel
+                )
+                innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
-                gridBagConstraints.gridy = j - 1
+                gridBagConstraints.gridy = innerPanelIndex - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-            service.setTabName(i, fileList, file, tabbedPane, panel, contentPromptText)
+            service.setTabName(tabCountIndex, fileList, innerFile, tabbedPane!!, panel, contentPromptText, tabName)
+            tabNameToInnerPanel[tabName] = innerPanel
         }
-        tabbedPane.addChangeListener(getChangeListener(tabbedPane))
-        tabbedPane.addAncestorListener(ancestorListener.getAncestorListener(tabbedPane))
+
+        tabbedPane!!.addChangeListener(getChangeListener(tabbedPane!!))
+        tabbedPane!!.addAncestorListener(ancestorListener.getAncestorListener(tabbedPane!!))
         val mainPanel = JPanel(BorderLayout())
-        mainPanel.add(tabbedPane, BorderLayout.CENTER)
+        tabbedPane!!.preferredSize = null
+        mainPanel.add(tabbedPane!!, BorderLayout.NORTH)
         return mainPanel
     }
 
@@ -80,28 +93,39 @@ class MoneyPennyToolWindow(
         }
     }
 
-    private fun createInnerPanel(
+    private fun addPromptsToInnerPanel(
         panelIndex: Int,
         file: File?,
         contentPromptText: String?,
-        nestedPanel: JPanel,
-        tabbedPane: JBTabbedPane
-    ): JPanel {
-        val innerPanel = JPanel()
-        if (panelIndex == 1) innerPanel.name = file?.canonicalPath ?: "Prompt"
+        tabCountIndex: Int,
+        innerPanel: JPanel
+    ) {
+        val canonicalPath = file?.canonicalPath
         innerPanel.layout = BoxLayout(innerPanel, BoxLayout.Y_AXIS)
         when (panelIndex) {
-            1 -> {
-                service.addPanelsToGlobalData(nestedPanel, innerPanel, tabbedPane)
-            }
-
+            1 -> service.addPanelsToGlobalData(innerPanel, innerPanel, tabbedPane!!)
             2 -> {
-                promptPanelFactory.promptPanel(innerPanel, file, contentPromptText)
-                service.invokeLater { fileEditorManager.openFileInEditor(file?.canonicalPath, contentPromptText) }
+                promptPanelFactory.promptPanel(innerPanel, file, contentPromptText, tabCountIndex)
+                service.invokeLater { fileEditorManager.openFileInEditor(canonicalPath, contentPromptText) }
             }
 
-//            3 -> comboBoxPanelFactory.comboBoxPanel(innerPanel, nestedPanel)
+            3 -> {
+                // Placeholder for additional functionality
+            }
         }
-        return innerPanel
+    }
+
+    private fun getNextTabName(): String {
+        return GlobalData.downerTabName++.toString()
+    }
+
+    override fun dispose() {
+        // Clear the content of tabbedPane if it exists
+        tabbedPane?.removeAll()
+        tabbedPane = null
+
+        // Dispose of other tracked disposables
+        disposables.forEach { Disposer.dispose(it) }
+        disposables.clear()
     }
 }

@@ -1,7 +1,7 @@
 package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.client.ChatGptMessage
-import com.github.sloppylopez.moneypennyideaplugin.global.GlobalData
+import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
@@ -36,12 +36,12 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
             editor
         )
         chatGPTService.sendChatPrompt(
-            getPrompt(selectedText), createCallback(file)
+            getPrompt(selectedText), createCallback(file), null, null
         ).whenComplete { _, _ ->
             progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
-
+    //This is for right click action only
     private fun getPrompt(selectedText: String?): String {
         val prePrompt = "Refactor code:\n"
         val postPrompt = "\nDRY it following best practices and using one-liners if possible"
@@ -66,10 +66,16 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
 
     private fun createCallback(file: VirtualFile): ChatGPTService.ChatGptChoiceCallback {
         return object : ChatGPTService.ChatGptChoiceCallback {
-            override fun onCompletion(choice: ChatGptMessage) {
+            override fun onCompletion(
+                choice: ChatGptMessage,
+                prompt: String,
+                upperTabName: String?,
+                promptList: List<String>?
+            ) {
                 try {
                     var content = choice.content
-                    if (GlobalData.role == "refactor-machine" && service.isCodeCommented(content)) {
+                    val role = GlobalData.role.split(" ")[1]
+                    if (role == "refactor-machine" && service.isCodeCommented(content)) {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {

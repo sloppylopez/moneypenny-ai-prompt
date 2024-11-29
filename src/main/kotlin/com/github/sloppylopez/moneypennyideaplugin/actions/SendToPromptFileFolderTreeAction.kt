@@ -18,7 +18,7 @@ class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction(
     }
 
     init {
-        templatePresentation.icon = AllIcons.Duplicates.SendToTheRight
+        templatePresentation.icon = AllIcons.Chooser.Right
         templatePresentation.text = "Send to Prompt"
     }
 

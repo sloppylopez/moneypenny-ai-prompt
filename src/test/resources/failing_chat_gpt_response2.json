@@ -1,0 +1,21 @@
+Topic: Code Refactoring
+Context: Refactoring the given code to improve readability and follow best practices.
+Intent: To improve the code using best practices and techniques.
+Named Entities: None
+Keywords: code, refactor, best practices, readability, one-liners, DRY
+Sentiment: Neutral
+
+Refactor Solution:
+```kotlin
+package com.github.sloppylopez.moneypennyideaplugin.gineapigs
+
+class StringsService {
+fun getPrimeNumbers(numbers: Array<Int>): List<Int> =
+numbers.filter { number ->
+number >= 2 && (2..number / 2).none { number % it == 0 }
+}
+}
+```
+
+Follow Up:
+"Can you explain the changes you made to the code and how it improves readability and follows best practices?"

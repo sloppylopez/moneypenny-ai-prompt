@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
+//    kotlin("plugin.serialization") version "1.6.0" // Kotlin Serialization support
 }
 
 group = properties("pluginGroup").get()
@@ -25,12 +26,15 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0-M1")
     testImplementation("org.mockito:mockito-core:5.4.0")
+    testImplementation("junit:junit:4.13.2")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
     implementation("com.google.api:gax:2.31.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
     implementation("org.jetbrains:annotations:23.0.0")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+//    implementation("org.openjfx:javafx:11")
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

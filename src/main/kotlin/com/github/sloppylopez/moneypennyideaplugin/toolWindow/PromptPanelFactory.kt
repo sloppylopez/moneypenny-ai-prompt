@@ -1,5 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
+import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.openapi.components.Service
@@ -7,6 +8,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
+import java.awt.BorderLayout
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
@@ -17,6 +19,7 @@ import java.io.File
 import java.nio.file.Files
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import javax.swing.UIManager
 
 
 @Service(Service.Level.PROJECT)
@@ -28,44 +31,52 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     private var prePromptTextArea: JTextArea? = JTextArea()
     private var contentPromptTextArea: JTextArea? = JTextArea()
     private var postPromptTextArea: JTextArea? = JTextArea()
-
+    //TODO pass an index here better
     fun promptPanel(
-        panel: JPanel,
+        innerPanel: JPanel,
         file: File?,
-        contentPromptText: String?
+        contentPromptText: String?,
+        tabCountIndex: Int
     ) {
         try {
             prePromptTextArea = textAreaFactory
-                .createDefaultTextArea("", 2, 79)
+                .createDefaultTextArea("", 2, 40)
+            prePromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
             contentPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "Paste text, drag a file, copy folder path, use Action, use Intention...",
-                    10,
-                    79
+                    8,
+                    40
                 )
             contentPromptTextArea?.name = "contentPromptTextArea"
+            contentPromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "",
-                    5,
-                    79,
+                    4,
+                    40,
                     "images/moneypenny-ai-mid.png"
                 )
+            postPromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
 
             if (contentPromptTextArea != null) {
+                innerPanel.add(
+                    ChatWindowContent(service.getProject()!!, tabCountIndex),
+                    BorderLayout.SOUTH
+                )
                 //Add radio buttons
-                radioButtonFactory.radioButtonsPanel(panel, prePromptTextArea!!)
+                radioButtonFactory.radioButtonsPanel(innerPanel, prePromptTextArea!!)
                 val prePromptScrollPane = JBScrollPane(prePromptTextArea)
-                panel.add(prePromptScrollPane)
+                innerPanel.add(prePromptScrollPane, BorderLayout.SOUTH)
                 //Set text in content prompt text area, then add drop target
                 val contentPromptScrollPane = JBScrollPane(contentPromptTextArea)
                 contentPromptTextArea?.text = service.getText(file, contentPromptText)
-                panel.add(contentPromptScrollPane)
+                innerPanel.add(contentPromptScrollPane, BorderLayout.SOUTH)
                 contentPromptTextArea?.dropTarget = DropTarget(contentPromptTextArea, this)
                 //Add checkboxes
                 val postPromptScrollPane = JBScrollPane(postPromptTextArea)
-                panel.add(postPromptScrollPane)
-                checkBoxFactory.checkboxesPanel(panel, postPromptTextArea!!)
+                innerPanel.add(postPromptScrollPane, BorderLayout.SOUTH)
+                checkBoxFactory.checkboxesPanel(innerPanel, postPromptTextArea!!)
             }
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
@@ -90,9 +101,9 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 val project = service.getProject()
                 val expandedFileList = service.expandFolders(fileList)
                 addTabbedPaneToToolWindow(project!!, expandedFileList)
-                expandedFileList.forEach {
-                    val fileContents = String(Files.readAllBytes(File(it.path).toPath()))
-                    service.highlightTextInEditor(fileContents)
+                expandedFileList.forEach { file ->
+                    val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
+                    service.highlightTextInAllEditors(fileContents) // Updated to use new method
                 }
             }
         } catch (e: Exception) {
