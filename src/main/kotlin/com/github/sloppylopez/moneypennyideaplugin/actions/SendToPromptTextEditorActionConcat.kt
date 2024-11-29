@@ -11,20 +11,17 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
 @Service(Service.Level.PROJECT)
-class SendToPromptTextEditorAction(project: Project) : AnAction() {
+class SendToPromptTextEditorActionConcat(project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
 
     init {
         templatePresentation.icon = AllIcons.Chooser.Right
-        templatePresentation.text = "Send to Prompt"
+        templatePresentation.text = "Send To Prompt Concat"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-         val file = getFile(e) ?: return
+        val file = getFile(e) ?: return
         val editor = getEditor(e) ?: return
-        service.getSelectedTextFromEditor(
-            editor
-        )
         service.addSelectedTextToTabbedPane(
             editor,
             service.virtualFileToFile(file)

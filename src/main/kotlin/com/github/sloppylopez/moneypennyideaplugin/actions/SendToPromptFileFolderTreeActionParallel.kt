@@ -9,17 +9,17 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 
 @Service(Service.Level.PROJECT)
-class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction() {
+class SendToPromptFileFolderTreeActionParallel(private var project: Project) : AnAction() {
     private val promptPanelFactory = project.service<PromptPanelFactory>()
 
     companion object {
         private const val ACTION_ID =
-            "com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction"
+            "com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeActionParallel"
     }
 
     init {
         templatePresentation.icon = AllIcons.Chooser.Right
-        templatePresentation.text = "Send to Prompt"
+        templatePresentation.text = "Send Folder to Prompt"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -45,12 +45,12 @@ class SendToPromptFileFolderTreeAction(private var project: Project) : AnAction(
         if (existingAction != null) {
             actionManager.unregisterAction(ACTION_ID)
         }
-        val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
-        actionManager.registerAction(ACTION_ID, sendToPromptFileFolderTreeAction)
+        val sendToPromptFileFolderTreeActionParallel = SendToPromptFileFolderTreeActionParallel(project)
+        actionManager.registerAction(ACTION_ID, sendToPromptFileFolderTreeActionParallel)
         val popupMenu = actionManager.getAction("ProjectViewPopupMenu")
         val defaultActionGroup = popupMenu as? DefaultActionGroup
         defaultActionGroup?.addSeparator()
-        defaultActionGroup?.add(sendToPromptFileFolderTreeAction, Constraints.LAST)
+        defaultActionGroup?.add(sendToPromptFileFolderTreeActionParallel, Constraints.LAST)
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {

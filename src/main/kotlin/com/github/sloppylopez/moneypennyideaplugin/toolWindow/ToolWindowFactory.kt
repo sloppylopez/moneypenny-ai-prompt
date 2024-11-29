@@ -1,7 +1,8 @@
 package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction
-import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeAction
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeActionConcat
+import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeActionParallel
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.github.sloppylopez.moneypennyideaplugin.intentions.RefactorIntentionFactory
 import com.intellij.openapi.application.ApplicationActivationListener
@@ -25,17 +26,10 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
         toolWindow: ToolWindow
     ) {
         try {
-            val sendToPromptFileFolderTreeAction = SendToPromptFileFolderTreeAction(project)
-            sendToPromptFileFolderTreeAction.registerFolderTreeAction()
-//            val sendToPromptTextEditorAction = SendToPromptTextEditorAction(project)
-//            sendToPromptTextEditorAction.registerFileEditorAction()
-//            val intentionManager = IntentionManager.getInstance()
-//            if (editor != null) {
-//                val psiFile = PsiManager.getInstance(project).findFile(editor)
-//                if (psiFile != null) {
-//                    intentionManager.addAction(ChatGptQuickFix())
-//                }
-//            }
+            val sendToPromptFileFolderTreeActionParallel = SendToPromptFileFolderTreeActionParallel(project)
+            sendToPromptFileFolderTreeActionParallel.registerFolderTreeAction()
+            val sendToPromptFileFolderTreeActionConcat = SendToPromptFileFolderTreeActionConcat(project)
+            sendToPromptFileFolderTreeActionConcat.registerFolderTreeAction()
             val popUpHooverAction = PopUpHooverAction()
             popUpHooverAction.addActionsToEditor()
             val refactorIntentionFactory = project.service<RefactorIntentionFactory>()

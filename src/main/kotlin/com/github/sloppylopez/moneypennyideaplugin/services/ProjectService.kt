@@ -162,7 +162,7 @@ class ProjectService {
 
     private fun createCustomIcon(imageName: String): Icon {
         // Code to generate a random image and create an icon from it
-        return ImageIcon(SendToPromptFileFolderTreeAction::class.java.getResource(imageName))
+        return ImageIcon(SendToPromptFileFolderTreeActionParallel::class.java.getResource(imageName))
     }
 
     fun showMessage(
@@ -177,11 +177,11 @@ class ProjectService {
         val editor = getCurrentEditor()
         editor?.let {
             val document = editor.document
-            val normalizedContentPromptText = contentPromptText.replace("\r\n", "\n")
-            val textOffset = document.text.indexOf(normalizedContentPromptText)
+            val normalizedCarryReturnsContentPromptText = contentPromptText.replace("\r\n", "\n")
+            val textOffset = document.text.indexOf(normalizedCarryReturnsContentPromptText)
             if (textOffset != -1) {
                 editor.caretModel.moveToOffset(textOffset)
-                editor.selectionModel.setSelection(textOffset, textOffset + normalizedContentPromptText.length)
+                editor.selectionModel.setSelection(textOffset, textOffset + normalizedCarryReturnsContentPromptText.length)
             }
         }
     }
@@ -571,7 +571,7 @@ class ProjectService {
             actionGroup,
             true
         )
-        actionGroup.add(SendToPromptTextEditorAction(project))
+        actionGroup.add(SendToPromptTextEditorActionParallel(project))
         actionGroup.add(AddTextAction(project))
         actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))

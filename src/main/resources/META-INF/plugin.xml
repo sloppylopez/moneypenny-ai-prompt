@@ -3,51 +3,36 @@
     <id>com.github.sloppylopez.moneypennyideaplugin</id>
     <name>MoneyPenny AI</name>
     <vendor>sloppylopez</vendor>
-    <description>MoneyPenny AI plugin for IntelliJ IDEA for PDD, Prompt Driven Development, this whole plugins was
-        developed using ChatGPT,
-        now we can leverage that with this plugin
-    </description>
+    <description>MoneyPenny AI plugin for IntelliJ IDEA for PDD (Prompt Driven Development). Developed with ChatGPT to help developers integrate AI into their workflows.</description>
     <!-- Add change notes for each version -->
     <change-notes><![CDATA[
-        <p>Initial release of MoneyPenny AI plugin for IntelliJ IDEA</p>
+        <p>Version 1.1.0 updates:</p>
+        <ul>
+            <li>Improved resource management with Disposable implementation.</li>
+            <li>Enhanced compatibility with IntelliJ IDEA lifecycle.</li>
+            <li>Bug fixes and performance improvements.</li>
+        </ul>
     ]]></change-notes>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <idea-version since-build="242"/>
 
-    <!--    <depends>com.intellij.modules.java</depends>-->
-
-    <resource-bundle>messages.Bundle</resource-bundle>
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-
-    <!--
-      Declare dependency on IntelliJ module `com.intellij.modules.platform` which provides the following:
-      Messaging, UI Themes, UI Components, Files, Documents, Actions, Components, Services, Extensions, Editors
-      More info: https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-    -->
+    <!-- Dependencies -->
     <depends>com.intellij.modules.platform</depends>
-    <!-- Markdown plugin. -->
     <depends>org.intellij.plugins.markdown</depends>
     <depends>com.intellij.modules.java</depends>
 
+    <!-- Resource Bundle -->
+    <resource-bundle>messages.Bundle</resource-bundle>
+
+    <!-- Tool Window Registration -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.sloppylopez.moneypennyideaplugin.toolWindow.ToolWindowFactory"
                     id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
     </extensions>
 
-    <!--    <actions>-->
-    <!--        <action id="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
-    <!--                class="com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction"-->
-    <!--                text="MoneyPenny AI Prompt"-->
-    <!--                description="Open MoneyPenny AI Prompt"-->
-    <!--                icon="/images/MoneyPenny-Icon_13x13-alpha.png">-->
-    <!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
-    <!--        </action>-->
-    <!--    </actions>-->
-
+    <!-- Application Listeners -->
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
-
-
 </idea-plugin>

@@ -80,13 +80,16 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
             progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
-
+    //this code is too ugly and too abstract
     private fun getGroupedPrompt(
         prompt: List<String>,
         role: String,
         promptMap: Map<String, List<String>>
     ): String {
         var currentPrompt = prompt.toString()
+        if (promptMap.isEmpty()) {
+            return ""
+        }
         promptMap.forEach { (tabName, promptList) ->
             run {
                 if (!promptList[0].contains("Refactor Code:")) {
@@ -99,7 +102,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
             }
         }
         currentPrompt = currentPrompt.replace("\r\n", "\n")
-        return currentPrompt + "\n"//This fixes text vertical indentation problem
+        return currentPrompt
     }
 
     private fun getPrompt(

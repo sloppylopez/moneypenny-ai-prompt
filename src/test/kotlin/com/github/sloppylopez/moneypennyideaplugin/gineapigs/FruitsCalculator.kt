@@ -7,30 +7,18 @@ class FruitsCalculator {
             "avocado", "blueberry", "pear", "pineapple", "peach"
         )
 
-        // Initialize categories
-        val shortWords = mutableListOf<String>()
-        val mediumWords = mutableListOf<String>()
-        val longWords = mutableListOf<String>()
+        val (shortWords, mediumWords, longWords) = strings.groupBy { when {
+            it.length <= 5 -> "Short"
+            it.length in 6..8 -> "Medium"
+            else -> "Long"
+        } }
 
-        // Initialize counters
-        var shortWordsCount = 0
-        var mediumWordsCount = 0
-        var longWordsCount = 0
+        val (shortWordsCount, mediumWordsCount, longWordsCount) = mapOf(
+            "Short" to shortWords.size,
+            "Medium" to mediumWords.size,
+            "Long" to longWords.size
+        )
 
-        for (word in strings) {
-            if (word.length <= 5) {
-                shortWords.add(word)
-                shortWordsCount++
-            } else if (word.length in 6..8) {
-                mediumWords.add(word)
-                mediumWordsCount++
-            } else if (word.length > 8) {
-                longWords.add(word)
-                longWordsCount++
-            }
-        }
-
-        // Print results
         println("Short words: $shortWords")
         println("Short words count: $shortWordsCount")
 
@@ -40,5 +28,4 @@ class FruitsCalculator {
         println("Long words: $longWords")
         println("Long words count: $longWordsCount")
     }
-
 }

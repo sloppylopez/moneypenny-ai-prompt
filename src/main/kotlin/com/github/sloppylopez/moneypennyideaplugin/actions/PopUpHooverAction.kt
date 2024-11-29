@@ -20,9 +20,10 @@ class PopUpHooverAction : ActionGroup() {
 
     // Return the actions for the submenu
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-        val project = getProjectFromEvent(e)
+        val project = getProjectFromEvent(e)!!
         return arrayOf(
-            SendToPromptTextEditorAction(project!!),
+            SendToPromptTextEditorActionConcat(project),
+            SendToPromptTextEditorActionParallel(project),
             DRYSelectionAction(project)
         )//TODO Add more actions here
     }
