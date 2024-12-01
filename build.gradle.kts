@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
-//    kotlin("plugin.serialization") version "1.6.0" // Kotlin Serialization support
+    kotlin("plugin.serialization") version "1.9.10" // Kotlin Serialization support
 }
 
 group = properties("pluginGroup").get()
@@ -33,6 +33,7 @@ dependencies {
     implementation("com.google.api:gax:2.58.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
     implementation("org.jetbrains:annotations:23.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") // Use the latest version
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
 //    implementation("org.openjfx:javafx:11")
 }

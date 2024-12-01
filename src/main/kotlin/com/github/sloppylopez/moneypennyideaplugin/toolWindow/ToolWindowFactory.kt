@@ -17,6 +17,7 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import javax.swing.SwingUtilities
 
 class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
+
     override fun applicationActivated(ideFrame: IdeFrame) {
         thisLogger().info("App activated")
     }
@@ -26,25 +27,49 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
         toolWindow: ToolWindow
     ) {
         try {
+            // Register actions
+            registerActions(project)
+
+            // Defer RefactorIntentionFactory logic to after initialization
+            deferIntentionSetup(project)
+
+            // Add the tabbed pane to the tool window
+            addTabbedPaneToToolWindow(project)
+
+        } catch (e: Exception) {
+            thisLogger().error("Error in createToolWindowContent: ${e.stackTraceToString()}")
+        }
+    }
+
+    private fun registerActions(project: Project) {
+        try {
             val sendToPromptFileFolderTreeActionParallel = SendToPromptFileFolderTreeActionParallel(project)
             sendToPromptFileFolderTreeActionParallel.registerFolderTreeAction()
+
             val sendToPromptFileFolderTreeActionConcat = SendToPromptFileFolderTreeActionConcat(project)
             sendToPromptFileFolderTreeActionConcat.registerFolderTreeAction()
+
             val popUpHooverAction = PopUpHooverAction()
             popUpHooverAction.addActionsToEditor()
-            val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
-            SwingUtilities.invokeLater {
-                ApplicationManager.getApplication().invokeLater(
-                    {
+        } catch (e: Exception) {
+            thisLogger().error("Error registering actions: ${e.stackTraceToString()}")
+        }
+    }
+
+    private fun deferIntentionSetup(project: Project) {
+        SwingUtilities.invokeLater {
+            ApplicationManager.getApplication().invokeLater(
+                {
+                    try {
+                        val refactorIntentionFactory = project.service<RefactorIntentionFactory>()
                         refactorIntentionFactory.removeIntentionsFromEditor()
                         refactorIntentionFactory.addIntentionToEditor()
-                    },
-                    ModalityState.any()
-                )
-            }
-            addTabbedPaneToToolWindow(project)
-        } catch (e: Exception) {
-            thisLogger().error(e.stackTraceToString())
+                    } catch (e: Exception) {
+                        thisLogger().error("Error in RefactorIntentionFactory setup: ${e.stackTraceToString()}")
+                    }
+                },
+                ModalityState.any()
+            )
         }
     }
 

@@ -26,7 +26,7 @@ class SendToPromptFileFolderTreeActionConcat(private var project: Project) : AnA
         try {
             val selectedFiles = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY)?.toList() // Convert array to list
             if (!selectedFiles.isNullOrEmpty()) {
-                promptPanelFactory.openFilesAndSendContentToPrompt(
+                promptPanelFactory.openFilesAndSendContentToPromptConcat(
                     selectedFiles
                 )
             }

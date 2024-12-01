@@ -94,7 +94,6 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
         }
     }
 
-    //TODO this is too clever, split in 2
     fun openFilesAndSendContentToPrompt(fileList: List<*>? = null) {
         try {
             if (!fileList.isNullOrEmpty()) {
@@ -103,6 +102,24 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
                 addTabbedPaneToToolWindow(project!!, expandedFileList)
                 expandedFileList.forEach { file ->
                     val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
+                    service.highlightTextInAllEditors(fileContents) // Updated to use new method
+                }
+            }
+        } catch (e: Exception) {
+            thisLogger().error(e.stackTraceToString())
+        }
+    }
+
+    fun openFilesAndSendContentToPromptConcat(fileList: List<*>? = null) {
+        try {
+            if (!fileList.isNullOrEmpty()) {
+                val project = service.getProject()
+                val expandedFileList = service.expandFolders(fileList)
+                addTabbedPaneToToolWindow(project!!, expandedFileList)
+                thisLogger().info(expandedFileList.toString())
+                expandedFileList.forEach { file ->
+                    val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
+                    thisLogger().info(fileContents)
                     service.highlightTextInAllEditors(fileContents) // Updated to use new method
                 }
             }

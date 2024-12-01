@@ -48,7 +48,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         prompt = getGroupedPrompt(
                             promptList, role, promptMap
                         )//TODO maybe adding 1 extra \n here the indenting poblem we have
-                        println("prompt: $prompt")
+                        println("Grouped prompt: $prompt")
                         chatGPTService.sendChatPrompt(
                             prompt, createCallback(tabName), upperTabName, promptList
                         ).whenComplete { _, _ ->

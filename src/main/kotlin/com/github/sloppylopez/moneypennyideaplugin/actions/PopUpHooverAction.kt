@@ -2,7 +2,6 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.getIcon
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 
 class PopUpHooverAction : ActionGroup() {
