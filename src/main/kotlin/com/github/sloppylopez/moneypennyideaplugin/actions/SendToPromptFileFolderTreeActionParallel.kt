@@ -25,7 +25,8 @@ class SendToPromptFileFolderTreeActionParallel(private var project: Project) : A
             val selectedFiles = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY)?.toList() // Convert array to list
             if (!selectedFiles.isNullOrEmpty()) {
                 promptPanelFactory.openFilesAndSendContentToPrompt(
-                    selectedFiles
+                    selectedFiles,
+                    false
                 )
             }
         } catch (e: Exception) {

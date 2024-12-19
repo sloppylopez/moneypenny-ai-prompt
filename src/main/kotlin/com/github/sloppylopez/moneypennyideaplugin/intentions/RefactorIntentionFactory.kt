@@ -37,7 +37,8 @@ class RefactorIntentionFactory(private val project: Project) {
                     )
                     service.addSelectedTextToTabbedPane(
                         editor,
-                        service.psiFileToFile(file!!)
+                        service.psiFileToFile(file!!),
+                        false//TODO check  what to do with this one
                     )
                 }
 

@@ -21,7 +21,7 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
     private val copiedMessage = "Copied to clipboard: "
-    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
+//    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
 
     init {
         templatePresentation.icon = AllIcons.Diff.MagicResolve
@@ -31,14 +31,14 @@ class DRYSelectionAction(private var project: Project) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val file = getFile(e) ?: return
         val editor = getEditor(e) ?: return
-        val jProgressBar = progressBarFactory.getProgressBar()
+//        val jProgressBar = progressBarFactory.getProgressBar()
         val selectedText = service.getSelectedTextFromEditor(
             editor
         )
         chatGPTService.sendChatPrompt(
             getPrompt(selectedText), createCallback(file), null, null
         ).whenComplete { _, _ ->
-            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
     //This is for right click action only

@@ -31,7 +31,8 @@ class ToolWindowHelper {
         fun addTabbedPaneToToolWindow(
             project: Project,
             fileList: List<*>? = emptyList<Any>(),
-            selectedText: @NlsSafe String? = null
+            selectedText: @NlsSafe String? = null,
+            isConcat: Boolean = false
         ) {
             try {
                 val service = project.service<ProjectService>()
@@ -47,7 +48,8 @@ class ToolWindowHelper {
                 }
 
                 toolWindow.setIcon(getIcon("/images/moneypenny-logo-main-alpha.png"))
-                val contentTab: Content = getContentTab(fileList, moneyPennyToolWindow!!, service, selectedText)
+                val contentTab: Content =
+                    getContentTab(fileList, moneyPennyToolWindow!!, service, selectedText, isConcat)
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
 
                 tabbedPane.selectedIndex = tabCounter - 1
@@ -85,23 +87,25 @@ class ToolWindowHelper {
             fileList: List<*>?,
             moneyPennyToolWindow: MoneyPennyToolWindow,
             service: ProjectService,
-            selectedText: @NlsSafe String? = null
+            selectedText: @NlsSafe String? = null,
+            isConcat: Boolean
         ): Content {
+            val contentFactory = ContentFactory.getInstance()
             val contentTab = if (fileList!!.isEmpty()) {
-                ContentFactory.getInstance().createContent(
+                contentFactory.createContent(
                     moneyPennyToolWindow.getContent(emptyList<Any>(), selectedText, "Prompt"),
                     "Prompt",
-                    true,
+                    isConcat,
                 )
             } else {
                 val expandedFileList = service.expandFolders(fileList)
                 val upperTabName = getDisplayName(expandedFileList)
-                ContentFactory.getInstance()
-                    .createContent(
-                        moneyPennyToolWindow.getContent(expandedFileList, selectedText, upperTabName),
-                        upperTabName,
-                        true
-                    )
+                contentFactory.createContent(
+                    moneyPennyToolWindow.getContent(expandedFileList, selectedText, upperTabName, isConcat),
+                    upperTabName,
+                    isConcat
+                )
+
             }
             return contentTab
         }

@@ -27,7 +27,8 @@ class SendToPromptTextEditorActionParallel(project: Project) : AnAction() {
         )
         service.addSelectedTextToTabbedPane(
             editor,
-            service.virtualFileToFile(file)
+            service.virtualFileToFile(file),
+            false
         )
     }
 

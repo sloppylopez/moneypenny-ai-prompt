@@ -1,5 +1,3 @@
-package com.github.sloppylopez.moneypennyideaplugin.gineapigs
-
 class FruitsCalculator {
     fun calculate() {
         val strings = listOf(
@@ -8,24 +6,21 @@ class FruitsCalculator {
         )
 
         val (shortWords, mediumWords, longWords) = strings.groupBy { when {
-            it.length <= 5 -> "Short"
-            it.length in 6..8 -> "Medium"
-            else -> "Long"
-        } }
+                it.length <= 5 -> "Short"
+                it.length in 6..8 -> "Medium"
+                else -> "Long"
+            }
+        }.values
 
-        val (shortWordsCount, mediumWordsCount, longWordsCount) = mapOf(
-            "Short" to shortWords.size,
-            "Medium" to mediumWords.size,
-            "Long" to longWords.size
-        )
+        val (shortWordsCount, mediumWordsCount, longWordsCount) = listOf(shortWords, mediumWords, longWords).map { it.size }
 
-        println("Short words: $shortWords")
-        println("Short words count: $shortWordsCount")
+        fun printInfo(words: List<String>, count: Int) {
+            println("Words: $words")
+            println("Words count: $count")
+        }
 
-        println("Medium words: $mediumWords")
-        println("Medium words count: $mediumWordsCount")
-
-        println("Long words: $longWords")
-        println("Long words count: $longWordsCount")
+        printInfo(shortWords, shortWordsCount)
+        printInfo(mediumWords, mediumWordsCount)
+        printInfo(longWords, longWordsCount)
     }
 }

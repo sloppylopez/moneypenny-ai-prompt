@@ -24,7 +24,8 @@ class SendToPromptTextEditorActionConcat(project: Project) : AnAction() {
         val editor = getEditor(e) ?: return
         service.addSelectedTextToTabbedPane(
             editor,
-            service.virtualFileToFile(file)
+            service.virtualFileToFile(file),
+            true
         )
     }
 

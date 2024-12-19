@@ -89,17 +89,18 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
 
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             openFilesAndSendContentToPrompt(
-                transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>,
+                false
             )
         }
     }
 
-    fun openFilesAndSendContentToPrompt(fileList: List<*>? = null) {
+    fun openFilesAndSendContentToPrompt(fileList: List<*>? = null, isConcat: Boolean) {
         try {
             if (!fileList.isNullOrEmpty()) {
                 val project = service.getProject()
                 val expandedFileList = service.expandFolders(fileList)
-                addTabbedPaneToToolWindow(project!!, expandedFileList)
+                addTabbedPaneToToolWindow(project!!, expandedFileList, null, isConcat)
                 expandedFileList.forEach { file ->
                     val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
                     service.highlightTextInAllEditors(fileContents) // Updated to use new method
@@ -109,22 +110,22 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             thisLogger().error(e.stackTraceToString())
         }
     }
-
-    fun openFilesAndSendContentToPromptConcat(fileList: List<*>? = null) {
-        try {
-            if (!fileList.isNullOrEmpty()) {
-                val project = service.getProject()
-                val expandedFileList = service.expandFolders(fileList)
-                addTabbedPaneToToolWindow(project!!, expandedFileList)
-                thisLogger().info(expandedFileList.toString())
-                expandedFileList.forEach { file ->
-                    val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
-                    thisLogger().info(fileContents)
-                    service.highlightTextInAllEditors(fileContents) // Updated to use new method
-                }
-            }
-        } catch (e: Exception) {
-            thisLogger().error(e.stackTraceToString())
-        }
-    }
+//    //TODO this is repeated code
+//    fun openFilesAndSendContentToPromptConcat(fileList: List<*>? = null) {
+//        try {
+//            if (!fileList.isNullOrEmpty()) {
+//                val project = service.getProject()
+//                val expandedFileList = service.expandFolders(fileList)
+//                addTabbedPaneToToolWindow(project!!, expandedFileList, null, false)
+//                thisLogger().info(expandedFileList.toString())
+//                expandedFileList.forEach { file ->
+//                    val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
+////                    thisLogger().info(fileContents)
+//                    service.highlightTextInAllEditors(fileContents) // Updated to use new method
+//                }
+//            }
+//        } catch (e: Exception) {
+//            thisLogger().error(e.stackTraceToString())
+//        }
+//    }
 }

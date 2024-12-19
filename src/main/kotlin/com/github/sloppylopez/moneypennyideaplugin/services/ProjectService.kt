@@ -4,7 +4,6 @@ import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
 import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.downerTabName
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToFilePathMap
@@ -317,23 +316,37 @@ class ProjectService {
         contentPromptText: String?,
         tabName: String
     ) {
+        // Always add the tab
+        tabbedPane.addTab(tabName, panel)
+
+        // If we have a file and it's within the fileList bounds, set file-based metadata
         if (i < fileList.size && file != null) {
-            tabbedPane.addTab(tabName, panel)
             tabNameToFilePathMap[tabName] = file.canonicalPath
-            if (contentPromptText != null) {//TODO I think this needs to me moved outside of this if statement
+            if (contentPromptText != null) {
                 tabNameToContentPromptTextMap[tabName] = contentPromptText
             } else {
                 tabNameToContentPromptTextMap[tabName] = file.readText()
             }
         } else {
-            tabbedPane.addTab(tabName, panel)
+            // If we don't have a file (e.g. concat mode), still store the contentPromptText if available
+            if (contentPromptText != null) {
+                tabNameToContentPromptTextMap[tabName] = contentPromptText
+            } else {
+                // Optionally, set it to an empty string or skip altogether if not needed.
+                tabNameToContentPromptTextMap[tabName] = ""
+            }
         }
 
-        if (contentPromptText != null && file != null) {
-            val currentTabName = "$downerTabName) ${file.name}"
-            tabNameToContentPromptTextMap[currentTabName] = contentPromptText
-        }
+        // The following block attempts to set content again based on file and contentPromptText
+        // but is redundant and can cause confusion, especially in concat mode.
+        // Remove or revise it if it's not absolutely necessary.
+        //
+        // if (contentPromptText != null && file != null) {
+        //     val currentTabName = "$downerTabName) ${file.name}"
+        //     tabNameToContentPromptTextMap[currentTabName] = contentPromptText
+        // }
     }
+
 
     fun getProject(): Project? {
         return ProjectManager.getInstance().openProjects.firstOrNull()
@@ -376,14 +389,15 @@ class ProjectService {
         }
     }
 
-    fun addSelectedTextToTabbedPane(editor: Editor?, file: File?) {
+    fun addSelectedTextToTabbedPane(editor: Editor?, file: File?, isConcat: Boolean) {
         try {
             val selectedTextFromEditor = getSelectedTextFromEditor(editor)
             if (!selectedTextFromEditor.isNullOrEmpty()) {
                 addTabbedPaneToToolWindow(
                     this.getProject()!!,
                     listOf(file),
-                    selectedTextFromEditor
+                    selectedTextFromEditor,
+                    isConcat
                 )
             }
         } catch (e: Exception) {

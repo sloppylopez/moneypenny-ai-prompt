@@ -20,7 +20,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
-    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
+//    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
     private val copiedMessage = "Copied to clipboard: "
 
     init {
@@ -30,10 +30,10 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
-        val jProgressBar = progressBarFactory.getProgressBar()
+//        val jProgressBar = progressBarFactory.getProgressBar()
         var prompt = ""
         try {
-            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
 
             val role = GlobalData.role.split(" ")[1]
@@ -75,7 +75,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
         } finally {
-            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
 

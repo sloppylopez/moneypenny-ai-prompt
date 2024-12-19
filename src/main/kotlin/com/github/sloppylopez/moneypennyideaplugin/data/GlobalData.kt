@@ -15,6 +15,7 @@ object GlobalData {
     val tabNameToFilePathMap = mutableMapOf<String, String>()
     val tabNameToContentPromptTextMap = mutableMapOf<String, String>()
 //    val upperTabNameToTimeLine = mutableMapOf<String, JPanel>()
+    val tabNameToUpperTabNameMap = mutableMapOf<String, String>()
     val tabNameToInnerPanel = mutableMapOf<String, JPanel>()
     val prompts = mutableMapOf<String, Map<String, List<String>>>()
     val apiKey: String? = System.getenv("OPENAI_API_KEY")

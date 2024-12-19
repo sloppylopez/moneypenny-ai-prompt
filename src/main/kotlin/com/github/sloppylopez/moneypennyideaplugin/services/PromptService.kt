@@ -1,7 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToInnerPanel
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -37,17 +36,15 @@ class PromptService(project: Project) {
                 for ((tabbedPaneIndex, tabbedPane) in nestedJBTabbedPanes.withIndex()) {
                     for (tabIndex in 0 until tabbedPane.tabCount) {
                         val tabComponents =
-                            (tabbedPane.getComponentAt(tabIndex) as? Container)?.components?.firstOrNull() as? Container
+                            (tabbedPane.getComponentAt(tabIndex) as? Container)?.components[1] as? Container//TODO this code is flaky
                         val tabName = tabbedPane.getTitleAt(tabIndex)
-                        val upperTabName = try {
-                            (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as? JBTabbedPane)
-                                ?.getTitleAt(tabbedPaneIndex) ?: ""
-                        } catch (e: Exception) {
-                            logger.warn("Failed to resolve upperTabName: ${e.message}")
-                            ""
-                        }
 
+                        // Retrieve upperTabName directly from the global map
+                        val upperTabName = GlobalData.tabNameToUpperTabNameMap[tabName] ?: ""
+
+                        logger.info("Processing tabIndex=$tabIndex with tabName='$tabName' and upperTabName='$upperTabName'")
                         tabComponents?.components?.forEach { tabComponent ->
+//                            logger.debug("Extracting prompt info from tabComponent: ${tabComponent.javaClass.name}")
                             getPromptInfo(tabComponent, tabIndex, tabName, upperTabName)
                         }
                     }
