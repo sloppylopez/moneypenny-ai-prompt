@@ -6,10 +6,10 @@ class FruitsCalculator {
         )
 
         val (shortWords, mediumWords, longWords) = strings.groupBy { when {
-                it.length <= 5 -> "Short"
-                it.length in 6..8 -> "Medium"
-                else -> "Long"
-            }
+            it.length <= 5 -> "Short"
+            it.length in 6..8 -> "Medium"
+            else -> "Long"
+        }
         }.values
 
         val (shortWordsCount, mediumWordsCount, longWordsCount) = listOf(shortWords, mediumWords, longWords).map { it.size }

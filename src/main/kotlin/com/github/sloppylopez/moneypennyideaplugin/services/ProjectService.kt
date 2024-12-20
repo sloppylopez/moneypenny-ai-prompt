@@ -4,7 +4,6 @@ import com.github.sloppylopez.moneypennyideaplugin.Bundle
 import com.github.sloppylopez.moneypennyideaplugin.actions.*
 import com.github.sloppylopez.moneypennyideaplugin.components.ChatWindowContent
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.role
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToContentPromptTextMap
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToFilePathMap
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
@@ -180,7 +179,10 @@ class ProjectService {
             val textOffset = document.text.indexOf(normalizedCarryReturnsContentPromptText)
             if (textOffset != -1) {
                 editor.caretModel.moveToOffset(textOffset)
-                editor.selectionModel.setSelection(textOffset, textOffset + normalizedCarryReturnsContentPromptText.length)
+                editor.selectionModel.setSelection(
+                    textOffset,
+                    textOffset + normalizedCarryReturnsContentPromptText.length
+                )
             }
         }
     }
@@ -470,7 +472,7 @@ class ProjectService {
                     followUpQuestionLast.contains("Next Follow-Up Question:", true)) &&*/
             GlobalData.followUpActive
         ) {
-            component.addElement("$role: -> $followUpQuestionLast")
+//            component.addElement("$role: -> $followUpQuestionLast")
         }
     }
 
@@ -493,7 +495,8 @@ class ProjectService {
                 }
                 if (parentTabName != null) {
                     component.addElement("${GlobalData.userRole}:\n${promptList!!.joinToString("\n")}")
-                    component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")
+//                    component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")//TODO, why drop last here? I think this is causing bugs
+                    component.addElement("$currentRole:\n${text.split("\n")}")
 //                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
 //                    timeLine.addPointInTimeLine(
 //                        Event(

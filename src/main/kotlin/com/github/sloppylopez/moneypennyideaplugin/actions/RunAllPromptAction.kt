@@ -5,7 +5,6 @@ import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -15,12 +14,14 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
+import java.io.FileNotFoundException
 
 class RunAllPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
-//    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
+
+    //    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
     private val copiedMessage = "Copied to clipboard: "
 
     init {
@@ -147,19 +148,26 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {
-                        service.copyToClipboard(content)
-                        service.showNotification(
-                            copiedMessage, content, NotificationType.INFORMATION
-                        )
-                        if (tabName.split(")")[1] != "No File") {
-                            try {
-//                                lastCode[tabName] = content
-                                val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
-                                service.modifySelectedTextInEditorByFile(
-                                    content, service.fileToVirtualFile(file)!!
-                                )
-                            } catch (e: Exception) {
-                                thisLogger().error(e.stackTraceToString())
+                        try {
+                            service.copyToClipboard(content)
+                            service.showNotification(
+                                copiedMessage, content, NotificationType.INFORMATION
+                            )
+                            val validTabName = tabName.takeIf { it.split(")")[1] != "No File" }
+
+                            val pathname = GlobalData.tabNameToFilePathMap[validTabName]
+                                ?: throw FileNotFoundException("Path not found for tab: $validTabName")
+
+                            if (pathname.isEmpty()) {
+                                throw FileNotFoundException("File not found for the specified path")
+                            }
+
+                            val file = File(pathname)
+                            service.modifySelectedTextInEditorByFile(content, service.fileToVirtualFile(file)!!)
+                        } catch (e: Exception) {
+                            when (e) {
+                                is FileNotFoundException -> thisLogger().warn("File not found: ${e.message}")
+                                else -> thisLogger().error("An unexpected error occurred: ${e.message}", e)
                             }
                         }
                     } else {
@@ -167,13 +175,8 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                             copiedMessage, content, NotificationType.ERROR
                         )
                     }
-                    promptService.setInChat(
-                        choice.content,
-                        tabName,
-                        GlobalData.role,
-                        upperTabName,
-                        promptList
-                    )//In the chat window we want to display the NPL analysis as well
+                    //In the chat window we want to display the NPL analysis as well
+                    promptService.setInChat(choice.content, tabName, GlobalData.role, upperTabName, promptList)
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())
                 }

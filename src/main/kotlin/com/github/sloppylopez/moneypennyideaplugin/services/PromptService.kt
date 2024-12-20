@@ -7,7 +7,6 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBTabbedPane
-import java.awt.Component
 import java.awt.Container
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
@@ -39,13 +38,14 @@ class PromptService(project: Project) {
                             (tabbedPane.getComponentAt(tabIndex) as? Container)?.components[1] as? Container//TODO this code is flaky
                         val tabName = tabbedPane.getTitleAt(tabIndex)
 
-                        // Retrieve upperTabName directly from the global map
                         val upperTabName = GlobalData.tabNameToUpperTabNameMap[tabName] ?: ""
 
                         logger.info("Processing tabIndex=$tabIndex with tabName='$tabName' and upperTabName='$upperTabName'")
                         tabComponents?.components?.forEach { tabComponent ->
-//                            logger.debug("Extracting prompt info from tabComponent: ${tabComponent.javaClass.name}")
-                            getPromptInfo(tabComponent, tabIndex, tabName, upperTabName)
+                            logger.debug("Extracting prompt info from tabComponent: ${tabComponent.javaClass.name}")
+                            if (tabComponent is JScrollPane) {
+                                getPromptInfo(tabComponent, tabIndex, tabName, upperTabName)
+                            }
                         }
                     }
                 }
@@ -54,7 +54,6 @@ class PromptService(project: Project) {
             val promptsAsJson = service.getPromptsAsJson(GlobalData.prompts)
             service.saveDataToExtensionFolder(promptsAsJson)
             return GlobalData.prompts
-
         } catch (e: Exception) {
             logger.error("Error in getPrompts: ${e.message}")
         }
@@ -62,7 +61,13 @@ class PromptService(project: Project) {
         return mutableMapOf()
     }
 
-    fun setInChat(text: String, tabName: String, currentRole: String, upperTabName: String?, promptList: List<String>?) {
+    fun setInChat(
+        text: String,
+        tabName: String,
+        currentRole: String,
+        upperTabName: String?,
+        promptList: List<String>?
+    ) {
         val contentManager = service.getToolWindow()?.contentManager ?: return
 
         for (index in 0 until contentManager.contentCount) {
@@ -83,19 +88,14 @@ class PromptService(project: Project) {
     }
 
     private fun getPromptInfo(
-        tabComponent: Component?,
-        tabIndex: Int,
-        tabName: String,
-        upperTabName: String
+        tabComponent: JScrollPane?, tabIndex: Int,
+        tabName: String, upperTabName: String
     ) {
-        if (tabComponent is JScrollPane) {
-            val textArea = tabComponent.viewport.view as? JTextArea
-            textArea?.let {
-                try {
-                    extractPromptInfo(tabName, it.text, upperTabName)
-                } catch (e: Exception) {
-                    logger.error("Error in getPromptInfo: ${e.message}")
-                }
+        (tabComponent?.viewport?.view as? JTextArea)?.let {
+            runCatching {
+                extractPromptInfo(tabName, it.text, upperTabName)
+            }.onFailure {
+                logger.error("Error in getPromptInfo: ${it.message}")
             }
         }
     }
