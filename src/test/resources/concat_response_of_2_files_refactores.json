@@ -1,0 +1,59 @@
+🤖 refactor-machine:
+**Topic**: Refactoring code.
+**Context**: Refactoring two classes in Kotlin - `FruitsCalculator` and `PrimeNumberCalculator`.
+**Intent**: Improve code quality, readability, and maintainability.
+**Named Entities**: FruitsCalculator, PrimeNumberCalculator.
+**Keywords**: Refactor, class, functions, list, groupBy, map, println, for loop, if conditions.
+**Sentiment**: Neutral.
+
+To refactor the provided code following best practices and reducing redundancy, we can apply the following improvements:
+
+1. **FruitsCalculator Refactoring**:
+
+```kotlin
+class FruitsCalculator {
+fun calculate() {
+val strings = listOf(
+"apple", "banana", "grape", "kiwi", "orange",
+"avocado", "blueberry", "pear", "pineapple", "peach"
+)
+
+val (shortWords, mediumWords, longWords) = strings.groupBy { when {
+it.length <= 5 -> "Short"
+it.length in 6..8 -> "Medium"
+else -> "Long"
+}
+}.values
+
+fun printInfo(words: List<String>, count: Int) {
+println("Words: $words")
+println("Words count: $count")
+}
+
+printInfo(shortWords, shortWords.size)
+printInfo(mediumWords, mediumWords.size)
+printInfo(longWords, longWords.size)
+}
+}
+```
+
+2. **PrimeNumberCalculator Refactoring**:
+
+```kotlin
+class PrimeNumberCalculator {
+fun getPrimeNumbers(numbers: Array<Int>) = numbers.filter { isPrime(it) }
+
+private fun isPrime(number: Int) = number > 1 && (2 until number).all { number % it != 0 }
+
+fun getEvenNumbers(numbers: Array<Int>) = numbers.filter { it % 2 == 0 }
+
+fun getOddNumbers(numbers: Array<Int>) = numbers.filter { it % 2 != 0 }
+
+fun getSumOfNumbers(numbers: Array<Int>) = numbers.sum()
+
+fun getAverageOfNumbers(numbers: Array<Int>) = numbers.average()
+}
+```
+
+**Follow-up question**:
+Is there any specific functionality or optimization you would like to focus on next for these classes, or do you have any other code refactoring tasks in mind?

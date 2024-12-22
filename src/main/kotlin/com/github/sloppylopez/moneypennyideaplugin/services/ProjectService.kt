@@ -494,9 +494,9 @@ class ProjectService {
                     parentTabName = parentComponent.getTitleAt(tabCountIndex)
                 }
                 if (parentTabName != null) {
-                    component.addElement("${GlobalData.userRole}:\n${promptList!!.joinToString("\n")}")
+                    component.addElement("${GlobalData.userRole}:\n${promptList!!.joinToString(" ")}")//It is very important to use the joinToString, if not the text boxes have non visible test, and the scroll is wrong as well
 //                    component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")//TODO, why drop last here? I think this is causing bugs
-                    component.addElement("$currentRole:\n${text.split("\n")}")
+                    component.addElement("$currentRole:\n${text.split("\n").joinToString("\n")}")
 //                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
 //                    timeLine.addPointInTimeLine(
 //                        Event(
