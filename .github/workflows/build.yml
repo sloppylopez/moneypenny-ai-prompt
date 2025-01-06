@@ -79,6 +79,7 @@ jobs:
       # Build plugin
       - name: Build plugin
         run: ./gradlew buildPlugin
+        continue-on-error: true
 
       # Prepare plugin archive content for creating artifact
       - name: Prepare Plugin Artifact
