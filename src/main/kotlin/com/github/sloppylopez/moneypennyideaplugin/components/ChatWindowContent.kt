@@ -43,9 +43,6 @@ class ChatWindowContent(
     /**
      * Adds a new chat entry to the panel. Each entry is a non-editable JTextArea
      * that supports partial text selection by default.
-     *
-     * Example usage:
-     *   addElement("🤖 refactor-machine:\n ... ```kotlin\nCode here\n``` ...")
      */
     fun addElement(element: String) {
         val textArea = JTextArea(element).apply {
@@ -59,7 +56,7 @@ class ChatWindowContent(
             override fun mouseClicked(e: MouseEvent) {
                 // Double-click (left mouse) -> copy logic
                 if (e.clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
-                    // If the message is from refactor-machine, extract code blocks only:
+                    // If the message is from refactor-machine, extract code blocks only
                     if (element.startsWith("🤖 refactor-machine")) {
                         val codeBlocks = extractCodeBlocks(element)
                         if (!codeBlocks.isNullOrEmpty()) {
@@ -94,8 +91,7 @@ class ChatWindowContent(
     }
 
     /**
-     * Right-click popup menu logic. This can remain the same or be adapted
-     * (example: partial selection if user has something highlighted).
+     * Right-click popup menu logic.
      */
     private fun showPopupMenu(e: MouseEvent, textArea: JTextArea) {
         val popupMenu = JPopupMenu()
@@ -112,7 +108,6 @@ class ChatWindowContent(
 
         val runFromHereItem = JMenuItem("Run from here").apply {
             addActionListener {
-                // Example placeholder: adapt as desired
                 service.showNotification("Run from here", "Not yet implemented", NotificationType.INFORMATION)
             }
         }
@@ -124,48 +119,25 @@ class ChatWindowContent(
     /**
      * Extracts **all** code blocks (delimited by triple backticks) from the given text
      * and concatenates them with a newline between each block.
-     *
-     * e.g. If text has:
-     *   ```kotlin
-     *   class X { ... }
-     *   ```
-     *   Some text
-     *   ```python
-     *   print("hello")
-     *   ```
-     * Then we return:
-     *   class X { ... }
-     *   (newline)
-     *   print("hello")
      */
     private fun extractCodeBlocks(fullText: String): String? {
-        // A regex that captures text between triple backticks.
-        // This handles:
-        // ```kotlin
-        //   some code
-        // ```
-        // or:
-        // ```
-        //   code with no specified language
-        // ```
-        // DOT_MATCHES_ALL to capture newlines inside the group.
         val pattern = Regex("""```(?:\w+)?\s*\n(.*?)\n?```""", RegexOption.DOT_MATCHES_ALL)
-
         val matches = pattern.findAll(fullText).toList()
         if (matches.isEmpty()) {
             return null
         }
-
-        // Join each match group (group 1) with a newline separating them
         return matches.joinToString("\n") { matchResult ->
-            // matchResult.groupValues[1] is the code inside the backticks
             matchResult.groupValues[1].trimEnd()
         }
     }
 
-    fun getTabCountIndex(): Int = tabCountIndex
+    /**
+     * Make the chat window bigger by default.
+     * Adjust to your preference (width=800, height=600, etc.)
+     */
+    override fun getPreferredSize(): Dimension = Dimension(800, 600)
 
-    override fun getPreferredSize(): Dimension = Dimension(500, 350)
+    fun getTabCountIndex(): Int = tabCountIndex
 
     override fun dispose() {
         disposables.forEach { it.dispose() }
