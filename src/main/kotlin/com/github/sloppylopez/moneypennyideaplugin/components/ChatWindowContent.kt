@@ -13,15 +13,17 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
 
-class ChatWindowContent(private val project: Project, private val tabCountIndex: Int) : JPanel(), Disposable {
+class ChatWindowContent(
+    private val project: Project,
+    private val tabCountIndex: Int
+) : JPanel(), Disposable {
 
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val disposables = mutableListOf<Disposable>()
 
-    // A main panel that will hold all chat entries (each as its own JTextArea).
+    // Container panel that holds all the chat entries (each as its own JTextArea).
     private val chatPanel = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
-        // A thin border on the panel itself (same as in your original code)
         border = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(JBColor.GRAY),
             BorderFactory.createEmptyBorder(0, 10, 0, 0)
@@ -50,15 +52,21 @@ class ChatWindowContent(private val project: Project, private val tabCountIndex:
             border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
         }
 
-        // Add mouse listener for double-click and popup menu on each chat entry
         textArea.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                if (e.clickCount == 2) {
-                    // Double-click
-                    service.showNotification("Double click", "Double click", NotificationType.INFORMATION)
+                // Double-click: copy entire content
+                if (e.clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
+                    val entireText = textArea.text
+                    service.copyToClipboard(entireText)
+                    service.showNotification(
+                        "Copied to clipboard",
+                        entireText,
+                        NotificationType.INFORMATION
+                    )
                 }
+
+                // Right-click: show context menu
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    // Show right-click popup menu
                     showPopupMenu(e, textArea)
                 }
             }
@@ -79,20 +87,16 @@ class ChatWindowContent(private val project: Project, private val tabCountIndex:
         val runMenuItem = JMenuItem("Run").apply {
             addActionListener {
                 val highlighted = textArea.selectedText
-                val textToUse = if (!highlighted.isNullOrEmpty()) {
-                    highlighted
-                } else {
-                    textArea.text
-                }
-                service.copyToClipboard(textToUse)
-                service.showNotification("Run", textToUse, NotificationType.INFORMATION)
+                val textToCopy = if (!highlighted.isNullOrEmpty()) highlighted else textArea.text
+                service.copyToClipboard(textToCopy)
+                service.showNotification("Copied to clipboard", textToCopy, NotificationType.INFORMATION)
             }
         }
         popupMenu.add(runMenuItem)
 
         val runFromHereItem = JMenuItem("Run from here").apply {
             addActionListener {
-                // Example: show all messages or handle them differently
+                // Example placeholder: adapt as desired
                 service.showNotification("Run from here", "Run from here not yet implemented", NotificationType.INFORMATION)
             }
         }
