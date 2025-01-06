@@ -5,7 +5,6 @@ import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -14,13 +13,15 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import com.intellij.ui.components.JBTabbedPane
 import java.io.File
 
 class RunAllInTabPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
-//    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
+
+    //    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
     private val copiedMessage = "Copied to clipboard: "
 
     init {
@@ -30,128 +31,44 @@ class RunAllInTabPromptAction(private var project: Project) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
-//        val jProgressBar = progressBarFactory.getProgressBar()
-        var prompt = ""
-        try {
-//            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
 
+        try {
             // Get all prompts and the selected tab
             val prompts = promptService.getPrompts()
-            val selectedTabName = GlobalData.selectedTabbedPane?.getTitleAt(GlobalData.selectedTabbedPane!!.selectedIndex)
-            println("Processing prompts for selected tab: $GlobalData.selectedTabbedPane")
-            val role = GlobalData.role.split(" ")[1]
-            val selectedTabbedPane = GlobalData.selectedTabbedPane
+            val selectedTabbedPane = GlobalData.selectedTabbedPane as? JBTabbedPane
 
-            if (selectedTabbedPane != null) {
-                val selectedIndex = selectedTabbedPane.selectedIndex
-                val selectedTabTitle = if (selectedIndex >= 0) {
-                    selectedTabbedPane.getTitleAt(selectedIndex)
-                } else {
-                    "No tab selected"
-                }
-
-                println("Processing prompts for selected tab: $selectedTabTitle")
-                println("All tabs in the pane:")
-                for (i in 0 until selectedTabbedPane.tabCount) {
-                    println("- Tab $i: ${selectedTabbedPane.getTitleAt(i)}")
-                }
-            } else {
-                println("No selected tab pane available.")
-            }
-            if (selectedTabName == null) {
-                println("No tab selected, aborting action.")
+            if (selectedTabbedPane == null) {
+                println("No selected tab pane available or it's not a JBTabbedPane.")
                 return
             }
-            println("Processing prompts for selected tab: $selectedTabName")
-            println("prompts: $prompts")
-            // Process only the prompts for the selected tab
-            prompts[selectedTabName]?.let { promptMap ->
-                println("Processing prompts for selected tab: $selectedTabName")
 
-                promptMap.forEach { (tabName, promptList) ->
-                    if (tabName == selectedTabName) {
-                        println("Matched tabName: $tabName with selectedTabName: $selectedTabName")
-                        // Check if there are multiple prompts to group them
-                        if (promptMap.size >= 2) {
-                            prompt = getGroupedPrompt(
-                                promptList, role, promptMap
-                            )
-                            println("Grouped prompt: $prompt")
-                            chatGPTService.sendChatPrompt(
-                                prompt, createCallback(tabName), selectedTabName, promptList
-                            ).whenComplete { _, _ ->
-                                thisLogger().info("ChatGPTService.sendChatPrompt completed for grouped prompts")
-                            }
-                        } else {
-                            // Handle a single prompt
-                            if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
-                                prompt = getPrompt(prompt, role, promptList)
-                                println("Single prompt: $prompt")
-                                chatGPTService.sendChatPrompt(
-                                    prompt, createCallback(tabName), selectedTabName, promptList
-                                ).whenComplete { _, _ ->
-                                    thisLogger().info("ChatGPTService.sendChatPrompt completed for single prompt")
-                                }
-                            }
+            // Gather all tab titles dynamically using the public API
+            val allTitles = (0 until selectedTabbedPane.tabCount).mapNotNull { index ->
+                selectedTabbedPane.getTitleAt(index) // Safely get the title
+            }
+
+            println("Available tab titles: $allTitles")
+
+            // Process prompts for each title independently
+            allTitles.forEach { title ->
+                // Look for a match in the prompts structure
+                prompts.forEach { (key, tabPrompts) ->
+                    // If this key contains a map of prompts
+                    tabPrompts[title]?.let { promptList ->
+                        // Combine all prompts for the current tab into a single string
+                        val combinedPrompt = promptList.joinToString("\n") { it.toString() }
+                        println("Sending combined prompt for tab: $title under key: $key")
+                        chatGPTService.sendChatPrompt(
+                            combinedPrompt, createCallback(title), key, promptList.map { it.toString() }
+                        ).whenComplete { _, _ ->
+                            thisLogger().info("ChatGPTService.sendChatPrompt completed for tab: $title")
                         }
                     }
                 }
-            } ?: run {
-                // Handle the case where no prompts are found for the selected tab
-                println("No prompts found for the selected tab: $selectedTabName")
             }
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
-        } finally {
-//            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
-    }
-
-    private fun getGroupedPrompt(
-        prompt: List<String>,
-        role: String,
-        promptMap: Map<String, List<String>>
-    ): String {
-        var currentPrompt = prompt.toString()
-        if (promptMap.isEmpty()) {
-            return ""
-        }
-        promptMap.forEach { (tabName, promptList) ->
-            run {
-                if (!promptList[0].contains("Refactor Code:")) {
-                    currentPrompt += if (role == "refactor-machine") {
-                        promptList.joinToString("\n")
-                    } else {
-                        promptList.joinToString(" ")
-                    }
-                }
-            }
-        }
-        currentPrompt = currentPrompt.replace("\r\n", "\n")
-        return currentPrompt
-    }
-
-    private fun getPrompt(
-        prompt: String,
-        role: String,
-        promptList: List<String>
-    ): String {
-        var currentPrompt = prompt
-        if (!promptList[0].contains("Refactor Code:")) {
-            currentPrompt += if (role == "refactor-machine") {
-                promptList.joinToString("\n")
-            } else {
-                promptList.joinToString(" ")
-            }
-        } else {
-            currentPrompt = if (role == "refactor-machine") {
-                promptList.joinToString("\n")
-            } else {
-                promptList.joinToString(" ")
-            }
-        }
-        currentPrompt = currentPrompt.replace("\r\n", "\n")
-        return currentPrompt
     }
 
     //TODO: needs DRYing
@@ -185,7 +102,7 @@ class RunAllInTabPromptAction(private var project: Project) : AnAction() {
                                     content, service.fileToVirtualFile(file)!!
                                 )
                             } catch (e: Exception) {
-                                thisLogger().error(e.stackTraceToString())
+                                thisLogger().warn(e.stackTraceToString())
                             }
                         }
                     } else {

@@ -438,11 +438,12 @@ class ProjectService {
                 if (parentTabName != null) {
                     // 1) DON'T Show who the user role is (plain text):
 //                    component.addElement("${GlobalData.userRole}:\n${promptList}")
+//                    component.addElement("${currentRole}:\n")
 
                     // 2) If the role is 'refactor-machine', parse code blocks only
                     if (currentRole == GlobalData.role) {
                         // parse code fences from 'text' and add them
-                        component.addMessageFromResponse(text)
+                        component.addMessageFromResponse("${currentRole}:\n" + text)
                     } else {
                         // Otherwise, plain text
                         component.addElement("$currentRole:\n${text.split("\n").joinToString("\n")}\n\n")

@@ -53,7 +53,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         chatGPTService.sendChatPrompt(
                             prompt, createCallback(tabName), upperTabName, promptList
                         ).whenComplete { _, _ ->
-                            thisLogger().info("ChatGPTService.sendChatPrompt completed")
+                            thisLogger().info("ChatGPTService.sendChatPrompt completed multi")
                         }
                     } else {
                         if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {

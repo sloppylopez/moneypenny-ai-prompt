@@ -6,6 +6,7 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -60,7 +61,15 @@ class ToolWindowHelper {
                 }
 
                 toolWindowContent.setContent(tabbedPane)
-                toolWindowContent.toolbar = service.getToolBar().component
+
+                // Ensure toolbar setup is delayed if needed
+                ApplicationManager.getApplication().invokeLater {
+                    val toolbar = service.getToolBar()
+                    // Explicitly set the target component to ensure proper action context
+                    toolbar.targetComponent = toolWindowContent // Link toolbar to the tool window content
+                    toolWindowContent.toolbar = toolbar.component
+                }
+
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
             } catch (e: Exception) {
                 thisLogger().error(e.stackTraceToString())

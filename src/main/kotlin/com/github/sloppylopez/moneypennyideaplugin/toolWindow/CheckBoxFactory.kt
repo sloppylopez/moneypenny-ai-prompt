@@ -2,13 +2,12 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
-class CheckBoxFactory(private val project: Project) : AutoCloseable {
+class CheckBoxFactory() : AutoCloseable {
 
     private val logger = thisLogger()
     private val checkBoxList = mutableListOf<JCheckBox>()
