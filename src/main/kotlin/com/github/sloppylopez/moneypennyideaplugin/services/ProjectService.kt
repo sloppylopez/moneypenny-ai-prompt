@@ -440,24 +440,6 @@ class ProjectService {
         content.getUserData(key)
     }
 
-    fun findNestedJBTabbedPanes(tabbedPane: JBTabbedPane): List<JBTabbedPane> {
-        val nestedTabbedPanes = mutableListOf<JBTabbedPane>()
-
-        fun findNestedTabbedPanesRecursive(container: Container) {
-            for (currentTabbedPane in container.components) {
-                if (currentTabbedPane is JBTabbedPane) {
-                    nestedTabbedPanes.add(currentTabbedPane)
-                    findNestedTabbedPanesRecursive(currentTabbedPane)
-                } else if (currentTabbedPane is Container) {
-                    findNestedTabbedPanesRecursive(currentTabbedPane)
-                }
-            }
-        }
-
-        findNestedTabbedPanesRecursive(tabbedPane)
-        return nestedTabbedPanes
-    }
-
     private fun addFollowUpQuestion(
         splitParts: List<String>,
         component: ChatWindowContent
@@ -494,9 +476,10 @@ class ProjectService {
                     parentTabName = parentComponent.getTitleAt(tabCountIndex)
                 }
                 if (parentTabName != null) {
-                    component.addElement("${GlobalData.userRole}:\n${promptList!!.joinToString(" ")}")//It is very important to use the joinToString, if not the text boxes have non visible test, and the scroll is wrong as well
+                    component.addElement("${GlobalData.userRole}:\n${promptList}")//It is very important to use the joinToString, if not the text boxes have non visible test, and the scroll is wrong as well
 //                    component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")//TODO, why drop last here? I think this is causing bugs
-                    component.addElement("$currentRole:\n${text.split("\n").joinToString("\n")}")
+                    component.addElement("$currentRole:\n${text.split("\n").joinToString("\n")}\n\n")
+//                    component.addElement("\n")
 //                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
 //                    timeLine.addPointInTimeLine(
 //                        Event(
@@ -532,23 +515,6 @@ class ProjectService {
         }
 
         findTabbedPanesRecursive(container)
-    }
-
-    fun findJBTabbedPanes(container: Container): List<JBTabbedPane> {
-        val tabbedPanes = mutableListOf<JBTabbedPane>()
-
-        fun findTabbedPanesRecursive(component: Component) {
-            if (component is JBTabbedPane) {
-                tabbedPanes.add(component)
-            } else if (component is Container) {
-                for (child in component.components) {
-                    findTabbedPanesRecursive(child)
-                }
-            }
-        }
-
-        findTabbedPanesRecursive(container)
-        return tabbedPanes
     }
 
 

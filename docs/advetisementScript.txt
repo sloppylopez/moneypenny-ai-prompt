@@ -1,0 +1,65 @@
+Script (1 Minute)
+Scene 1: The Call (10 seconds)
+Visuals:
+
+A cozy bedroom at night. The developer snores peacefully in bed.
+Their phone buzzes violently on the nightstand, flashing "BOSS CALLING" in bold red letters.
+Narration:
+"Finally asleep, but your boss has other plans..."
+
+Sound Effects:
+
+Phone ringing obnoxiously.
+Text on Screen:
+"The life of a developer..."
+
+Scene 2: The Impossible Task (15 seconds)
+Visuals:
+
+The boss yells furiously through the phone (split screen):
+Boss: "Refactor the ENTIRE codebase into FOUR languages by yesterday! Or else!"
+Cut to the developer, wide-eyed in disbelief, whispering: "What?!"
+Text on Screen:
+"Impossible requests? We've all been there."
+
+Twist:
+
+The bed starts rumbling. Wheels and headlights pop out, and it drives off! with the developer on it and comfortably alying like sleeping
+Sound Effects:
+
+Whimsical engine revs as the bed zooms out of the house.
+Scene 3: The Journey & Solution (25 seconds)
+Visuals:
+
+The bed hilariously speeds through absurd locations with the developer on it:
+A drive-thru, a beach, and straight into the office building.
+It screeches to a halt in front of a computer.
+The developer clicks "Refactor Now" in IntelliJ IDEA with MoneyPenny AI Plugin.
+Screen shows chaotic code transforming into clean, beautiful code in seconds.
+Text on Screen:
+"Refactor your code in just ONE click."
+
+Narration:
+"With MoneyPenny AI, even the impossible is easy."
+
+Scene 4: The Reward (10 seconds)
+Visuals:
+
+The bed drives the developer back home, parks perfectly in the bedroom.
+The boss texts: "Genius! Great work!"
+The developer smirks, turns off the phone, and snuggles back to sleep.
+Text on Screen:
+"Go from stressed to success—effortlessly."
+
+Call to Action (5 seconds)
+Visuals:
+
+The MoneyPenny AI logo with the tagline:
+"MoneyPenny AI: Refactor your code in ONE click."
+Narration:
+"Stop wasting time. Try MoneyPenny AI today!"
+
+Text on Screen:
+"Download Now. Impossible? Solved."
+
+Voices are all in male british

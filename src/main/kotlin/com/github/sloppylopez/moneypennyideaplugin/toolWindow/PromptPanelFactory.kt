@@ -110,22 +110,4 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             thisLogger().error(e.stackTraceToString())
         }
     }
-//    //TODO this is repeated code
-//    fun openFilesAndSendContentToPromptConcat(fileList: List<*>? = null) {
-//        try {
-//            if (!fileList.isNullOrEmpty()) {
-//                val project = service.getProject()
-//                val expandedFileList = service.expandFolders(fileList)
-//                addTabbedPaneToToolWindow(project!!, expandedFileList, null, false)
-//                thisLogger().info(expandedFileList.toString())
-//                expandedFileList.forEach { file ->
-//                    val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
-////                    thisLogger().info(fileContents)
-//                    service.highlightTextInAllEditors(fileContents) // Updated to use new method
-//                }
-//            }
-//        } catch (e: Exception) {
-//            thisLogger().error(e.stackTraceToString())
-//        }
-//    }
 }

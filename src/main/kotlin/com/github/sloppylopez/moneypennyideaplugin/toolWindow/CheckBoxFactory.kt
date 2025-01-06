@@ -68,12 +68,13 @@ class CheckBoxFactory(private val project: Project) : AutoCloseable {
     }
 
     override fun close() {
-        // Remove all listeners and clear the checkBoxList to prevent memory leaks
+        // Properly dispose of checkboxes and their listeners
         checkBoxList.forEach { checkBox ->
             for (listener in checkBox.actionListeners) {
                 checkBox.removeActionListener(listener)
             }
         }
         checkBoxList.clear()
+        logger.info("CheckBoxFactory disposed successfully.")
     }
 }

@@ -1,0 +1,59 @@
+**Topic:** Refactoring code in Kotlin.
+
+**Context:** The given code consists of two classes, `FruitsCalculator` and `PrimeNumberCalculator`, with various functions to perform calculations on lists of strings and integers.
+
+**Intent:** The intent is to refactor the code by following best practices, eliminating redundancy, and potentially using one-liners to improve readability and maintainability.
+
+**Named Entities:**
+- `FruitsCalculator`
+- `PrimeNumberCalculator`
+- Methods within each class
+- Variables used in calculations
+
+**Keywords:** Refactor, code, Kotlin, best practices, one-liners, readability, maintainability.
+
+**Sentiment:** Neutral.
+
+---
+
+Considering the analysis performed, here is the refactored code following best practices and utilizing one-liners:
+
+```kotlin
+class FruitsCalculator {
+fun calculate() {
+val strings = listOf(
+"apple", "banana", "grape", "kiwi", "orange",
+"avocado", "blueberry", "pear", "pineapple", "peach"
+)
+
+val groupedWords = strings.groupBy { when {
+it.length <= 5 -> "Short"
+it.length in 6..8 -> "Medium"
+else -> "Long"
+}}
+
+fun printInfo(words: List<String>, count: Int) {
+println("Words: $words\nWords count: $count")
+}
+
+with(groupedWords) {
+printInfo(get("Short") ?: emptyList(), get("Short")?.size ?: 0)
+printInfo(get("Medium") ?: emptyList(), get("Medium")?.size ?: 0)
+printInfo(get("Long") ?: emptyList(), get("Long")?.size ?: 0)
+}
+}
+}
+
+class PrimeNumberCalculator {
+fun getPrimeNumbers(numbers: Array<Int>) = numbers.filter { num -> num > 1 && (2 until num).none { num % it == 0 } }
+fun getEvenNumbers(numbers: Array<Int>) = numbers.filter { it % 2 == 0 }
+fun getOddNumbers(numbers: Array<Int>) = numbers.filter { it % 2 != 0 }
+fun getSumOfNumbers(numbers: Array<Int>) = numbers.sum()
+fun getAverageOfNumbers(numbers: Array<Int>) = numbers.takeIf { it.isNotEmpty() }?.let { it.sum().toDouble() / it.size } ?: 0.0
+}
+```
+
+---
+
+**Follow-up question:**
+How would you handle a scenario where the input numbers for calculating statistics in the `PrimeNumberCalculator` class are negative integers?

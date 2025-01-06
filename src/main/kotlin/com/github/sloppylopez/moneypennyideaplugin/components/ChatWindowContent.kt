@@ -6,84 +6,94 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.JBColor
-import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
-import javax.swing.event.ListSelectionListener
 
 class ChatWindowContent(private val project: Project, private val tabCountIndex: Int) : JPanel(), Disposable {
+
     private val service: ProjectService by lazy { project.service<ProjectService>() }
-    private var chatList: JBList<String>? = null
-    private val copiedMessage = "Copied to clipboard: "
     private val disposables = mutableListOf<Disposable>()
 
-    init {
-        initializeChatList()
-        layout = BorderLayout()
-        val scrollPane = JBScrollPane(chatList).apply {
-            border = BorderFactory.createEmptyBorder(0, 0, 0, 0)
-        }
+    // A main panel that will hold all chat entries (each as its own JTextArea).
+    private val chatPanel = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        // A thin border on the panel itself (same as in your original code)
         border = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(JBColor.GRAY),
             BorderFactory.createEmptyBorder(0, 10, 0, 0)
         )
+    }
+
+    init {
+        layout = BorderLayout()
+
+        // Put chatPanel in a scroll pane
+        val scrollPane = JBScrollPane(chatPanel).apply {
+            border = BorderFactory.createEmptyBorder(0, 0, 0, 0)
+        }
         add(scrollPane, BorderLayout.CENTER)
     }
 
-    fun getTabCountIndex(): Int = tabCountIndex
-
-    private fun initializeChatList() {
-        chatList = JBList(DefaultListModel<String>()).apply {
-            cellRenderer = ChatCellRenderer()
-            layoutOrientation = JList.VERTICAL
-            fixedCellWidth = 470
-
-            // Add ListSelectionListener
-            val listSelectionListener = ListSelectionListener { e ->
-                if (!e.valueIsAdjusting) {
-                    service.copyToClipboard(selectedValue)
-                    service.showNotification(copiedMessage, selectedValue, NotificationType.INFORMATION)
-                }
-            }
-            addListSelectionListener(listSelectionListener)
-            registerDisposable { removeListSelectionListener(listSelectionListener) }
-
-            // Add MouseListener for double-click and popup menu
-            val mouseListener = object : MouseAdapter() {
-                override fun mouseClicked(e: MouseEvent?) {
-                    if (e == null) return // Ensure the event is non-null before processing
-                    if (e.clickCount == 2) {
-                        service.showNotification("Double click", "Double click", NotificationType.INFORMATION)
-                    }
-                    if (SwingUtilities.isRightMouseButton(e)) {
-                        showPopupMenu(e)
-                    }
-                }
-            }
-            addMouseListener(mouseListener)
-            registerDisposable { removeMouseListener(mouseListener) }
+    /**
+     * Adds a new chat entry to the panel. Each entry is a non-editable JTextArea
+     * that supports partial text selection by default.
+     */
+    fun addElement(element: String) {
+        val textArea = JTextArea(element).apply {
+            isEditable = false
+            lineWrap = true
+            wrapStyleWord = true
+            border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
         }
+
+        // Add mouse listener for double-click and popup menu on each chat entry
+        textArea.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    // Double-click
+                    service.showNotification("Double click", "Double click", NotificationType.INFORMATION)
+                }
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    // Show right-click popup menu
+                    showPopupMenu(e, textArea)
+                }
+            }
+        })
+
+        chatPanel.add(textArea)
+        chatPanel.revalidate()
+        chatPanel.repaint()
     }
 
-    private fun showPopupMenu(e: MouseEvent) {
+    /**
+     * Shows a popup menu with “Run” and “Run from here” actions.
+     * “Run” will copy either highlighted text (if any) or the entire text area content.
+     */
+    private fun showPopupMenu(e: MouseEvent, textArea: JTextArea) {
         val popupMenu = JPopupMenu()
 
         val runMenuItem = JMenuItem("Run").apply {
             addActionListener {
-                getSelectedCellText()?.let { cellText ->
-                    service.showNotification("Run", cellText, NotificationType.INFORMATION)
+                val highlighted = textArea.selectedText
+                val textToUse = if (!highlighted.isNullOrEmpty()) {
+                    highlighted
+                } else {
+                    textArea.text
                 }
+                service.copyToClipboard(textToUse)
+                service.showNotification("Run", textToUse, NotificationType.INFORMATION)
             }
         }
         popupMenu.add(runMenuItem)
 
         val runFromHereItem = JMenuItem("Run from here").apply {
             addActionListener {
-                service.showNotification("Run from here", getChatList().toString(), NotificationType.INFORMATION)
+                // Example: show all messages or handle them differently
+                service.showNotification("Run from here", "Run from here not yet implemented", NotificationType.INFORMATION)
             }
         }
         popupMenu.add(runFromHereItem)
@@ -91,33 +101,12 @@ class ChatWindowContent(private val project: Project, private val tabCountIndex:
         popupMenu.show(e.component, e.x, e.y)
     }
 
-    fun addElement(element: String) {
-        (chatList?.model as? DefaultListModel<String>)?.addElement(element)
-    }
+    fun getTabCountIndex(): Int = tabCountIndex
 
     override fun getPreferredSize(): Dimension = Dimension(500, 350)
 
-    fun getChatList(): List<String>? = chatList?.let { list ->
-        val model = list.model as? DefaultListModel<String> ?: return null
-        List(model.size) { model.getElementAt(it) }
-    }
-
-    fun getSelectedCellText(): String? {
-        return chatList?.selectedValue
-    }
-
-    private fun registerDisposable(disposable: () -> Unit) {
-        disposables.add(object : Disposable {
-            override fun dispose() {
-                disposable()
-            }
-        })
-    }
-
     override fun dispose() {
-        // Dispose of listeners and clear resources
-        chatList?.removeAll()
-        chatList = null
+        // If you had any Disposable objects or listeners to clean up, do so here
         disposables.forEach { it.dispose() }
         disposables.clear()
     }

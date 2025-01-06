@@ -6,7 +6,6 @@ import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.selectedTabbe
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -94,7 +93,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
                                     content, service.fileToVirtualFile(file)!!
                                 )
                             } catch (e: Exception) {
-                                thisLogger().error(e.stackTraceToString())
+                                thisLogger().info(e.stackTraceToString())
                             }
                         }
                     } else {
