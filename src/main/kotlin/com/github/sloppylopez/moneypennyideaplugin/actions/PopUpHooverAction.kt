@@ -2,10 +2,8 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.getIcon
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 
-@Service(Service.Level.PROJECT)
 class PopUpHooverAction : ActionGroup() {
 
     companion object {
@@ -20,9 +18,10 @@ class PopUpHooverAction : ActionGroup() {
 
     // Return the actions for the submenu
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-        val project = getProjectFromEvent(e)
+        val project = getProjectFromEvent(e)!!
         return arrayOf(
-            SendToPromptTextEditorAction(project!!),
+            SendToPromptTextEditorActionConcat(project),
+            SendToPromptTextEditorActionParallel(project),
             DRYSelectionAction(project)
         )//TODO Add more actions here
     }

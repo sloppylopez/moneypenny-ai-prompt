@@ -1,16 +1,15 @@
 package com.github.sloppylopez.moneypennyideaplugin.services
 
 import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
-import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToInnerPanel
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBTabbedPane
-import java.awt.Component
 import java.awt.Container
 import javax.swing.JScrollPane
+import javax.swing.JTabbedPane
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
@@ -37,18 +36,17 @@ class PromptService(project: Project) {
                 for ((tabbedPaneIndex, tabbedPane) in nestedJBTabbedPanes.withIndex()) {
                     for (tabIndex in 0 until tabbedPane.tabCount) {
                         val tabComponents =
-                            (tabbedPane.getComponentAt(tabIndex) as? Container)?.components?.firstOrNull() as? Container
+                            (tabbedPane.getComponentAt(tabIndex) as? Container)?.components[1] as? Container//TODO this code is flaky
                         val tabName = tabbedPane.getTitleAt(tabIndex)
-                        val upperTabName = try {
-                            (tabNameToInnerPanel[tabName]?.parent?.parent?.parent?.parent?.parent as? JBTabbedPane)
-                                ?.getTitleAt(tabbedPaneIndex) ?: ""
-                        } catch (e: Exception) {
-                            logger.warn("Failed to resolve upperTabName: ${e.message}")
-                            ""
-                        }
 
+                        val upperTabName = GlobalData.tabNameToUpperTabNameMap[tabName] ?: ""
+
+                        logger.info("Processing tabIndex=$tabIndex with tabName='$tabName' and upperTabName='$upperTabName'")
                         tabComponents?.components?.forEach { tabComponent ->
-                            getPromptInfo(tabComponent, tabIndex, tabName, upperTabName)
+                            logger.debug("Extracting prompt info from tabComponent: ${tabComponent.javaClass.name}")
+                            if (tabComponent is JScrollPane) {
+                                getPromptInfo(tabComponent, tabName, upperTabName)
+                            }
                         }
                     }
                 }
@@ -57,7 +55,6 @@ class PromptService(project: Project) {
             val promptsAsJson = service.getPromptsAsJson(GlobalData.prompts)
             service.saveDataToExtensionFolder(promptsAsJson)
             return GlobalData.prompts
-
         } catch (e: Exception) {
             logger.error("Error in getPrompts: ${e.message}")
         }
@@ -65,40 +62,42 @@ class PromptService(project: Project) {
         return mutableMapOf()
     }
 
-    fun setInChat(text: String, tabName: String, currentRole: String, upperTabName: String?, promptList: List<String>?) {
+    fun setInChat(
+        text: String,
+        tabName: String,
+        currentRole: String,
+        upperTabName: String?,
+        promptList: List<String>?
+    ) {
         val contentManager = service.getToolWindow()?.contentManager ?: return
 
         for (index in 0 until contentManager.contentCount) {
             val content = contentManager.getContent(index) ?: continue
             val simpleToolWindowPanel = content.component as? SimpleToolWindowPanel ?: continue
 
-            simpleToolWindowPanel.components.forEach { component ->
-                service.addChatWindowContentListModelToGlobalData(
-                    component as Container,
-                    text,
-                    currentRole,
-                    tabName,
-                    upperTabName,
-                    promptList
-                )
-            }
+            // Find the first component of type JTabbedPane
+            val jTabbedPaneComponent = simpleToolWindowPanel.components.firstOrNull { it is JTabbedPane } as? JTabbedPane ?: continue
+
+            service.addChatWindowContentListModelToGlobalData(
+                jTabbedPaneComponent as Container,
+                text,
+                currentRole,
+                tabName,
+                upperTabName,
+                promptList
+            )
         }
     }
 
     private fun getPromptInfo(
-        tabComponent: Component?,
-        tabIndex: Int,
-        tabName: String,
+        tabComponent: JScrollPane?, tabName: String,
         upperTabName: String
     ) {
-        if (tabComponent is JScrollPane) {
-            val textArea = tabComponent.viewport.view as? JTextArea
-            textArea?.let {
-                try {
-                    extractPromptInfo(tabName, it.text, upperTabName)
-                } catch (e: Exception) {
-                    logger.error("Error in getPromptInfo: ${e.message}")
-                }
+        (tabComponent?.viewport?.view as? JTextArea)?.let {
+            runCatching {
+                extractPromptInfo(tabName, it.text, upperTabName)
+            }.onFailure {
+                logger.error("Error in getPromptInfo: ${it.message}")
             }
         }
     }

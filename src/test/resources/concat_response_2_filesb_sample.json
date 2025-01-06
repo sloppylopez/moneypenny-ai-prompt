@@ -1,0 +1,7 @@
+**Topic**: Refactoring code.
+**Context**: Refactoring two classes in Kotlin - `FruitsCalculator` and `PrimeNumberCalculator`.
+**Intent**: Improve code quality, readability, and maintainability.
+**Named Entities**: FruitsCalculator, PrimeNumberCalculator.
+**Keywords**: Refactor, class, functions, list, groupBy, map, println, for loop, if conditions.
+**Sentiment**: Neutral.
+

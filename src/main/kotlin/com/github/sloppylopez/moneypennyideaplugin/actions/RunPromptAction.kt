@@ -6,7 +6,6 @@ import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.selectedTabbe
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -23,7 +22,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
-    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
+//    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
     private val copiedMessage = "Copied to clipboard: "
 
     init {
@@ -34,10 +33,10 @@ class RunPromptAction(private var project: Project) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
         val prompt: String
-        val jProgressBar = progressBarFactory.getProgressBar()
+//        val jProgressBar = progressBarFactory.getProgressBar()
         try {
             val tabName = selectedTabbedPane?.getTitleAt(selectedTabbedPane!!.selectedIndex)
-            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
             val promptList = service.getPromptListByKey(prompts, tabName!!).toMutableList()
             //Write code that will return the key from prompts that contains this value in the list tabName
@@ -64,7 +63,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
         } finally {
-            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
 
@@ -94,7 +93,7 @@ class RunPromptAction(private var project: Project) : AnAction() {
                                     content, service.fileToVirtualFile(file)!!
                                 )
                             } catch (e: Exception) {
-                                thisLogger().error(e.stackTraceToString())
+                                thisLogger().info(e.stackTraceToString())
                             }
                         }
                     } else {

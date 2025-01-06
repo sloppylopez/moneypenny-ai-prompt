@@ -89,18 +89,18 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
 
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
             openFilesAndSendContentToPrompt(
-                transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>,
+                false
             )
         }
     }
 
-    //TODO this is too clever, split in 2
-    fun openFilesAndSendContentToPrompt(fileList: List<*>? = null) {
+    fun openFilesAndSendContentToPrompt(fileList: List<*>? = null, isConcat: Boolean) {
         try {
             if (!fileList.isNullOrEmpty()) {
                 val project = service.getProject()
                 val expandedFileList = service.expandFolders(fileList)
-                addTabbedPaneToToolWindow(project!!, expandedFileList)
+                addTabbedPaneToToolWindow(project!!, expandedFileList, null, isConcat)
                 expandedFileList.forEach { file ->
                     val fileContents = String(Files.readAllBytes(File(file.path).toPath()))
                     service.highlightTextInAllEditors(fileContents) // Updated to use new method

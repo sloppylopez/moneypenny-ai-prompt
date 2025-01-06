@@ -1,6 +1,6 @@
 package com.github.sloppylopez.moneypennyideaplugin.gineapigs
 
-class PrimeNumberCalculator {
+class   PrimeNumberCalculator {
     fun getPrimeNumbers(numbers: Array<Int>): List<Int> {
         val primes = mutableListOf<Int>()
         for (number in numbers) {

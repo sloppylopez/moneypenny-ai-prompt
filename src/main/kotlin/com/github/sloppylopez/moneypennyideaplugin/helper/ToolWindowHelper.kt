@@ -6,6 +6,7 @@ import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ButtonTabComponent
 import com.github.sloppylopez.moneypennyideaplugin.toolWindow.MoneyPennyToolWindow
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -31,7 +32,8 @@ class ToolWindowHelper {
         fun addTabbedPaneToToolWindow(
             project: Project,
             fileList: List<*>? = emptyList<Any>(),
-            selectedText: @NlsSafe String? = null
+            selectedText: @NlsSafe String? = null,
+            isConcat: Boolean = false
         ) {
             try {
                 val service = project.service<ProjectService>()
@@ -47,7 +49,8 @@ class ToolWindowHelper {
                 }
 
                 toolWindow.setIcon(getIcon("/images/moneypenny-logo-main-alpha.png"))
-                val contentTab: Content = getContentTab(fileList, moneyPennyToolWindow!!, service, selectedText)
+                val contentTab: Content =
+                    getContentTab(fileList, moneyPennyToolWindow!!, service, selectedText, isConcat)
                 tabbedPane.addTab(contentTab.displayName, contentTab.component)
 
                 tabbedPane.selectedIndex = tabCounter - 1
@@ -58,7 +61,15 @@ class ToolWindowHelper {
                 }
 
                 toolWindowContent.setContent(tabbedPane)
-                toolWindowContent.toolbar = service.getToolBar().component
+
+                // Ensure toolbar setup is delayed if needed
+                ApplicationManager.getApplication().invokeLater {
+                    val toolbar = service.getToolBar()
+                    // Explicitly set the target component to ensure proper action context
+                    toolbar.targetComponent = toolWindowContent // Link toolbar to the tool window content
+                    toolWindowContent.toolbar = toolbar.component
+                }
+
                 addChangeListenerToTabbedPane(tabbedPane, toolWindow.contentManager)
             } catch (e: Exception) {
                 thisLogger().error(e.stackTraceToString())
@@ -85,23 +96,25 @@ class ToolWindowHelper {
             fileList: List<*>?,
             moneyPennyToolWindow: MoneyPennyToolWindow,
             service: ProjectService,
-            selectedText: @NlsSafe String? = null
+            selectedText: @NlsSafe String? = null,
+            isConcat: Boolean
         ): Content {
+            val contentFactory = ContentFactory.getInstance()
             val contentTab = if (fileList!!.isEmpty()) {
-                ContentFactory.getInstance().createContent(
+                contentFactory.createContent(
                     moneyPennyToolWindow.getContent(emptyList<Any>(), selectedText, "Prompt"),
                     "Prompt",
-                    true,
+                    isConcat,
                 )
             } else {
                 val expandedFileList = service.expandFolders(fileList)
                 val upperTabName = getDisplayName(expandedFileList)
-                ContentFactory.getInstance()
-                    .createContent(
-                        moneyPennyToolWindow.getContent(expandedFileList, selectedText, upperTabName),
-                        upperTabName,
-                        true
-                    )
+                contentFactory.createContent(
+                    moneyPennyToolWindow.getContent(expandedFileList, selectedText, upperTabName, isConcat),
+                    upperTabName,
+                    isConcat
+                )
+
             }
             return contentTab
         }

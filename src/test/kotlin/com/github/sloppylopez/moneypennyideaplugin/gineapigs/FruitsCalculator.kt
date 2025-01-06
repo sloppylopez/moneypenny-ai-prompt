@@ -1,5 +1,3 @@
-package com.github.sloppylopez.moneypennyideaplugin.gineapigs
-
 class FruitsCalculator {
     fun calculate() {
         val strings = listOf(
@@ -7,38 +5,33 @@ class FruitsCalculator {
             "avocado", "blueberry", "pear", "pineapple", "peach"
         )
 
-        // Initialize categories
-        val shortWords = mutableListOf<String>()
-        val mediumWords = mutableListOf<String>()
-        val longWords = mutableListOf<String>()
-
-        // Initialize counters
-        var shortWordsCount = 0
-        var mediumWordsCount = 0
-        var longWordsCount = 0
-
-        for (word in strings) {
-            if (word.length <= 5) {
-                shortWords.add(word)
-                shortWordsCount++
-            } else if (word.length in 6..8) {
-                mediumWords.add(word)
-                mediumWordsCount++
-            } else if (word.length > 8) {
-                longWords.add(word)
-                longWordsCount++
+        // Group words by length category
+        val groupedWords = strings.groupBy {
+            when {
+                it.length <= 5 -> "Short"
+                it.length in 6..8 -> "Medium"
+                else -> "Long"
             }
         }
 
-        // Print results
-        println("Short words: $shortWords")
-        println("Short words count: $shortWordsCount")
+        // Extract the lists for each category, ensuring a default empty list if not present
+        val shortWords = groupedWords["Short"] ?: emptyList()
+        val mediumWords = groupedWords["Medium"] ?: emptyList()
+        val longWords = groupedWords["Long"] ?: emptyList()
 
-        println("Medium words: $mediumWords")
-        println("Medium words count: $mediumWordsCount")
+        // Calculate counts for each category
+        val shortWordsCount = shortWords.size
+        val mediumWordsCount = mediumWords.size
+        val longWordsCount = longWords.size
 
-        println("Long words: $longWords")
-        println("Long words count: $longWordsCount")
+        // Print information for each category
+        fun printInfo(words: List<String>, count: Int) {
+            println("Words: $words")
+            println("Words count: $count")
+        }
+
+        printInfo(shortWords, shortWordsCount)
+        printInfo(mediumWords, mediumWordsCount)
+        printInfo(longWords, longWordsCount)
     }
-
 }

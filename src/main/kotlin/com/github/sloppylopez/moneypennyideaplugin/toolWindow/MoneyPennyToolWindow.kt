@@ -35,49 +35,105 @@ class MoneyPennyToolWindow(
         fileList: List<*>? = emptyList<Any>(),
         contentPromptText: String? = null,
         upperTabName: String? = null,
+        isConcat: Boolean = false
     ): JBPanel<JBPanel<*>> {
         return JBPanel<JBPanel<*>>().apply {
-            add(moneyPennyPromptPanel(fileList!!, contentPromptText, upperTabName))
+            add(moneyPennyPromptPanel(fileList!!, contentPromptText, upperTabName, isConcat))
         }
     }
 
     private fun moneyPennyPromptPanel(
-        fileList: List<*>, contentPromptText: String? = null, upperTabName: String?
+        fileList: List<*>,
+        contentPromptText: String? = null,
+        upperTabName: String?,
+        isConcat: Boolean = false
     ): JComponent {
-        var file: File? = null
         tabbedPane = JBTabbedPane(JTabbedPane.BOTTOM)
 
-        val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
-        for (tabCountIndex in 0..tabCount) {
-            val innerFile = if (fileList.isNotEmpty()) service.readFile(fileList, tabCountIndex) else null
-            val tabName = "${getNextTabName()}) ${innerFile?.name ?: "No File"}"
-            val panel = JPanel(GridBagLayout())
+        if (isConcat) {
+            // CONCAT MODE: Single tab with all files concatenated
+            val concatenatedContent = StringBuilder()
+            for (index in fileList.indices) {
+                val innerFile = service.readFile(fileList, index)
+                if (innerFile != null) {
+                    val fileText = innerFile.readText().trim()
+                    if (fileText.isNotEmpty()) {
+                        concatenatedContent.append(fileText).append("\n")
+                    }
+                }
+            }
 
+            val panel = JPanel(GridBagLayout())
             val gridBagConstraints = GridBagConstraints().apply {
                 anchor = GridBagConstraints.NORTH
                 insets = JBUI.insets(2)
             }
 
-            val innerPanel = JPanel(BorderLayout())
-            for (innerPanelIndex in 1..3) {
+            // Create the three panels (just like original logic)
+            for (panelIndex in 1..3) {
+                val innerPanel = JPanel(BorderLayout())
                 addPromptsToInnerPanel(
-                    innerPanelIndex,
-                    innerFile,
-                    contentPromptText,
-                    tabCountIndex,
+                    panelIndex,
+                    null,
+                    concatenatedContent.toString(),
+                    0,
                     innerPanel
                 )
                 innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
                 gridBagConstraints.gridx = 0
-                gridBagConstraints.gridy = innerPanelIndex - 1
+                gridBagConstraints.gridy = panelIndex - 1
                 panel.add(innerPanel, gridBagConstraints)
             }
-            service.setTabName(tabCountIndex, fileList, innerFile, tabbedPane!!, panel, contentPromptText, tabName)
-            tabNameToInnerPanel[tabName] = innerPanel
+
+            val tabName = "${getNextTabName()}) Concatenated Files"
+            service.setTabName(0, fileList, null, tabbedPane!!, panel, concatenatedContent.toString(), tabName)
+            tabNameToInnerPanel[tabName] = panel
+
+            // Store the upperTabName for this tab
+            GlobalData.tabNameToUpperTabNameMap[tabName] = upperTabName ?: ""
+
+        } else {
+            // NON-CONCAT MODE: One tab per file
+            val tabCount = if (fileList.isEmpty()) 0 else fileList.size - 1
+            for (tabCountIndex in 0..tabCount) {
+                val innerFile = if (fileList.isNotEmpty()) service.readFile(fileList, tabCountIndex) else null
+                val tabName = "${getNextTabName()}) ${innerFile?.name ?: "No File"}"
+                val panel = JPanel(GridBagLayout())
+
+                val gridBagConstraints = GridBagConstraints().apply {
+                    anchor = GridBagConstraints.NORTH
+                    insets = JBUI.insets(2)
+                }
+
+                // Create 3 inner panels as per original logic
+                for (innerPanelIndex in 1..3) {
+                    val innerPanel = JPanel(BorderLayout())
+                    addPromptsToInnerPanel(
+                        innerPanelIndex,
+                        innerFile,
+                        contentPromptText,
+                        tabCountIndex,
+                        innerPanel
+                    )
+                    innerPanel.border = BorderFactory.createLineBorder(JBColor.GRAY, 1)
+                    gridBagConstraints.gridx = 0
+                    gridBagConstraints.gridy = innerPanelIndex - 1
+                    panel.add(innerPanel, gridBagConstraints)
+                }
+
+                service.setTabName(tabCountIndex, fileList, innerFile, tabbedPane!!, panel, contentPromptText, tabName)
+                tabNameToInnerPanel[tabName] = panel
+
+                // Store the upperTabName for this tab
+                GlobalData.tabNameToUpperTabNameMap[tabName] = upperTabName ?: ""
+            }
         }
 
-        tabbedPane!!.addChangeListener(getChangeListener(tabbedPane!!))
-        tabbedPane!!.addAncestorListener(ancestorListener.getAncestorListener(tabbedPane!!))
+        if (tabbedPane!!.tabCount > 0) {
+            tabbedPane!!.addChangeListener(getChangeListener(tabbedPane!!))
+            tabbedPane!!.addAncestorListener(ancestorListener.getAncestorListener(tabbedPane!!))
+        }
+
         val mainPanel = JPanel(BorderLayout())
         tabbedPane!!.preferredSize = null
         mainPanel.add(tabbedPane!!, BorderLayout.NORTH)

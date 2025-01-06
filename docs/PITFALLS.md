@@ -228,3 +228,30 @@ with characters such as ‘?.!’ which helps GPT recognise questions, sentences
    B) From second IDE run 'Attach to process'
    C) Breaking points go on FIRST IDE
    D) Profit :)
+
+7)
+Promotional content for a free product that genuinely adds value to developers’ lives can still work well on Hacker News, provided the tone and approach are tailored to the community's expectations. Hacker News readers are receptive to free tools if the presentation is informative, transparent, and focused on solving real developer problems.
+
+Here’s how you can effectively promote your free IntelliJ plugin:
+
+1. Position Your Post as Value-Driven (Not Salesy)
+   Frame your post around how the plugin helps developers rather than focusing on promotional aspects.
+   Example post titles:
+   "We made a free IntelliJ plugin to refactor code instantly—no catch!"
+   "Frustrated with repetitive coding tasks? Check out this free IntelliJ plugin we built."
+   "Tired of messy codebases? A free tool that refactors code in one click."
+2. Structure Your Post
+   Headline:
+   Keep it concise, intriguing, and clear. Mention that the tool is free and highlights a developer pain point.
+
+Body:
+
+Introduction: Start with the problem developers face (e.g., repetitive refactoring or messy codebases).
+Solution: Briefly explain your plugin and what it does.
+Why It’s Free: Be transparent about why you’re offering the tool for free (e.g., building trust, contributing to the developer community, or gathering feedback).
+Call to Action: Share a direct link to the plugin or the JetBrains Marketplace. Include installation instructions or a quick-start guide for convenience.
+Request Feedback: Invite readers to share thoughts or suggestions. This not only engages the audience but also aligns with Hacker News' culture of constructive discussion.
+3. Timing is Key
+   Post your content during peak engagement hours for Hacker News:
+   Between 8 AM and 12 PM (PST) on weekdays.
+   Tuesday and Wednesday are generally high-traffic days.

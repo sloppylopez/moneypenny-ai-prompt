@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
-//    kotlin("plugin.serialization") version "1.6.0" // Kotlin Serialization support
+    kotlin("plugin.serialization") version "1.9.10" // Kotlin Serialization support
 }
 
 group = properties("pluginGroup").get()
@@ -28,18 +28,26 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.4.0")
     testImplementation("junit:junit:4.13.2")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
-    implementation("com.google.api:gax:2.31.0")
+//    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk17:2.0.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.20")
+    implementation("com.google.api:gax:2.58.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.8.1")
     implementation("org.jetbrains:annotations:23.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") // Use the latest version
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
 //    implementation("org.openjfx:javafx:11")
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(20)
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(20)) // Replace 21 with the desired Java version
+    }
 }
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html

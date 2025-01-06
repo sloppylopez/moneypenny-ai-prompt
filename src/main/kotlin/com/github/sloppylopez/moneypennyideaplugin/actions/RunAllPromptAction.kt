@@ -5,24 +5,23 @@ import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData
 import com.github.sloppylopez.moneypennyideaplugin.services.ChatGPTService
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.github.sloppylopez.moneypennyideaplugin.services.PromptService
-import com.github.sloppylopez.moneypennyideaplugin.toolWindow.ProgressBarFactory
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import java.io.File
+import java.io.FileNotFoundException
 
-@Service(Service.Level.PROJECT)
 class RunAllPromptAction(private var project: Project) : AnAction() {
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val promptService: PromptService by lazy { project.service<PromptService>() }
     private val chatGPTService: ChatGPTService by lazy { project.service<ChatGPTService>() }
-    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
+
+    //    private val progressBarFactory: ProgressBarFactory by lazy { project.service<ProgressBarFactory>() }
     private val copiedMessage = "Copied to clipboard: "
 
     init {
@@ -32,10 +31,10 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         project = e.project!!
-        val jProgressBar = progressBarFactory.getProgressBar()
+//        val jProgressBar = progressBarFactory.getProgressBar()
         var prompt = ""
         try {
-            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            progressBarFactory.addProgressBar(GlobalData.innerPanel!!, jProgressBar)
             val prompts = promptService.getPrompts()
 
             val role = GlobalData.role.split(" ")[1]
@@ -50,11 +49,11 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         prompt = getGroupedPrompt(
                             promptList, role, promptMap
                         )//TODO maybe adding 1 extra \n here the indenting poblem we have
-                        println("prompt: $prompt")
+                        println("Grouped prompt: $prompt")
                         chatGPTService.sendChatPrompt(
                             prompt, createCallback(tabName), upperTabName, promptList
                         ).whenComplete { _, _ ->
-                            thisLogger().info("ChatGPTService.sendChatPrompt completed")
+                            thisLogger().info("ChatGPTService.sendChatPrompt completed multi")
                         }
                     } else {
                         if (promptList.isNotEmpty() && promptList[1].isNotBlank()) {
@@ -77,16 +76,20 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
         } catch (e: Exception) {
             thisLogger().error(e.stackTraceToString())
         } finally {
-            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
+//            progressBarFactory.removeProgressBar(GlobalData.innerPanel!!, jProgressBar)
         }
     }
 
+    //this code is too ugly and too abstract
     private fun getGroupedPrompt(
         prompt: List<String>,
         role: String,
         promptMap: Map<String, List<String>>
     ): String {
         var currentPrompt = prompt.toString()
+        if (promptMap.isEmpty()) {
+            return ""
+        }
         promptMap.forEach { (tabName, promptList) ->
             run {
                 if (!promptList[0].contains("Refactor Code:")) {
@@ -99,7 +102,7 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
             }
         }
         currentPrompt = currentPrompt.replace("\r\n", "\n")
-        return currentPrompt + "\n"//This fixes text vertical indentation problem
+        return currentPrompt
     }
 
     private fun getPrompt(
@@ -145,19 +148,26 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                         content = service.extractCommentsFromCode(content)
                     }
                     if (!content.contains("Error: No response from GPT")) {
-                        service.copyToClipboard(content)
-                        service.showNotification(
-                            copiedMessage, content, NotificationType.INFORMATION
-                        )
-                        if (tabName.split(")")[1] != "No File") {
-                            try {
-//                                lastCode[tabName] = content
-                                val file = File(GlobalData.tabNameToFilePathMap[tabName]!!)
-                                service.modifySelectedTextInEditorByFile(
-                                    content, service.fileToVirtualFile(file)!!
-                                )
-                            } catch (e: Exception) {
-                                thisLogger().error(e.stackTraceToString())
+                        try {
+                            service.copyToClipboard(content)
+                            service.showNotification(
+                                copiedMessage, content, NotificationType.INFORMATION
+                            )
+                            val validTabName = tabName.takeIf { it.split(")")[1] != "No File" }
+
+                            val pathname = GlobalData.tabNameToFilePathMap[validTabName]
+                                ?: throw FileNotFoundException("Path not found for tab: $validTabName")
+
+                            if (pathname.isEmpty()) {
+                                throw FileNotFoundException("File not found for the specified path")
+                            }
+
+                            val file = File(pathname)
+                            service.modifySelectedTextInEditorByFile(content, service.fileToVirtualFile(file)!!)
+                        } catch (e: Exception) {
+                            when (e) {
+                                is FileNotFoundException -> thisLogger().warn("File not found: ${e.message}")
+                                else -> thisLogger().error("An unexpected error occurred: ${e.message}", e)
                             }
                         }
                     } else {
@@ -165,13 +175,8 @@ class RunAllPromptAction(private var project: Project) : AnAction() {
                             copiedMessage, content, NotificationType.ERROR
                         )
                     }
-                    promptService.setInChat(
-                        choice.content,
-                        tabName,
-                        GlobalData.role,
-                        upperTabName,
-                        promptList
-                    )//In the chat window we want to display the NPL analysis as well
+                    //In the chat window we want to display the NPL analysis as well
+                    promptService.setInChat(choice.content, tabName, GlobalData.role, upperTabName, promptList)
                 } catch (e: Exception) {
                     thisLogger().error(e.stackTraceToString())
                 }

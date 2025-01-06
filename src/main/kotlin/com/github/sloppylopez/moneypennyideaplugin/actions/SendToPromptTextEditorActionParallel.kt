@@ -2,16 +2,16 @@ package com.github.sloppylopez.moneypennyideaplugin.actions
 
 import com.github.sloppylopez.moneypennyideaplugin.services.ProjectService
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.components.Service
+import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
-@Service(Service.Level.PROJECT)
-class SendToPromptTextEditorAction(project: Project) : AnAction() {
+class SendToPromptTextEditorActionParallel(project: Project) : AnAction() {
     private val service = project.service<ProjectService>()
 
     init {
@@ -20,14 +20,15 @@ class SendToPromptTextEditorAction(project: Project) : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-         val file = getFile(e) ?: return
+        val file = getFile(e) ?: return
         val editor = getEditor(e) ?: return
         service.getSelectedTextFromEditor(
             editor
         )
         service.addSelectedTextToTabbedPane(
             editor,
-            service.virtualFileToFile(file)
+            service.virtualFileToFile(file),
+            false
         )
     }
 

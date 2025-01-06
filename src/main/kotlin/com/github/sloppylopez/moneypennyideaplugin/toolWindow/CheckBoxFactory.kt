@@ -2,13 +2,12 @@ package com.github.sloppylopez.moneypennyideaplugin.toolWindow
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
-class CheckBoxFactory(private val project: Project) : AutoCloseable {
+class CheckBoxFactory() : AutoCloseable {
 
     private val logger = thisLogger()
     private val checkBoxList = mutableListOf<JCheckBox>()
@@ -68,12 +67,13 @@ class CheckBoxFactory(private val project: Project) : AutoCloseable {
     }
 
     override fun close() {
-        // Remove all listeners and clear the checkBoxList to prevent memory leaks
+        // Properly dispose of checkboxes and their listeners
         checkBoxList.forEach { checkBox ->
             for (listener in checkBox.actionListeners) {
                 checkBox.removeActionListener(listener)
             }
         }
         checkBoxList.clear()
+        logger.info("CheckBoxFactory disposed successfully.")
     }
 }
