@@ -28,7 +28,6 @@ object GlobalData {
     var selectedTabbedPane: JBTabbedPane? = null
     val lastCode = mutableMapOf<String, String>()
     val engineModelStrings = arrayOf(
-        "gpt-3.5-turbo",
         "gpt-3.5-turbo-16k",
         "gpt-4-32k",
         "gpt-4",
