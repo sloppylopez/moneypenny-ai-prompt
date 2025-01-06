@@ -65,10 +65,10 @@ class ChatWindowContent(
                     service.copyToClipboard(text)
                     service.showNotification("Copied to clipboard", text, NotificationType.INFORMATION)
                 }
-                // Right-click -> popup menu
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    showTextAreaPopup(e, textArea)
-                }
+                // Right-click -> popup menu T. B. D.
+//                if (SwingUtilities.isRightMouseButton(e)) {
+//                    showTextAreaPopup(e, textArea)
+//                }
             }
         })
 
@@ -91,12 +91,12 @@ class ChatWindowContent(
         // Regex to capture:
         // group(1) = optional language label (like 'kotlin', 'java', etc.)
         // group(2) = code content
-        // We do '```(\w+)?\s*\n(.*?)\n?```' to handle possible whitespace + newline.
         val pattern = Regex("""```(\w+)?\s*\n(.*?)\n?```""", RegexOption.DOT_MATCHES_ALL)
 
         val matches = pattern.findAll(fullResponse).toList()
         if (matches.isEmpty()) {
-            // If no code blocks found, do nothing (or optionally show something?)
+            // If no code blocks are found, treat the entire response as raw text
+            addElement(fullResponse.trim())
             return
         }
 
