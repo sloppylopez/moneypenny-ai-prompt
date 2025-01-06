@@ -45,7 +45,7 @@ class PromptService(project: Project) {
                         tabComponents?.components?.forEach { tabComponent ->
                             logger.debug("Extracting prompt info from tabComponent: ${tabComponent.javaClass.name}")
                             if (tabComponent is JScrollPane) {
-                                getPromptInfo(tabComponent, tabIndex, tabName, upperTabName)
+                                getPromptInfo(tabComponent, tabName, upperTabName)
                             }
                         }
                     }
@@ -86,20 +86,12 @@ class PromptService(project: Project) {
                 upperTabName,
                 promptList
             )
-//                service.addChatWindowContentListModelToGlobalData(
-//                    component as Container,
-//                    "fun foo() { println(\"Hello from refactor machine!\") }",
-//                    "🤖 refactor-machine",
-//                    tabName,
-//                    upperTabName,
-//                    listOf("User Prompt")
-//                )
         }
     }
 
     private fun getPromptInfo(
-        tabComponent: JScrollPane?, tabIndex: Int,
-        tabName: String, upperTabName: String
+        tabComponent: JScrollPane?, tabName: String,
+        upperTabName: String
     ) {
         (tabComponent?.viewport?.view as? JTextArea)?.let {
             runCatching {
