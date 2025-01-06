@@ -22,7 +22,9 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>org.intellij.plugins.markdown</depends>
     <depends>com.intellij.modules.java</depends>
-
+    <depends>com.intellij.modules.lang</depends>
+    <!-- TODO check if this is required If you specifically rely on Kotlin highlighting: -->
+    <depends>org.jetbrains.kotlin</depends>
     <!-- Resource Bundle -->
     <resource-bundle>messages.Bundle</resource-bundle>
 
@@ -33,7 +35,6 @@
         <startupActivity
                 implementation="com.github.sloppylopez.moneypennyideaplugin.toolWindow.PostStartupIntentionSetupActivity"/>
     </extensions>
-
     <!-- Application Listeners -->
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"

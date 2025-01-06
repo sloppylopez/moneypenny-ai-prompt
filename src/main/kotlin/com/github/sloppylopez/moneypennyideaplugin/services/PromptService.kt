@@ -83,6 +83,14 @@ class PromptService(project: Project) {
                     upperTabName,
                     promptList
                 )
+//                service.addChatWindowContentListModelToGlobalData(
+//                    component as Container,
+//                    "fun foo() { println(\"Hello from refactor machine!\") }",
+//                    "🤖 refactor-machine",
+//                    tabName,
+//                    upperTabName,
+//                    listOf("User Prompt")
+//                )
             }
         }
     }

@@ -476,35 +476,22 @@ class ProjectService {
                     parentTabName = parentComponent.getTitleAt(tabCountIndex)
                 }
                 if (parentTabName != null) {
-                    component.addElement("${GlobalData.userRole}:\n${promptList}")//It is very important to use the joinToString, if not the text boxes have non visible test, and the scroll is wrong as well
-//                    component.addElement("$currentRole:\n${text.split("\n").dropLast(1).joinToString("\n")}")//TODO, why drop last here? I think this is causing bugs
-                    component.addElement("$currentRole:\n${text.split("\n").joinToString("\n")}\n\n")
-//                    component.addElement("\n")
-//                    val timeLine = GlobalData.upperTabNameToTimeLine[upperTabName] as TimeLine
-//                    timeLine.addPointInTimeLine(
-//                        Event(
-//                            LocalDateTime.now(),
-//                            promptList[0],
-//                            true
-//                        )
-//                    )
-//                    timeLine.addPointInTimeLine(
-//                        Event(
-//                            LocalDateTime.now(),
-//                            "Response",
-//                            false
-//                        )
-//                    )
+                    // 1) Show who the user role is (plain text):
+                    component.addElement("${GlobalData.userRole}:\n${promptList}")
+
+                    // 2) If the role is '🤖 refactor-machine', show code as Kotlin
+                    if (currentRole == "🤖 refactor-machine") {
+                        // We add the entire 'text' as a Kotlin code cell:
+                        component.addKotlinCodeMessage(text)
+                    } else {
+                        // Otherwise, plain text
+                        component.addElement("$currentRole:\n${text.split("\n").joinToString("\n")}\n\n")
+                    }
+
+                    // 3) Optionally handle follow-up questions if needed
                     if (currentRole == "🤖 refactor-machine") {
                         val splitParts = text.split("\n")
                         addFollowUpQuestion(splitParts, component)
-//                        timeLine.addPointInTimeLine(
-//                            Event(
-//                                LocalDateTime.now(),
-//                                "Follow Up Question:",
-//                                false
-//                            )
-//                        )
                     }
                 }
             } else if (component is Container) {
@@ -516,6 +503,7 @@ class ProjectService {
 
         findTabbedPanesRecursive(container)
     }
+
 
 
     fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
