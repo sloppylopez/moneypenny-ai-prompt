@@ -9,6 +9,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.Container
 import javax.swing.JScrollPane
+import javax.swing.JTabbedPane
 import javax.swing.JTextArea
 
 @Service(Service.Level.PROJECT)
@@ -74,15 +75,17 @@ class PromptService(project: Project) {
             val content = contentManager.getContent(index) ?: continue
             val simpleToolWindowPanel = content.component as? SimpleToolWindowPanel ?: continue
 
-            simpleToolWindowPanel.components.forEach { component ->
-                service.addChatWindowContentListModelToGlobalData(
-                    component as Container,
-                    text,
-                    currentRole,
-                    tabName,
-                    upperTabName,
-                    promptList
-                )
+            // Find the first component of type JTabbedPane
+            val jTabbedPaneComponent = simpleToolWindowPanel.components.firstOrNull { it is JTabbedPane } as? JTabbedPane ?: continue
+
+            service.addChatWindowContentListModelToGlobalData(
+                jTabbedPaneComponent as Container,
+                text,
+                currentRole,
+                tabName,
+                upperTabName,
+                promptList
+            )
 //                service.addChatWindowContentListModelToGlobalData(
 //                    component as Container,
 //                    "fun foo() { println(\"Hello from refactor machine!\") }",
@@ -91,7 +94,6 @@ class PromptService(project: Project) {
 //                    upperTabName,
 //                    listOf("User Prompt")
 //                )
-            }
         }
     }
 

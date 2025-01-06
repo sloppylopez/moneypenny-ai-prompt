@@ -419,9 +419,6 @@ class ProjectService {
         }
     }
 
-    // --------------------------------------------------------------------------
-    // CHANGED HERE: Instead of addKotlinCodeMessage, we now call addMessageFromResponse
-    // --------------------------------------------------------------------------
     fun addChatWindowContentListModelToGlobalData(
         container: Container,
         text: String,
