@@ -1,0 +1,65 @@
+**Topic:** Refactoring code using best practices.
+
+**Context:** The provided code consists of two classes: `FruitsCalculator` and `PrimeNumberCalculator`.
+
+**Intent:** Refactor the code to follow the DRY (Don't Repeat Yourself) principle, improve readability, and use concise one-liners where possible.
+
+**Named Entities:** `FruitsCalculator`, `PrimeNumberCalculator`, `calculate`, `getPrimeNumbers`, `isPrime`, `getEvenNumbers`, `getOddNumbers`, `getSumOfNumbers`, `getAverageOfNumbers`.
+
+**Keywords:** Refactor, DRY, best practices, one-liners, readability.
+
+**Sentiment:** Neutral.
+
+---
+
+```kotlin
+class FruitsCalculator {
+fun calculate() {
+val strings = listOf(
+"apple", "banana", "grape", "kiwi", "orange",
+"avocado", "blueberry", "pear", "pineapple", "peach"
+)
+
+val groupedWords = strings.groupBy { when {
+it.length <= 5 -> "Short"
+it.length in 6..8 -> "Medium"
+else -> "Long"
+} }
+
+fun printInfo(words: List<String>, count: Int) {
+println("Words: $words\nWords count: $count")
+}
+
+with(groupedWords) {
+printInfo(this["Short"] ?: emptyList(), this["Short"]?.size ?: 0)
+printInfo(this["Medium"] ?: emptyList(), this["Medium"]?.size ?: 0)
+printInfo(this["Long"] ?: emptyList(), this["Long"]?.size ?: 0)
+}
+}
+}
+
+class PrimeNumberCalculator {
+fun filterNumbers(numbers: Array<Int>, filterCondition: (Int) -> Boolean): List<Int> {
+return numbers.filter { filterCondition(it) }
+}
+
+fun getPrimeNumbers(numbers: Array<Int>): List<Int> = filterNumbers(numbers) { isPrime(it) }
+
+fun getEvenNumbers(numbers: Array<Int>): List<Int> = filterNumbers(numbers) { it % 2 == 0 }
+
+fun getOddNumbers(numbers: Array<Int>): List<Int> = filterNumbers(numbers) { it % 2 != 0 }
+
+fun getSumOfNumbers(numbers: Array<Int>): Int = numbers.sum()
+
+fun getAverageOfNumbers(numbers: Array<Int>): Double = numbers.average()
+
+private fun isPrime(number: Int): Boolean {
+if (number < 2) return false
+return (2..number / 2).all { number % it != 0 }
+}
+}
+```
+
+**Next Steps:** The code has been refactored to follow best practices, reduce redundancy, and improve readability. Each function now has a single responsibility, and concise one-liners have been used where possible.
+
+**Follow-up question:** Do you have any specific requirements or additional improvements in mind for the refactored code?

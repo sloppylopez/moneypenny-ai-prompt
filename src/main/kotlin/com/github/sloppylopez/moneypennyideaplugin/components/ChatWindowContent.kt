@@ -21,7 +21,7 @@ class ChatWindowContent(
     private val service: ProjectService by lazy { project.service<ProjectService>() }
     private val disposables = mutableListOf<Disposable>()
 
-    // Container panel that holds all the chat entries (each as its own JTextArea).
+    // Panel that holds all chat entries (each as its own JTextArea).
     private val chatPanel = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
         border = BorderFactory.createCompoundBorder(
@@ -43,6 +43,9 @@ class ChatWindowContent(
     /**
      * Adds a new chat entry to the panel. Each entry is a non-editable JTextArea
      * that supports partial text selection by default.
+     *
+     * Example usage:
+     *   addElement("🤖 refactor-machine:\n ... ```kotlin\nCode here\n``` ...")
      */
     fun addElement(element: String) {
         val textArea = JTextArea(element).apply {
@@ -54,18 +57,31 @@ class ChatWindowContent(
 
         textArea.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                // Double-click: copy entire content
+                // Double-click (left mouse) -> copy logic
                 if (e.clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
-                    val entireText = textArea.text
-                    service.copyToClipboard(entireText)
+                    // If the message is from refactor-machine, extract code blocks only:
+                    if (element.startsWith("🤖 refactor-machine")) {
+                        val codeBlocks = extractCodeBlocks(element)
+                        if (!codeBlocks.isNullOrEmpty()) {
+                            service.copyToClipboard(codeBlocks)
+                            service.showNotification(
+                                "Copied to clipboard",
+                                codeBlocks,
+                                NotificationType.INFORMATION
+                            )
+                            return
+                        }
+                    }
+                    // Otherwise (or if no code blocks found), copy entire text
+                    service.copyToClipboard(textArea.text)
                     service.showNotification(
                         "Copied to clipboard",
-                        entireText,
+                        textArea.text,
                         NotificationType.INFORMATION
                     )
                 }
 
-                // Right-click: show context menu
+                // Right-click -> show popup
                 if (SwingUtilities.isRightMouseButton(e)) {
                     showPopupMenu(e, textArea)
                 }
@@ -78,8 +94,8 @@ class ChatWindowContent(
     }
 
     /**
-     * Shows a popup menu with “Run” and “Run from here” actions.
-     * “Run” will copy either highlighted text (if any) or the entire text area content.
+     * Right-click popup menu logic. This can remain the same or be adapted
+     * (example: partial selection if user has something highlighted).
      */
     private fun showPopupMenu(e: MouseEvent, textArea: JTextArea) {
         val popupMenu = JPopupMenu()
@@ -97,7 +113,7 @@ class ChatWindowContent(
         val runFromHereItem = JMenuItem("Run from here").apply {
             addActionListener {
                 // Example placeholder: adapt as desired
-                service.showNotification("Run from here", "Run from here not yet implemented", NotificationType.INFORMATION)
+                service.showNotification("Run from here", "Not yet implemented", NotificationType.INFORMATION)
             }
         }
         popupMenu.add(runFromHereItem)
@@ -105,12 +121,53 @@ class ChatWindowContent(
         popupMenu.show(e.component, e.x, e.y)
     }
 
+    /**
+     * Extracts **all** code blocks (delimited by triple backticks) from the given text
+     * and concatenates them with a newline between each block.
+     *
+     * e.g. If text has:
+     *   ```kotlin
+     *   class X { ... }
+     *   ```
+     *   Some text
+     *   ```python
+     *   print("hello")
+     *   ```
+     * Then we return:
+     *   class X { ... }
+     *   (newline)
+     *   print("hello")
+     */
+    private fun extractCodeBlocks(fullText: String): String? {
+        // A regex that captures text between triple backticks.
+        // This handles:
+        // ```kotlin
+        //   some code
+        // ```
+        // or:
+        // ```
+        //   code with no specified language
+        // ```
+        // DOT_MATCHES_ALL to capture newlines inside the group.
+        val pattern = Regex("""```(?:\w+)?\s*\n(.*?)\n?```""", RegexOption.DOT_MATCHES_ALL)
+
+        val matches = pattern.findAll(fullText).toList()
+        if (matches.isEmpty()) {
+            return null
+        }
+
+        // Join each match group (group 1) with a newline separating them
+        return matches.joinToString("\n") { matchResult ->
+            // matchResult.groupValues[1] is the code inside the backticks
+            matchResult.groupValues[1].trimEnd()
+        }
+    }
+
     fun getTabCountIndex(): Int = tabCountIndex
 
     override fun getPreferredSize(): Dimension = Dimension(500, 350)
 
     override fun dispose() {
-        // If you had any Disposable objects or listeners to clean up, do so here
         disposables.forEach { it.dispose() }
         disposables.clear()
     }
