@@ -44,10 +44,7 @@ import java.io.File
 import java.io.FileReader
 import java.util.*
 import java.util.stream.Collectors
-import javax.swing.Icon
-import javax.swing.ImageIcon
-import javax.swing.JPanel
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
@@ -474,6 +471,7 @@ class ProjectService {
         if (!extensionFolder.exists()) {
             extensionFolder.mkdir()
         }
+        //C:\Users\sergi\PycharmProjects2\moneypenny-idea-plugin\build\idea-sandbox\plugins\MoneyPenny AI\prompt_history.json
         val dataFile = File(extensionFolder, "prompt_history.json")
         dataFile.writeText(data)
     }
@@ -502,7 +500,7 @@ class ProjectService {
             true
         )
         actionGroup.add(SendToPromptTextEditorActionParallel(project))
-        actionGroup.add(AddTextAction(project))
+//        actionGroup.add(AddTextAction(project))
         actionGroup.addSeparator()
         actionGroup.add(RunPromptAction(project))
         actionGroup.add(RunAllInTabPromptAction(project))
@@ -525,7 +523,7 @@ class ProjectService {
                 AllIcons.CodeWithMe.Users,
                 "Role Selection",
                 GlobalData.roleModelStrings,
-                "ChatGPT Roles"
+                "Roles"
             )
         )
         actionGroup.addSeparator()
