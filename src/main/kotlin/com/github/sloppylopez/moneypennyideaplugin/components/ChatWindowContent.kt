@@ -47,16 +47,10 @@ class ChatWindowContent(
         add(scrollPane, BorderLayout.CENTER)
     }
 
-    // ----------------------------------------------------------------------
-    //  For backward compatibility: treat addElement(...) as plain text
-    // ----------------------------------------------------------------------
     fun addElement(element: String) {
         addPlainMessage(element)
     }
 
-    /**
-     * Add a plain-text cell via JTextArea (used by older code or for debugging).
-     */
     fun addPlainMessage(text: String) {
         val textArea = JTextArea(text).apply {
             isEditable = false
