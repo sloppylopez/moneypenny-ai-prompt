@@ -55,7 +55,7 @@ class ChatWindowContent(
     }
 
     /**
-     * Add a plain-text cell via JTextArea.
+     * Add a plain-text cell via JTextArea (used by older code or for debugging).
      */
     fun addPlainMessage(text: String) {
         val textArea = JTextArea(text).apply {
@@ -84,24 +84,60 @@ class ChatWindowContent(
     }
 
     // ----------------------------------------------------------------------
-    //  Add a Kotlin code cell with syntax highlighting
+    //  NEW: Add a message that might contain triple-backtick code blocks
     // ----------------------------------------------------------------------
-    fun addKotlinCodeMessage(code: String) {
-        // Attempt to get the Kotlin language, else fallback to Language.ANY
-        val language = Language.findLanguageByID("kotlin") ?: Language.ANY
-        val editorPanel = createEditorComponentAsync(code, language)
-        chatPanel.add(editorPanel)
-        chatPanel.revalidate()
-        chatPanel.repaint()
+    /**
+     * Takes an entire ChatGPT response (which may have text plus code fences)
+     * and displays ONLY the code inside triple backticks, one cell per fence.
+     * e.g. "```kotlin\nsome code\n```" => we display that code with Kotlin highlighting.
+     *
+     * If no language is specified or recognized, fallback to Language.ANY.
+     */
+    fun addMessageFromResponse(fullResponse: String) {
+        // Regex to capture:
+        // group(1) = optional language label (like 'kotlin', 'java', etc.)
+        // group(2) = code content
+        // We do '```(\w+)?\s*\n(.*?)\n?```' to handle possible whitespace + newline.
+        val pattern = Regex("""```(\w+)?\s*\n(.*?)\n?```""", RegexOption.DOT_MATCHES_ALL)
+
+        val matches = pattern.findAll(fullResponse).toList()
+        if (matches.isEmpty()) {
+            // If no code blocks found, do nothing (or optionally show something?)
+            return
+        }
+
+        for (match in matches) {
+            val languageLabel = match.groups[1]?.value  // e.g. "kotlin"
+            val code = match.groups[2]?.value ?: ""
+            addCodeBlock(code, languageLabel)
+        }
+    }
+
+    /**
+     * Based on the optional languageLabel, try to highlight as that language.
+     * If not found, fallback to ANY.
+     */
+    private fun addCodeBlock(code: String, languageLabel: String?) {
+        // If user typed "kotlin" or "java" or "js"
+        if (!languageLabel.isNullOrBlank()) {
+            val foundLanguage = Language.findLanguageByID(languageLabel.lowercase()) ?: Language.ANY
+            addCodeCellAsync(code, foundLanguage)
+        } else {
+            // No label => fallback
+            addCodeCellAsync(code, Language.ANY)
+        }
     }
 
     /**
      * Create a read-only editor *asynchronously* on the EDT + read action,
      * returning a placeholder panel immediately.
      */
-    private fun createEditorComponentAsync(code: String, language: Language): JPanel {
-        // Return a panel now (so we don't block the caller).
+    private fun addCodeCellAsync(code: String, language: Language) {
+        // Return a panel now (so we don't block).
         val placeholderPanel = JPanel(BorderLayout())
+        chatPanel.add(placeholderPanel)
+        chatPanel.revalidate()
+        chatPanel.repaint()
 
         // 1) Schedule on the Event Dispatch Thread:
         ApplicationManager.getApplication().invokeLater {
@@ -109,14 +145,11 @@ class ChatWindowContent(
             ApplicationManager.getApplication().runReadAction {
                 val virtualFile: VirtualFile = LightVirtualFile("DummyFile.${language.id}", language, code)
 
-                // Attempt to get doc from FileDocumentManager; if null, create a new doc
                 val doc: Document = FileDocumentManager.getInstance().getDocument(virtualFile)
                     ?: EditorFactory.getInstance().createDocument(code)
 
-                // Create the editor in read-only mode
                 val editor: Editor = EditorFactory.getInstance().createEditor(doc, project, virtualFile, true)
 
-                // Tweak editor settings
                 (editor as? EditorEx)?.apply {
                     isViewer = true
                     settings.isLineNumbersShown = true
@@ -126,30 +159,26 @@ class ChatWindowContent(
                     settings.additionalLinesCount = 2
                 }
 
-                // Add a mouse listener for double-click + right-click on the editor
+                // Add double-click / right-click logic
                 editor.component.addMouseListener(object : MouseAdapter() {
                     override fun mouseClicked(e: MouseEvent) {
-                        // Double-click -> copy entire code
                         if (e.clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
                             val codeToCopy = doc.text
                             service.copyToClipboard(codeToCopy)
                             service.showNotification("Copied to clipboard", codeToCopy, NotificationType.INFORMATION)
                         }
-                        // Right-click -> show editor popup
                         if (SwingUtilities.isRightMouseButton(e)) {
                             showEditorPopup(e, editor)
                         }
                     }
                 })
 
-                // Finally, put the editor UI into our placeholder
+                // Insert the editor into placeholder
                 placeholderPanel.add(editor.component, BorderLayout.CENTER)
                 placeholderPanel.revalidate()
                 placeholderPanel.repaint()
             }
         }
-
-        return placeholderPanel
     }
 
     /**
@@ -208,7 +237,7 @@ class ChatWindowContent(
     fun getTabCountIndex(): Int = tabCountIndex
 
     override fun dispose() {
-        // We could store editor references to release them in the future.
+        // We could store editor references to release them in the future if desired.
         disposables.forEach { it.dispose() }
         disposables.clear()
     }

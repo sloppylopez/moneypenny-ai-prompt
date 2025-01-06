@@ -9,8 +9,12 @@ import com.github.sloppylopez.moneypennyideaplugin.data.GlobalData.tabNameToFile
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
 import com.google.gson.Gson
 import com.intellij.icons.AllIcons
-import com.intellij.notification.*
-import com.intellij.openapi.actionSystem.*
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionToolbar
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
@@ -18,18 +22,13 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.openapi.fileEditor.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.NlsSafe
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.*
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.PsiElement
@@ -45,11 +44,14 @@ import java.io.File
 import java.io.FileReader
 import java.util.*
 import java.util.stream.Collectors
-import javax.swing.*
-
+import javax.swing.Icon
+import javax.swing.ImageIcon
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 @Service(Service.Level.PROJECT)
 class ProjectService {
+
     private val currentProcessPrompt = Key.create<String>("Current Processed Prompt")
     private val pluginId = "MoneyPenny AI"
 
@@ -111,7 +113,7 @@ class ProjectService {
     fun showDialog(
         message: String,
         title: String,
-        buttons: Array<String>? = emptyArray<String>(),
+        buttons: Array<String>? = emptyArray(),
         defaultOptionIndex: Int? = 0,
         icon: Icon? = AllIcons.Icons.Ide.NextStep
     ) {
@@ -245,7 +247,6 @@ class ProjectService {
         }
     }
 
-
     fun expandFolders(fileList: List<*>? = null): List<File> {
         if (fileList == null) {
             return emptyList()
@@ -334,21 +335,10 @@ class ProjectService {
             if (contentPromptText != null) {
                 tabNameToContentPromptTextMap[tabName] = contentPromptText
             } else {
-                // Optionally, set it to an empty string or skip altogether if not needed.
                 tabNameToContentPromptTextMap[tabName] = ""
             }
         }
-
-        // The following block attempts to set content again based on file and contentPromptText
-        // but is redundant and can cause confusion, especially in concat mode.
-        // Remove or revise it if it's not absolutely necessary.
-        //
-        // if (contentPromptText != null && file != null) {
-        //     val currentTabName = "$downerTabName) ${file.name}"
-        //     tabNameToContentPromptTextMap[currentTabName] = contentPromptText
-        // }
     }
-
 
     fun getProject(): Project? {
         return ProjectManager.getInstance().openProjects.firstOrNull()
@@ -357,29 +347,6 @@ class ProjectService {
     fun getToolWindow(): ToolWindow? {
         return ToolWindowManager.getInstance(getProject()!!).getToolWindow(pluginId)
     }
-
-//    fun sendFileToContentPrompt(
-//        editor: Editor?,
-//        file: File?,
-//    ) {
-//        try {
-//            editor?.let { selectedEditor ->
-//                var selectedTextFromEditor = selectedEditor.selectionModel.selectedText
-//                if (selectedTextFromEditor.isNullOrEmpty()) {
-//                    selectedTextFromEditor = this.getSelectedTextFromOpenedFileInEditor(selectedEditor)
-//                }
-//                if (!selectedTextFromEditor.isNullOrEmpty()) {
-//                    addTabbedPaneToToolWindow(
-//                        this.getProject()!!,
-//                        listOf(file),
-//                        selectedTextFromEditor
-//                    )
-//                }
-//            }
-//        } catch (e: Exception) {
-//            thisLogger().error(e.stackTraceToString())
-//        }
-//    }
 
     fun getSelectedTextFromEditor(editor: Editor?): String? {
         return editor?.let { selectedEditor ->
@@ -445,20 +412,16 @@ class ProjectService {
         component: ChatWindowContent
     ) {
         val followUpQuestionLast =
-            splitParts[splitParts.size - 1]//this magic number is to take the follow-up question from the npm analysis response part of the previous request
-        if (/*(followUpQuestionLast.contains("Follow Up Question:", true) ||
-                    followUpQuestionLast.contains("Follow Up:", true) ||
-                    followUpQuestionLast.contains("Follow-Up Question:", true) ||
-                    followUpQuestionLast.contains("Follow-Up:", true) ||
-                    followUpQuestionLast.contains("Next Follow Up Question:", true) ||
-                    followUpQuestionLast.contains("Next Follow-Up Question:", true)) &&*/
-            GlobalData.followUpActive
-        ) {
-//            component.addElement("$role: -> $followUpQuestionLast")
+            splitParts[splitParts.size - 1]
+        if (GlobalData.followUpActive) {
+            // If you want to display a follow-up, do it here
+            // e.g.: component.addPlainMessage("Follow-up? -> $followUpQuestionLast")
         }
     }
 
-    //TODO: This method is not very robust, find a better way to do this
+    // --------------------------------------------------------------------------
+    // CHANGED HERE: Instead of addKotlinCodeMessage, we now call addMessageFromResponse
+    // --------------------------------------------------------------------------
     fun addChatWindowContentListModelToGlobalData(
         container: Container,
         text: String,
@@ -479,10 +442,10 @@ class ProjectService {
                     // 1) Show who the user role is (plain text):
                     component.addElement("${GlobalData.userRole}:\n${promptList}")
 
-                    // 2) If the role is '🤖 refactor-machine', show code as Kotlin
+                    // 2) If the role is '🤖 refactor-machine', parse code blocks only
                     if (currentRole == "🤖 refactor-machine") {
-                        // We add the entire 'text' as a Kotlin code cell:
-                        component.addKotlinCodeMessage(text)
+                        // NEW: parse code fences from 'text' and add them
+                        component.addMessageFromResponse(text)
                     } else {
                         // Otherwise, plain text
                         component.addElement("$currentRole:\n${text.split("\n").joinToString("\n")}\n\n")
@@ -503,8 +466,6 @@ class ProjectService {
 
         findTabbedPanesRecursive(container)
     }
-
-
 
     fun getPromptsAsJson(prompts: MutableMap<String, Map<String, List<String>>>): String {
         return Gson().toJson(prompts)
@@ -592,32 +553,4 @@ class ProjectService {
     fun createPointer(element: PsiElement) {
         SmartPointerManager.createPointer<PsiElement?>(element)
     }
-//TODO use alarms to be able to cancel requests supposedly
-//    fun createToolBar(toolWindow: JComponent?): JComponent {
-//        val actionGroup = DefaultActionGroup()
-//        actionGroup.add(SendToPromptFileFolderTreeAction(this.getProject()!!))
-//        actionGroup.addSeparator()
-//        val actionManager: ActionManager = ActionManager.getInstance()
-//        val toolbar: ActionToolbar = actionManager.createActionToolbar("MoneyPennyAI.MainPanel", actionGroup, true)
-//        toolbar.targetComponent = toolWindow
-//        return toolbar.component
-//    }
-
-//    JOptionPane.showMessageDialog(
-//    this@SQLPluginPanel, "Can't read file '$file'", "Error",
-//    JOptionPane.ERROR_MESSAGE
-//    )
-////Write a kotlin class that will do the same as this one but instead of adding buttons, it will add Actions to a ToolBar, the actions will match with the buttons so "Run", "Run All" and "Copy Prompt", assume we are using Intellij Idea SDK
-
-//    fun hola(){
-//        getProject().getModelAccess().executeCommand(object : DefaultCommand() {
-//            fun run() {
-//                createConsoleModel()
-//                addBuiltInImports()
-//                loadHistory(history)
-//                createEditor()
-//                myFileEditor = ConsoleFileEditor(myEditor)
-//            }
-//        })
-//    }
 }
