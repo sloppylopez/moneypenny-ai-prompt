@@ -91,6 +91,7 @@ jobs:
           unzip "$FILENAME" -d content
 
           echo "filename=${FILENAME:0:-4}" >> $GITHUB_OUTPUT
+        continue-on-error: true
 
       # Store already-built plugin as an artifact for downloading
       - name: Upload artifact
