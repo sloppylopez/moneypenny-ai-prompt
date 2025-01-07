@@ -26,6 +26,7 @@
     <!-- TODO check if this is required If you specifically rely on Kotlin highlighting: -->
     <depends>org.jetbrains.kotlin</depends>
     <!-- Resource Bundle -->
+<!--    <depends>org.jetbrains.kotlin.compilerEmbeddable</depends>-->
     <resource-bundle>messages.Bundle</resource-bundle>
 
     <!-- Tool Window Registration -->
@@ -34,10 +35,26 @@
                     id="MoneyPenny AI" anchor="right" icon="/icons/pluginIcon.svg"/>
         <startupActivity
                 implementation="com.github.sloppylopez.moneypennyideaplugin.toolWindow.PostStartupIntentionSetupActivity"/>
+        <lineMarkerProvider
+                implementation="com.github.sloppylopez.moneypennyideaplugin.provider.MarkdownLineMarkerProvider"/>
+        <inlayProvider language="JAVA" implementationClass="com.github.sloppylopez.moneypennyideaplugin.actions.ClickableTextInlayHintsProvider" />
+        <inlayProvider language="kotlin" implementationClass="com.github.sloppylopez.moneypennyideaplugin.actions.ClickableTextInlayHintsProvider" />
+    </extensions>
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK2="true" />
     </extensions>
     <!-- Application Listeners -->
     <applicationListeners>
         <listener class="com.github.sloppylopez.moneypennyideaplugin.listeners.ApplicationActivationListener"
                   topic="com.intellij.openapi.application.ApplicationActivationListener"/>
     </applicationListeners>
+    <actions>
+        <action
+                id="TestMarkdownLineMarkerAction"
+                class="com.github.sloppylopez.moneypennyideaplugin.actions.TestMarkdownLineMarkerAction"
+                text="Test Markdown Line Marker"
+                description="Test the Markdown Line Marker">
+            <add-to-group group-id="ToolsMenu" />
+        </action>
+    </actions>
 </idea-plugin>

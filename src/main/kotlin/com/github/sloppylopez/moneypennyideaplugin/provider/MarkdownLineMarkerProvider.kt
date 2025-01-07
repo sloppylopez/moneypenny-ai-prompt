@@ -5,21 +5,23 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.util.IconLoader
 import com.intellij.psi.PsiElement
-import com.intellij.psi.tree.TokenSet
-import org.intellij.plugins.markdown.lang.MarkdownElementTypes
+import org.intellij.markdown.MarkdownTokenTypes
 import javax.swing.Icon
 
 internal class MarkdownLineMarkerProvider : LineMarkerProvider {
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
+        println("Processing element: ${element.text}")
         val node = element.node
-        val tokenSet = TokenSet.create(MarkdownElementTypes.INLINE_LINK)
         val icon = loadIcon("icons/ic_linemarkerprovider.svg")
 
-        return if (tokenSet.contains(node.elementType)) {
-            createLineMarkerInfo(element, icon)
-        } else {
-            null
+        return when (node.elementType) {
+            MarkdownTokenTypes.URL,
+            MarkdownTokenTypes.AUTOLINK -> {
+                println("Adding line marker to: ${element.text}")
+                createLineMarkerInfo(element, icon)
+            }
+            else -> null
         }
     }
 
