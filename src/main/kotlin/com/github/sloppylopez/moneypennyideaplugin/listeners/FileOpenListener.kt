@@ -4,55 +4,50 @@ import com.github.sloppylopez.moneypennyideaplugin.inlay.SimpleInlayManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.ex.MarkupModelEx
-import com.intellij.openapi.editor.impl.DocumentMarkupModel
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 
 class FileOpenListener(private val project: Project) {
 
-    private val listeners: MutableList<Pair<MarkupModelEx, Editor>> = mutableListOf()
+    private val editorsWithInlays = mutableSetOf<Editor>() // Track editors that already have inlays
 
     fun register() {
         val connection = project.messageBus.connect()
         connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, object : FileEditorManagerListener {
+
             override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
                 thisLogger().info("File opened: ${file.name}")
-                addInlayToEditor(file)
+                addInlayToCurrentEditor()
+            }
+
+            override fun selectionChanged(event: FileEditorManagerEvent) {
+                thisLogger().info("Editor selection changed to: ${event.newFile?.name}")
+                addInlayToCurrentEditor()
+            }
+
+            override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
+                thisLogger().info("File closed: ${file.name}")
             }
         })
     }
 
-    private fun addInlayToEditor(file: VirtualFile) {
+    private fun addInlayToCurrentEditor() {
         ApplicationManager.getApplication().invokeLater {
             val editor = FileEditorManager.getInstance(project).selectedTextEditor ?: return@invokeLater
 
-            val document = editor.document
-            val markupModel = DocumentMarkupModel.forDocument(document, project, false) as? MarkupModelEx
-                ?: return@invokeLater
+            // Avoid adding inlays to the same editor multiple times
+            if (editorsWithInlays.contains(editor)) {
+                thisLogger().info("Inlay already added for this editor. Skipping.")
+                return@invokeLater
+            }
 
-            // Add the clickable inlay
             SimpleInlayManager().addEnhancedInlay(editor)
 
-            // Track the editor and markup model for updates
-            listeners.add(Pair(markupModel, editor))
-
-            thisLogger().info("Clickable inlay added to editor for file: ${file.name}")
-        }
-    }
-
-    fun updateAllListeners() {
-        ApplicationManager.getApplication().invokeLater {
-            listeners.forEach { (_, editor) ->
-                try {
-                    // Reapply inlays if necessary
-                    SimpleInlayManager().addEnhancedInlay(editor)
-                } catch (e: Exception) {
-                    thisLogger().error("Error updating inlays for editor: ${e.stackTraceToString()}")
-                }
-            }
+            editorsWithInlays.add(editor) // Mark this editor as having an inlay
+            thisLogger().info("Clickable inlay added to editor.")
         }
     }
 }
