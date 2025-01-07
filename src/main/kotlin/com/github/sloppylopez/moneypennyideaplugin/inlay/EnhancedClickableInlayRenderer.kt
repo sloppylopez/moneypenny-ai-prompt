@@ -18,12 +18,13 @@ class EnhancedClickableInlayRenderer(
     private val onClick: () -> Unit
 ) : EditorCustomElementRenderer {
 
-    private var isListenerAdded = false // Flag to track if the listener is already added
+    private var isListenerAdded = false // Prevent duplicate listeners
 
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
-        val fontMetrics =
-            editor.contentComponent.getFontMetrics(editor.colorsScheme.getFont(com.intellij.openapi.editor.colors.EditorFontType.PLAIN))
-        return fontMetrics.stringWidth(text) + 10 // Add some padding
+        val fontMetrics = editor.contentComponent.getFontMetrics(
+            editor.colorsScheme.getFont(com.intellij.openapi.editor.colors.EditorFontType.PLAIN)
+        )
+        return fontMetrics.stringWidth(text) + 10 // Add padding for clarity
     }
 
     override fun paint(
@@ -32,19 +33,19 @@ class EnhancedClickableInlayRenderer(
         targetRegion: Rectangle,
         textAttributes: TextAttributes
     ) {
-        // Set font and colors
+        // Set font and colors for the rendered text
         val font = Font("Arial", Font.BOLD, editor.colorsScheme.editorFontSize)
         g.font = font
 
-        // Shadow effect
+        // Draw shadow for a 3D effect
         g.color = Color.GRAY
         g.drawString(text, targetRegion.x + 2, targetRegion.y + g.fontMetrics.ascent + 2)
 
-        // Main text
+        // Draw main text
         g.color = Color.BLUE
         g.drawString(text, targetRegion.x, targetRegion.y + g.fontMetrics.ascent)
 
-        // Draw underline
+        // Add underline
         g.drawLine(
             targetRegion.x,
             targetRegion.y + g.fontMetrics.ascent + 2,
@@ -73,14 +74,11 @@ class EnhancedClickableInlayRenderer(
             }
         }
 
-        // Remove any existing listeners to avoid duplicates
-        for (listener in editor.contentComponent.mouseListeners) {
-            if (listener is MouseAdapter) {
-                editor.contentComponent.removeMouseListener(listener)
-            }
-        }
+        // Ensure only one mouse listener is added
+        editor.contentComponent.mouseListeners
+            .filterIsInstance<MouseAdapter>()
+            .forEach { editor.contentComponent.removeMouseListener(it) }
 
-        // Add the new listener
         editor.contentComponent.addMouseListener(mouseListener)
     }
 }

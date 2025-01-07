@@ -10,9 +10,21 @@ class SimpleInlayManager {
         val inlayModel: InlayModel = editor.inlayModel
         val offset = 0 // Add the inlay at the very beginning of the document
 
-        inlayModel.addInlineElement(offset, true, EnhancedClickableInlayRenderer("Click Me", editor) {
-            // This callback will be triggered on click
-            Messages.showMessageDialog(editor.project, "You clicked the inlay!", "Click Event", Messages.getInformationIcon())
-        })
+        // Use block inlay without named arguments
+        inlayModel.addBlockElement(
+            offset,
+            true,  // relatesToPrecedingText
+            true,  // showAbove
+            0,     // priority
+            EnhancedClickableInlayRenderer("Click Me", editor) {
+                // This callback will be triggered on click
+                Messages.showMessageDialog(
+                    editor.project,
+                    "You clicked the inlay!",
+                    "Click Event",
+                    Messages.getInformationIcon()
+                )
+            }
+        )
     }
 }
