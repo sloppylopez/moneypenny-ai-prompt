@@ -3,6 +3,7 @@ package com.github.sloppylopez.moneypennyideaplugin.listeners
 import com.github.sloppylopez.moneypennyideaplugin.inlay.SimpleInlayManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.MarkupModelEx
 import com.intellij.openapi.editor.impl.DocumentMarkupModel
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -12,7 +13,7 @@ import com.intellij.openapi.vfs.VirtualFile
 
 class FileOpenListener(private val project: Project) {
 
-    private val listeners: MutableList<Pair<MarkupModelEx, SimpleInlayManager>> = mutableListOf()
+    private val listeners: MutableList<Pair<MarkupModelEx, Editor>> = mutableListOf()
 
     fun register() {
         val connection = project.messageBus.connect()
@@ -32,20 +33,25 @@ class FileOpenListener(private val project: Project) {
             val markupModel = DocumentMarkupModel.forDocument(document, project, false) as? MarkupModelEx
                 ?: return@invokeLater
 
-            // Initialize SimpleInlayManager for this editor
-            val inlayManager = SimpleInlayManager()
-            inlayManager.addHelloWorldInlay(editor)
+            // Add the clickable inlay
+            SimpleInlayManager().addEnhancedInlay(editor)
 
-            listeners.add(Pair(markupModel, inlayManager))
-            thisLogger().info("Inlay added to editor for file: ${file.name}")
+            // Track the editor and markup model for updates
+            listeners.add(Pair(markupModel, editor))
+
+            thisLogger().info("Clickable inlay added to editor for file: ${file.name}")
         }
     }
 
     fun updateAllListeners() {
-        // Iterate through listeners and reapply any necessary updates
-        listeners.forEach { (model, manager) ->
-            model.allHighlighters.forEach {
-                // Logic to update or reapply inlay highlights
+        ApplicationManager.getApplication().invokeLater {
+            listeners.forEach { (_, editor) ->
+                try {
+                    // Reapply inlays if necessary
+                    SimpleInlayManager().addEnhancedInlay(editor)
+                } catch (e: Exception) {
+                    thisLogger().error("Error updating inlays for editor: ${e.stackTraceToString()}")
+                }
             }
         }
     }
