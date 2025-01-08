@@ -12,19 +12,24 @@ import javax.swing.SwingUtilities
 class EnhancedClickableInlayRenderer(
     private val editor: Editor,
     private val onTestClick: () -> Unit,
-    private val onOptionsClick: () -> Unit
+    private val onOptionClick: (String) -> Unit
 ) : EditorCustomElementRenderer {
 
+    private var isOptionsExpanded = false
     private val padding = 10
     private var isListenerAdded = false
+    private val optionsList = listOf("Security Check", "Improve", "Explain", "Docstring")
 
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
         val fontMetrics = editor.contentComponent.getFontMetrics(
             editor.colorsScheme.getFont(com.intellij.openapi.editor.colors.EditorFontType.PLAIN)
         )
-        val testWidth = fontMetrics.stringWidth("Test this code")
-        val optionsWidth = fontMetrics.stringWidth("Options")
-        return testWidth + optionsWidth + 3 * padding // Total width with padding
+        val baseText = if (isOptionsExpanded) {
+            "Test this code | Options -> ${optionsList.joinToString(", ")}"
+        } else {
+            "Test this code | Options"
+        }
+        return fontMetrics.stringWidth(baseText) + padding
     }
 
     override fun paint(
@@ -38,42 +43,81 @@ class EnhancedClickableInlayRenderer(
 
         val fontMetrics = g.fontMetrics
         val ascent = fontMetrics.ascent
+        var currentX = targetRegion.x
 
         // Draw "Test this code"
         g.color = Color.BLUE
-        val testX = targetRegion.x
-        g.drawString("Test this code", testX, targetRegion.y + ascent)
+        g.drawString("Test this code", currentX, targetRegion.y + ascent)
+        val testEndX = currentX + fontMetrics.stringWidth("Test this code")
+        currentX = testEndX + padding
 
-        // Draw "Options"
-        val optionsX = testX + fontMetrics.stringWidth("Test this code") + padding
-        g.color = Color.RED
-        g.drawString("Options", optionsX, targetRegion.y + ascent)
+        if (isOptionsExpanded) {
+            // Draw expanded options
+            g.color = Color.RED
+            g.drawString("Options ->", currentX, targetRegion.y + ascent)
+            currentX += fontMetrics.stringWidth("Options ->") + padding
+
+            for (option in optionsList) {
+                g.drawString(option, currentX, targetRegion.y + ascent)
+                currentX += fontMetrics.stringWidth(option) + padding
+            }
+        } else {
+            // Draw "Options"
+            g.color = Color.RED
+            g.drawString("Options", currentX, targetRegion.y + ascent)
+        }
 
         if (!isListenerAdded) {
-            addMouseListener(targetRegion, testX, optionsX, fontMetrics)
+            addMouseListener(targetRegion, fontMetrics, testEndX, ascent)
             isListenerAdded = true
         }
     }
 
-    private fun addMouseListener(targetRegion: Rectangle, testX: Int, optionsX: Int, fontMetrics: FontMetrics) {
+    private fun addMouseListener(
+        targetRegion: Rectangle,
+        fontMetrics: FontMetrics,
+        testEndX: Int,
+        ascent: Int
+    ) {
         val mouseListener = object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     val mouseX = e.x
                     val mouseY = e.y
+                    var currentX = targetRegion.x
 
-                    // Check if click is within "Test this code"
-                    if (mouseX in testX until (testX + fontMetrics.stringWidth("Test this code")) &&
-                        targetRegion.contains(mouseX, mouseY)
-                    ) {
+                    // Handle "Test this code"
+                    val testEndX = currentX + fontMetrics.stringWidth("Test this code")
+                    if (mouseX in currentX until testEndX) {
                         onTestClick.invoke()
+                        return
                     }
+                    currentX = testEndX + padding
 
-                    // Check if click is within "Options"
-                    if (mouseX in optionsX until (optionsX + fontMetrics.stringWidth("Options")) &&
-                        targetRegion.contains(mouseX, mouseY)
-                    ) {
-                        onOptionsClick.invoke()
+                    if (isOptionsExpanded) {
+                        // Handle expanded options
+                        val optionsStartX = currentX
+                        currentX += fontMetrics.stringWidth("Options ->") + padding
+                        for (option in optionsList) {
+                            val optionEndX = currentX + fontMetrics.stringWidth(option)
+                            if (mouseX in currentX until optionEndX) {
+                                onOptionClick(option)
+                                return
+                            }
+                            currentX = optionEndX + padding
+                        }
+                        // If no option is clicked, check if "Options ->" is clicked
+                        if (mouseX in optionsStartX until (optionsStartX + fontMetrics.stringWidth("Options ->"))) {
+                            isOptionsExpanded = false
+                            editor.contentComponent.repaint()
+                            return
+                        }
+                    } else {
+                        // Handle "Options"
+                        if (mouseX in currentX until (currentX + fontMetrics.stringWidth("Options"))) {
+                            isOptionsExpanded = true
+                            editor.contentComponent.repaint()
+                        }
                     }
                 }
             }

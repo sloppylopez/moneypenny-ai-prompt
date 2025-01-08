@@ -10,7 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil
 class SimpleInlayManager {
 
     fun addEnhancedInlaysAboveClasses(editor: Editor) {
-        // Retrieve the VirtualFile using FileDocumentManager
         val virtualFile = FileDocumentManager.getInstance().getFile(editor.document)
         val psiFile = editor.project?.let { project ->
             virtualFile?.let { com.intellij.psi.PsiManager.getInstance(project).findFile(it) }
@@ -18,34 +17,32 @@ class SimpleInlayManager {
 
         val inlayModel: InlayModel = editor.inlayModel
 
-        // Find all class-like elements in the file and select the first one
         val classElement = PsiTreeUtil.findChildrenOfType(psiFile, PsiElement::class.java)
             .firstOrNull { isClassElement(it) }
 
         if (classElement != null) {
             val offset = classElement.textOffset
 
-            // Add a single inlay above the class
             inlayModel.addBlockElement(
                 offset,
-                false, // relatesToPrecedingText
-                true,  // showAbove
-                0,     // priority
+                false,
+                true,
+                0,
                 EnhancedClickableInlayRenderer(
                     editor,
                     onTestClick = {
                         Messages.showMessageDialog(
                             editor.project,
-                            "Test this code for: ${classElement.text}",
-                            "Inlay Clicked",
+                            "Testing this code for class: ${classElement.text}",
+                            "Test Action",
                             Messages.getInformationIcon()
                         )
                     },
-                    onOptionsClick = {
+                    onOptionClick = { option ->
                         Messages.showMessageDialog(
                             editor.project,
-                            "Options for: ${classElement.text}",
-                            "Inlay Clicked",
+                            "Option selected: $option",
+                            "Option Action",
                             Messages.getInformationIcon()
                         )
                     }
@@ -55,7 +52,6 @@ class SimpleInlayManager {
     }
 
     private fun isClassElement(element: PsiElement): Boolean {
-        // Logic to identify class-like elements
         val elementType = element.node?.elementType?.toString()?.lowercase()
         return elementType?.contains("class") == true
     }
