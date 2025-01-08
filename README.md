@@ -119,6 +119,9 @@ code? Fork the repository and submit a pull request. We're excited to see your c
     <li><a href="https://plugins.jetbrains.com/docs/intellij/psi-files.html#how-do-i-get-a-psi-file">Psi files</a></li>
     <li><a href="https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html?from=jetbrains.org#bundled-and-other-plugins">Plugins Support</a></li>
     <li><a href="https://mediamodifier.com/svg-editor#">Svg Editor</a></li>
+    <li><a href="https://github.com/JetBrains/intellij-sdk-docs/blob/main/code_samples/psi_demo/src/main/java/org/intellij/sdk/psi/PsiNavigationDemoAction.java">PsiNavigationDemoAction</a></li>
+    <li><a href="https://github.com/codeemoji/codeemoji-plugin/blob/main/src/main/java/codeemoji/inlay/external/VulnerabilityInfo.java">VulnerabilityInfo</a></li>
+    <li><a href="https://github.com/IoaNNUwU/InLine/blob/main/src/main/kotlin/com/ioannuwu/inline2/pluginlogic/render/RenderDataElementMetrics.kt">RenderDataElementMetrics</a></li>
   </ul>
 </div>
 
