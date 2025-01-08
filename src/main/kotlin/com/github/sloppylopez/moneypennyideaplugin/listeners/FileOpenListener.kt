@@ -12,7 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile
 
 class FileOpenListener(private val project: Project) {
 
-    private val editorsWithInlays = mutableSetOf<Editor>() // Track editors that already have inlays
+    private val editorsWithInlays = mutableSetOf<Editor>() // Track editors with inlays
 
     fun register() {
         val connection = project.messageBus.connect()
@@ -30,6 +30,7 @@ class FileOpenListener(private val project: Project) {
 
             override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
                 thisLogger().info("File closed: ${file.name}")
+                removeEditorFromTracking(source.selectedTextEditor)
             }
         })
     }
@@ -44,10 +45,17 @@ class FileOpenListener(private val project: Project) {
                 return@invokeLater
             }
 
-            SimpleInlayManager().addEnhancedInlay(editor)
+            SimpleInlayManager().addEnhancedInlaysAboveClasses(editor)
 
             editorsWithInlays.add(editor) // Mark this editor as having an inlay
             thisLogger().info("Clickable inlay added to editor.")
+        }
+    }
+
+    private fun removeEditorFromTracking(editor: Editor?) {
+        editor?.let {
+            editorsWithInlays.remove(it)
+            thisLogger().info("Editor removed from tracking.")
         }
     }
 }
