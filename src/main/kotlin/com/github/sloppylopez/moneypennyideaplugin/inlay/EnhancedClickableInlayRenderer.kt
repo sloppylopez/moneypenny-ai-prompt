@@ -82,12 +82,11 @@ class EnhancedClickableInlayRenderer(
         val mouseListener = object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    // Check if the click's y-coordinate falls within this inlay's vertical region.
-                    if (e.y !in targetRegion.y until (targetRegion.y + targetRegion.height)) {
-                        return
-                    }
+                    // Only process if the click is within this inlay's bounds.
+                    if (!targetRegion.contains(e.point)) return
 
                     val mouseX = e.x
+                    // Start from the left boundary of the target region
                     var currentX = targetRegion.x
 
                     // Handle "Test this code"
@@ -99,6 +98,7 @@ class EnhancedClickableInlayRenderer(
                     currentX = testEndXLocal + padding
 
                     if (isOptionsExpanded) {
+                        // Handle expanded options
                         val optionsStartX = currentX
                         val optionsArrowWidth = fontMetrics.stringWidth("Options ->")
                         currentX += optionsArrowWidth + padding
@@ -110,14 +110,14 @@ class EnhancedClickableInlayRenderer(
                             }
                             currentX = optionEndX + padding
                         }
-                        // Check if "Options ->" is clicked (to collapse)
+                        // If no option is clicked, check if "Options ->" is clicked to collapse
                         if (mouseX in optionsStartX until (optionsStartX + optionsArrowWidth)) {
                             isOptionsExpanded = false
                             editor.contentComponent.repaint()
                             return
                         }
                     } else {
-                        // Handle "Options"
+                        // Handle "Options" click to expand
                         if (mouseX in currentX until (currentX + fontMetrics.stringWidth("Options"))) {
                             isOptionsExpanded = true
                             editor.contentComponent.repaint()
@@ -126,6 +126,7 @@ class EnhancedClickableInlayRenderer(
                 }
             }
         }
+        // Do not remove existing mouse listeners to avoid affecting other inlays.
         editor.contentComponent.addMouseListener(mouseListener)
     }
 }

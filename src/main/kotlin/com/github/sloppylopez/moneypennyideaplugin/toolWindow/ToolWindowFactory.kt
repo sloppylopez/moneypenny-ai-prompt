@@ -37,7 +37,7 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
             fileOpenListener.register()
 
             // Apply inlays or markers for existing open files
-            applyInlaysToOpenFiles(project)
+//            applyInlaysToOpenFiles(project)
         } catch (e: Exception) {
             thisLogger().error("Error in createToolWindowContent: ${e.stackTraceToString()}")
         }
