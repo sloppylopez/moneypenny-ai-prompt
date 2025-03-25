@@ -7,7 +7,7 @@ import com.intellij.openapi.util.IconLoader
 import com.intellij.psi.PsiElement
 import org.intellij.markdown.MarkdownTokenTypes
 import javax.swing.Icon
-
+//findme
 internal class MarkdownLineMarkerProvider : LineMarkerProvider {
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
