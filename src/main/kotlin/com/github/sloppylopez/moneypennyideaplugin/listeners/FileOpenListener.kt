@@ -45,7 +45,7 @@ class FileOpenListener(private val project: Project) {
                 return@invokeLater
             }
 
-            SimpleInlayManager().addEnhancedInlaysAboveClasses(editor)
+            SimpleInlayManager().addEnhancedInlays(editor)
 
             editorsWithInlays.add(editor) // Mark this editor as having an inlay
             thisLogger().info("Clickable inlay added to editor.")
