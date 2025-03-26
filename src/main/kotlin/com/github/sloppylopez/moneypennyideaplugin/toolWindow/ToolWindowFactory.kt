@@ -4,6 +4,7 @@ import com.github.sloppylopez.moneypennyideaplugin.actions.PopUpHooverAction
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeActionConcat
 import com.github.sloppylopez.moneypennyideaplugin.actions.SendToPromptFileFolderTreeActionParallel
 import com.github.sloppylopez.moneypennyideaplugin.helper.ToolWindowHelper.Companion.addTabbedPaneToToolWindow
+import com.github.sloppylopez.moneypennyideaplugin.listeners.FileOpenListener
 import com.intellij.openapi.application.ApplicationActivationListener
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -27,6 +28,10 @@ class ToolWindowFactory : ToolWindowFactory, ApplicationActivationListener {
 
             // Add the tabbed pane to the tool window
             addTabbedPaneToToolWindow(project)
+
+            // Register file open listener for applying inlays
+            val fileOpenListener = FileOpenListener(project)
+            fileOpenListener.register()
 
         } catch (e: Exception) {
             thisLogger().error("Error in createToolWindowContent: ${e.stackTraceToString()}")

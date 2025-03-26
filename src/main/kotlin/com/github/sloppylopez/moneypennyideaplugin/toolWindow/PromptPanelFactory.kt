@@ -40,7 +40,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
     ) {
         try {
             prePromptTextArea = textAreaFactory
-                .createDefaultTextArea("", 2, 40)
+                .createDefaultTextArea("", 1, 40)
             prePromptTextArea!!.font = UIManager.getFont("List.font") // Set font size 12
             contentPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
@@ -53,7 +53,7 @@ class PromptPanelFactory(project: Project) : DropTargetAdapter() {
             postPromptTextArea = textAreaFactory
                 .createDefaultTextArea(
                     "",
-                    4,
+                    3,
                     40,
                     "images/moneypenny-ai-mid.png"
                 )

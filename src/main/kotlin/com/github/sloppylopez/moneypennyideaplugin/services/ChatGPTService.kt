@@ -124,11 +124,18 @@ class ChatGPTService(project: Project) {
     }
 
     private fun getMaxTokenCountPerEngine(promptLength: Int): Int {
+        // Calculate tokens used by system messages and the prompt
+        val usedTokens = GlobalData.refactorMachineRolePromptDescription.length +
+                GlobalData.virtuousCircleRolePromptDescription.length +
+                promptLength
+
         return when (GlobalData.engine) {
-            "gpt-3.5-turbo-16k" -> 16384 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
-            "gpt-4-32k" -> 32768 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
-            "gpt-4" -> 8192 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
-            else -> 4096 - 1 - GlobalData.refactorMachineRolePromptDescription.length - GlobalData.virtuousCircleRolePromptDescription.length - promptLength
+            "gpt-3.5-turbo-16k" -> 16384 - 1 - usedTokens
+            "gpt-4-32k" -> 32768 - 1 - usedTokens
+            "gpt-4" -> 8192 - 1 - usedTokens
+            "o3-mini-high" -> 16384 - 1 - usedTokens  // adjust this token limit if needed
+            "o3-mini" -> 16384 - 1 - usedTokens         // another new model, update as required
+            else -> 4096 - 1 - usedTokens
         }
     }
 

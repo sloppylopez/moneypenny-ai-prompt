@@ -1,5 +1,5 @@
 class DummyKotlinFile {
     fun dummyFunction() {
-        println("Hello World!")
+        println("Hello kotlin!")
     }
 }
