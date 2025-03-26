@@ -3,17 +3,17 @@ package com.github.sloppylopez.moneypennyideaplugin.inlay
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorCustomElementRenderer
 import com.intellij.openapi.editor.Inlay
+import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.markup.TextAttributes
-import java.awt.Color
-import java.awt.Font
-import java.awt.Graphics
-import java.awt.Rectangle
+import com.intellij.openapi.util.TextRange
+import java.awt.*
 import java.awt.event.MouseEvent
 
 class EnhancedClickableInlayRenderer(
     private val editor: Editor,
     private val onTestClick: () -> Unit,
-    private val onOptionClick: (String) -> Unit
+    private val onOptionClick: (String) -> Unit,
+    private val offset: Int
 ) : EditorCustomElementRenderer {
 
     private var isOptionsExpanded = false
@@ -21,24 +21,27 @@ class EnhancedClickableInlayRenderer(
     private val optionsList = listOf("Security Check", "Improve", "Explain", "Docstring")
 
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
-        val fontMetrics = editor.contentComponent.getFontMetrics(
-            editor.colorsScheme.getFont(com.intellij.openapi.editor.colors.EditorFontType.PLAIN)
-        )
+        val fontMetrics = getFontMetrics()
         val baseText = if (isOptionsExpanded) {
             "Test this code | Options -> ${optionsList.joinToString(", ")}"
         } else {
             "Test this code | Options"
         }
-        return fontMetrics.stringWidth(baseText) + padding
+        return getIndentationWidth() + fontMetrics.stringWidth(baseText) + padding
     }
 
-    override fun paint(inlay: Inlay<*>, g: Graphics, targetRegion: Rectangle, textAttributes: TextAttributes) {
+    override fun paint(
+        inlay: Inlay<*>,
+        g: Graphics,
+        targetRegion: Rectangle,
+        textAttributes: TextAttributes
+    ) {
         val font = Font("Arial", Font.BOLD, editor.colorsScheme.editorFontSize)
         g.font = font
-
         val fontMetrics = g.fontMetrics
         val ascent = fontMetrics.ascent
-        var currentX = targetRegion.x
+
+        var currentX = targetRegion.x + getIndentationWidth()
 
         g.color = Color.BLUE
         g.drawString("Test this code", currentX, targetRegion.y + ascent)
@@ -58,13 +61,10 @@ class EnhancedClickableInlayRenderer(
     }
 
     fun handleClick(e: MouseEvent) {
-        val g = editor.contentComponent.graphics
-        val font = Font("Arial", Font.BOLD, editor.colorsScheme.editorFontSize)
-        g.font = font
-        val fontMetrics = g.fontMetrics
+        val fontMetrics = getFontMetrics()
 
-        var currentX = 0
-        val testEndX = fontMetrics.stringWidth("Test this code")
+        var currentX = getIndentationWidth()
+        val testEndX = currentX + fontMetrics.stringWidth("Test this code")
         if (e.x in currentX until testEndX) {
             onTestClick()
             return
@@ -72,13 +72,14 @@ class EnhancedClickableInlayRenderer(
         currentX = testEndX + padding
 
         if (isOptionsExpanded) {
-            val optionsArrowWidth = fontMetrics.stringWidth("Options ->")
-            if (e.x in currentX until (currentX + optionsArrowWidth)) {
+            val arrowWidth = fontMetrics.stringWidth("Options ->")
+            val optionsStartX = currentX - arrowWidth - padding
+            if (e.x in optionsStartX until currentX) {
                 isOptionsExpanded = false
                 editor.contentComponent.repaint()
                 return
             }
-            currentX += optionsArrowWidth + padding
+            currentX += arrowWidth + padding
 
             for (option in optionsList) {
                 val optionWidth = fontMetrics.stringWidth(option)
@@ -96,4 +97,36 @@ class EnhancedClickableInlayRenderer(
             }
         }
     }
+
+    private fun getFontMetrics(): FontMetrics {
+        return editor.contentComponent.getFontMetrics(
+            editor.colorsScheme.getFont(EditorFontType.PLAIN)
+        )
+    }
+
+    private fun getIndentationWidth(): Int {
+        val document = editor.document
+        val lineNumber = document.getLineNumber(offset)
+        val lineStartOffset = document.getLineStartOffset(lineNumber)
+
+        // Get the text from the start of the line up to the element
+        val rawIndent = document.getText(TextRange(lineStartOffset, offset))
+        val leadingWhitespace = rawIndent.takeWhile { it == ' ' || it == '\t' }
+
+        val fontMetrics = getFontMetrics()
+
+        // Compute total width of spaces and tabs
+        return leadingWhitespace.sumOf {
+            if (it == '\t') getTabWidthInPixels(fontMetrics)
+            else fontMetrics.charWidth(' ')
+        }
+    }
+
+    private fun getTabWidthInPixels(fontMetrics: FontMetrics): Int {
+        // Most IntelliJ editors default to 4 spaces per tab, but you can make this dynamic later
+        val tabSizeInSpaces = 4
+        return tabSizeInSpaces * fontMetrics.charWidth(' ')
+    }
+
+
 }

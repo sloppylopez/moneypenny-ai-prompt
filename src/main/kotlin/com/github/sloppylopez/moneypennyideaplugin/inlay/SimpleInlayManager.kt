@@ -56,7 +56,8 @@ class SimpleInlayManager {
                             "Option Action",
                             Messages.getInformationIcon()
                         )
-                    }
+                    },
+                    offset = offset
                 )
             )
         }
@@ -92,7 +93,8 @@ class SimpleInlayManager {
                             "Option Action",
                             Messages.getInformationIcon()
                         )
-                    }
+                    },
+                    offset = offset
                 )
             )
         }
